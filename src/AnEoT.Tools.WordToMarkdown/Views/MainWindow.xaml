@@ -89,7 +89,7 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <TextBlock Margin="0,0,0,5" Text="预览" />
+                <TextBlock Margin="0,0,0,5" Text="预览（不一定准确）" />
                 <mdXaml:MarkdownScrollViewer
                     Grid.Row="1"
                     BorderBrush="SkyBlue"

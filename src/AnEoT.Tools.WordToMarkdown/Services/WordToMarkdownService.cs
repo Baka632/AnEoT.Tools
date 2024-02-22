@@ -1,4 +1,4 @@
-﻿// TODO: 这里的代码一团糟，以后一定要重构
+﻿// TODO: 这里的代码一团糟，以后一定要重构 2024/2/22 By Baka632
 
 using System.Text;
 using DocumentFormat.OpenXml;
@@ -15,12 +15,38 @@ public static class WordToMarkdownService
 
         MainDocumentPart? mainDocumentPart = document.MainDocumentPart;
 
-        if (mainDocumentPart is not null)
+        if (mainDocumentPart is not null && mainDocumentPart.Document.Body is not null)
         {
-            foreach (OpenXmlElement element in mainDocumentPart.Document.Body ?? [])
+            IEnumerable<HyperlinkRelationship> hyperlinkRelationships = mainDocumentPart.HyperlinkRelationships;
+            #region 准备有序列表与无序列表的相关数据
+            Numbering? numbering = mainDocumentPart.NumberingDefinitionsPart?.Numbering;
+            Dictionary<int, List<Paragraph>> numberingIdToParagraphMapping = [];
+
+            if (numbering != null)
+            {
+                foreach (Paragraph para in mainDocumentPart.Document.Body.Descendants<Paragraph>())
+                {
+                    if (para?.ParagraphProperties?.NumberingProperties?.NumberingId?.Val is not null)
+                    {
+                        int id = para.ParagraphProperties.NumberingProperties.NumberingId.Val.Value;
+                        if (numberingIdToParagraphMapping.TryGetValue(id, out List<Paragraph>? list))
+                        {
+                            list.Add(para);
+                        }
+                        else
+                        {
+                            numberingIdToParagraphMapping[id] = [para];
+                        }
+                    }
+                }
+            }
+            #endregion
+
+            foreach (OpenXmlElement element in mainDocumentPart.Document.Body)
             {
                 if (element is Paragraph paragraph)
                 {
+                    bool shouldAppendAdditonalLineBreak = true;
                     ParagraphProperties? paraProp = paragraph.ParagraphProperties;
 
                     #region 读取段落样式
@@ -37,13 +63,16 @@ public static class WordToMarkdownService
                     #region 写 Markdown 相关的东西
 
                     #region Markdown 标题
+                    bool isHeader = false;
                     if (paraProp?.OutlineLevel?.Val != null)
                     {
                         WriteMarkdownHeaderByOutlineLevel(stringBuilder, paraProp.OutlineLevel);
+                        isHeader = true;
                     }
                     else if (paraStyle is not null && paraStyle?.StyleParagraphProperties?.OutlineLevel is not null)
                     {
                         WriteMarkdownHeaderByOutlineLevel(stringBuilder, paraStyle.StyleParagraphProperties.OutlineLevel);
+                        isHeader = true;
                     }
                     #endregion
 
@@ -52,21 +81,67 @@ public static class WordToMarkdownService
                     bool isStrike = false;
                     bool isItalic = false;
                     bool isUnderline = false;
-                    if (paraProp?.ParagraphMarkRunProperties is not null)
+
+                    if (isHeader != true)
                     {
-                        DetermineRunPropertiesByChildElement(paraProp.ParagraphMarkRunProperties.ChildElements,
-                                                             ref isBold,
-                                                             ref isStrike,
-                                                             ref isItalic,
-                                                             ref isUnderline);
+                        if (paraProp?.ParagraphMarkRunProperties is not null)
+                        {
+                            DetermineRunPropertiesByChildElement(paraProp.ParagraphMarkRunProperties.ChildElements,
+                                                                 ref isBold,
+                                                                 ref isStrike,
+                                                                 ref isItalic,
+                                                                 ref isUnderline);
+                        }
+                        else if (paraStyle is not null && paraStyle?.StyleRunProperties is not null)
+                        {
+                            DetermineRunPropertiesByChildElement(paraStyle.StyleRunProperties.ChildElements,
+                                                                 ref isBold,
+                                                                 ref isStrike,
+                                                                 ref isItalic,
+                                                                 ref isUnderline);
+                        }
                     }
-                    else if (paraStyle is not null && paraStyle?.StyleRunProperties is not null)
+                    #endregion
+
+                    #region 无序列表 + 有序列表
+                    if (numbering is not null && paraProp?.NumberingProperties is not null)
                     {
-                        DetermineRunPropertiesByChildElement(paraStyle.StyleRunProperties.ChildElements,
-                                                             ref isBold,
-                                                             ref isStrike,
-                                                             ref isItalic,
-                                                             ref isUnderline);
+                        NumberingProperties numberingProps = paraProp.NumberingProperties;
+                        NumberingId? numId = numberingProps.NumberingId;
+                        NumberingLevelReference? numLevelRef = numberingProps.NumberingLevelReference;
+
+                        NumberingInstance? numInstance = numbering.Descendants<NumberingInstance>().FirstOrDefault(instance => instance.NumberID == numId?.Val);
+                        if (numInstance != null)
+                        {
+                            AbstractNumId? absNumId = numInstance.GetFirstChild<AbstractNumId>();
+                            AbstractNum? absNum = numbering.OfType<AbstractNum>().FirstOrDefault(absNum => absNum.AbstractNumberId == absNumId?.Val);
+                            if (absNum != null)
+                            {
+                                Level? level = absNum.OfType<Level>().FirstOrDefault(lvl => lvl.LevelIndex == numLevelRef?.Val);
+                                EnumValue<NumberFormatValues>? formatVal = level?.NumberingFormat?.Val;
+
+                                if (formatVal is not null)
+                                {
+                                    NumberFormatValues format = formatVal.Value;
+
+                                    if (format == NumberFormatValues.Bullet)
+                                    {
+                                        stringBuilder.Append("- ");
+                                        shouldAppendAdditonalLineBreak = false;
+                                    }
+                                    else if (numberingIdToParagraphMapping is not null && numId?.Val is not null)
+                                    {
+                                        List<Paragraph> list = numberingIdToParagraphMapping[numId.Val.Value];
+                                        int index = list.IndexOf(paragraph);
+                                        if (index != -1)
+                                        {
+                                            stringBuilder.Append($"{index + 1}. ");
+                                            shouldAppendAdditonalLineBreak = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     #endregion
 
@@ -94,9 +169,9 @@ public static class WordToMarkdownService
                         stringBuilder.Append("**");
                     }
 
-                    foreach (Run run in paragraph.Descendants<Run>())
+                    foreach (OpenXmlElement? ele in paragraph)
                     {
-                        if (run is not null)
+                        if (ele is Run run)
                         {
                             string? colorHex = run.RunProperties?.Color?.Val?.Value;
 
@@ -111,6 +186,13 @@ public static class WordToMarkdownService
                             {
                                 stringBuilder.Append("</span>");
                             }
+                        }
+                        else if (ele is Hyperlink hyperlink)
+                        {
+                            stringBuilder.Append($"[{hyperlink.InnerText}]");
+
+                            string? link = hyperlinkRelationships.FirstOrDefault(relation => relation.Id == hyperlink.Id)?.Uri?.ToString();
+                            stringBuilder.Append($"({link})");
                         }
                     }
 
@@ -166,7 +248,10 @@ public static class WordToMarkdownService
                     }
                     #endregion
 
-                    stringBuilder.AppendLine();
+                    if (shouldAppendAdditonalLineBreak)
+                    {
+                        stringBuilder.AppendLine();
+                    }
                 }
 
                 stringBuilder.AppendLine();
@@ -214,7 +299,7 @@ public static class WordToMarkdownService
 
         if (outlineLevel.Val != null && outlineLevel.Val.Value != 9)
         {
-            IEnumerable<char> paraIndicators = Enumerable.Repeat('#', outlineLevel.Val.Value + 1);
+            IEnumerable<char> paraIndicators = Enumerable.Repeat('#', outlineLevel.Val.Value + 2);
 
             string paraIndicator = new(paraIndicators.ToArray());
             writer.Append($"{paraIndicator} ");
