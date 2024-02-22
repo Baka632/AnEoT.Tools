@@ -120,23 +120,31 @@ public static class WordToMarkdownService
                                 Level? level = absNum.OfType<Level>().FirstOrDefault(lvl => lvl.LevelIndex == numLevelRef?.Val);
                                 EnumValue<NumberFormatValues>? formatVal = level?.NumberingFormat?.Val;
 
-                                if (formatVal is not null)
+                                if (formatVal is not null && numId?.Val?.Value is not null)
                                 {
                                     NumberFormatValues format = formatVal.Value;
+                                    List<Paragraph> list = numberingIdToParagraphMapping[numId.Val.Value];
 
                                     if (format == NumberFormatValues.Bullet)
                                     {
                                         stringBuilder.Append("- ");
-                                        shouldAppendAdditonalLineBreak = false;
+
+                                        if (list.LastOrDefault() != paragraph)
+                                        {
+                                            shouldAppendAdditonalLineBreak = false;
+                                        }
                                     }
-                                    else if (numberingIdToParagraphMapping is not null && numId?.Val is not null)
+                                    else
                                     {
-                                        List<Paragraph> list = numberingIdToParagraphMapping[numId.Val.Value];
                                         int index = list.IndexOf(paragraph);
                                         if (index != -1)
                                         {
                                             stringBuilder.Append($"{index + 1}. ");
-                                            shouldAppendAdditonalLineBreak = false;
+
+                                            if (list.LastOrDefault() != paragraph)
+                                            {
+                                                shouldAppendAdditonalLineBreak = false;
+                                            }
                                         }
                                     }
                                 }
