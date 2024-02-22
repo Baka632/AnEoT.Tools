@@ -183,14 +183,14 @@ public static class WordToMarkdownService
                         {
                             string? colorHex = run.RunProperties?.Color?.Val?.Value;
 
-                            if (colorHex is not null)
+                            if (colorHex is not null && !colorHex.Equals("auto", StringComparison.OrdinalIgnoreCase))
                             {
                                 stringBuilder.Append($"""<span style="color:#{colorHex}">""");
                             }
 
                             stringBuilder.Append(run.InnerText);
 
-                            if (colorHex is not null)
+                            if (colorHex is not null && !colorHex.Equals("auto", StringComparison.OrdinalIgnoreCase))
                             {
                                 stringBuilder.Append("</span>");
                             }
