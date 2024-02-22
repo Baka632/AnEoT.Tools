@@ -72,10 +72,17 @@ public sealed partial class MainViewModel : ObservableObject
 
         if (isOk == true)
         {
-            using StreamWriter writer = File.CreateText(dialog.FileName);
-            await writer.WriteAsync(MarkdownString);
+            try
+            {
+                using StreamWriter writer = File.CreateText(dialog.FileName);
+                await writer.WriteAsync(MarkdownString);
 
-            MessageBox.Show("保存成功。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("保存成功。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"出现未知错误。\n{ex}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
