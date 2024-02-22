@@ -3,6 +3,12 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:AnEoT.Tools.WordToMarkdown"
+    xmlns:mdhtml="clr-namespace:MdXaml.Html;assembly=MdXaml.Html"
+    xmlns:mdplug="clr-namespace:MdXaml.Plugins;assembly=MdXaml.Plugins"
     StartupUri="/Views/MainWindow.xaml">
-    <Application.Resources />
+    <Application.Resources>
+        <mdplug:MdXamlPlugins x:Key="MdXamlPlugins">
+            <mdhtml:HtmlPluginSetup />
+        </mdplug:MdXamlPlugins>
+    </Application.Resources>
 </Application>

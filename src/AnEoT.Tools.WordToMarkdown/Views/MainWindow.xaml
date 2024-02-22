@@ -12,6 +12,11 @@
     Height="450"
     d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
     mc:Ignorable="d">
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding OpenWordAndStartLoadingCommand}" Gesture="Ctrl+O" />
+        <KeyBinding Command="{Binding SaveMarkdownCommand}" Gesture="Ctrl+S" />
+    </Window.InputBindings>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
