@@ -35,7 +35,7 @@ public sealed partial class MainViewModel : ObservableObject
                 using WordprocessingDocument doc = WordprocessingDocument.Open(dialog.FileName, false);
                 string markdown = WordToMarkdownService.GetMarkdown(doc);
 
-                if (markdown.Length > 20000)
+                if (markdown.Length > 100000)
                 {
                     MarkdownString = "解析出来的 Markdown 文档太长，预览已禁用。\n\n不过，您仍可以保存 Markdown 文档。";
 #pragma warning disable MVVMTK0034
