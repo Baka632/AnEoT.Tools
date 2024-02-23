@@ -290,14 +290,15 @@ public static class WordToMarkdownService
         {
             classList.Add(".aright");
         }
-        else if (justification == JustificationValues.Left)
-        {
-            classList.Add(".aleft");
-        }
         else if (justification == JustificationValues.Center)
         {
             classList.Add(".centering");
         }
+        // 一般情况下，不需要加这个东西
+        //else if (justification == JustificationValues.Left)
+        //{
+        //    classList.Add(".aleft");
+        //}
     }
 
     private static void WriteMarkdownHeaderByOutlineLevel(StringBuilder writer, OutlineLevel outlineLevel)

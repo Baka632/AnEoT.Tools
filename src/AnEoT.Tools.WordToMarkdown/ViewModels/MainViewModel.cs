@@ -16,7 +16,7 @@ public sealed partial class MainViewModel : ObservableObject
     private string markdownString = string.Empty;
 
     [RelayCommand]
-    private void OpenWordAndStartLoading()
+    private async Task OpenWordAndStartLoading()
     {
         IsLoading = true;
 
@@ -32,8 +32,11 @@ public sealed partial class MainViewModel : ObservableObject
         {
             try
             {
-                using WordprocessingDocument doc = WordprocessingDocument.Open(dialog.FileName, false);
-                string markdown = WordToMarkdownService.GetMarkdown(doc);
+                string markdown = await Task.Run(() =>
+                {
+                    using WordprocessingDocument doc = WordprocessingDocument.Open(dialog.FileName, false);
+                    return WordToMarkdownService.GetMarkdown(doc);
+                });
 
                 if (markdown.Length > 100000)
                 {
