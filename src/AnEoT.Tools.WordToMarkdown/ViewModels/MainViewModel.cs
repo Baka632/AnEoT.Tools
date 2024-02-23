@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using AnEoT.Tools.WordToMarkdown.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,6 +13,8 @@ public sealed partial class MainViewModel : ObservableObject
 {
     [ObservableProperty]
     private bool isLoading;
+    [ObservableProperty]
+    private bool isTextBoxReadOnly;
     [ObservableProperty]
     private string markdownString = string.Empty;
 
@@ -40,6 +43,7 @@ public sealed partial class MainViewModel : ObservableObject
 
                 if (markdown.Length > 100000)
                 {
+                    IsTextBoxReadOnly = true;
                     MarkdownString = "解析出来的 Markdown 文档太长，预览已禁用。\n\n不过，您仍可以保存 Markdown 文档。";
 #pragma warning disable MVVMTK0034
                     markdownString = markdown;
@@ -47,6 +51,7 @@ public sealed partial class MainViewModel : ObservableObject
                 }
                 else
                 {
+                    IsTextBoxReadOnly = false;
                     MarkdownString = markdown;
                 }
             }
@@ -98,5 +103,20 @@ public sealed partial class MainViewModel : ObservableObject
                 MessageBox.Show($"出现未知错误。\n{ex}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+    }
+
+    [RelayCommand]
+    private void AddEodTagToTextBox(TextBox textBox)
+    {
+        if (IsTextBoxReadOnly)
+        {
+            return;
+        }
+
+        ArgumentNullException.ThrowIfNull(textBox);
+
+        int caretIndex = textBox.CaretIndex;
+        MarkdownString = MarkdownString.Insert(caretIndex, "<eod />");
+        textBox.Select(caretIndex, 0);
     }
 }
