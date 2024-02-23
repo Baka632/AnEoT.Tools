@@ -1,7 +1,9 @@
 ﻿using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using AnEoT.Tools.WordToMarkdown.Services;
+using AnEoT.Tools.WordToMarkdown.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DocumentFormat.OpenXml.Packaging;
@@ -93,8 +95,9 @@ public sealed partial class MainViewModel : ObservableObject
         {
             try
             {
-                using StreamWriter writer = File.CreateText(dialog.FileName);
+                StreamWriter writer = File.CreateText(dialog.FileName);
                 await writer.WriteAsync(MarkdownString);
+                await writer.DisposeAsync();
 
                 MessageBox.Show("保存成功。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -118,5 +121,54 @@ public sealed partial class MainViewModel : ObservableObject
         int caretIndex = textBox.CaretIndex;
         MarkdownString = MarkdownString.Insert(caretIndex, "<eod />");
         textBox.Select(caretIndex, 0);
+    }
+
+    [RelayCommand]
+    private async Task AddEditorInfoToTextBox(TextBox textBox)
+    {
+        if (IsTextBoxReadOnly)
+        {
+            return;
+        }
+
+        ArgumentNullException.ThrowIfNull(textBox);
+
+        EditorsInfoDialog dialog = new();
+
+        if (dialog.ShowDialog() == true)
+        {
+            List<string> editorsInfoPart = new(3);
+            StringBuilder builder = new(50);
+
+            if (string.IsNullOrWhiteSpace(dialog.EditorString) != true)
+            {
+                editorsInfoPart.Add($"责任编辑：{dialog.EditorString}");
+            }
+            
+            if (string.IsNullOrWhiteSpace(dialog.WebsiteLayoutDesigner) != true)
+            {
+                editorsInfoPart.Add($"网页排版：{dialog.WebsiteLayoutDesigner}");
+            }
+            
+            if (string.IsNullOrWhiteSpace(dialog.Illustrator) != true)
+            {
+                editorsInfoPart.Add($"绘图：{dialog.Illustrator}");
+            }
+
+            if (editorsInfoPart.Count == 0)
+            {
+                return;
+            }
+
+            string editorInfos = string.Join('；', editorsInfoPart);
+            builder.AppendLine();
+            builder.Append($"（{editorInfos}）");
+
+            textBox.AppendText(builder.ToString());
+
+            await Task.Delay(500);
+
+            textBox.Select(MarkdownString.Length - 1, 0);
+        }
     }
 }
