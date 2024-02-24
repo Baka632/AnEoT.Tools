@@ -14,7 +14,6 @@
     SizeToContent="WidthAndHeight"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
-
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition />

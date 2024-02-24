@@ -1,0 +1,307 @@
+﻿<Window
+    x:Class="AnEoT.Tools.WordToMarkdown.Views.FrontMatterInfoDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:AnEoT.Tools.WordToMarkdown.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:AnEoT.Tools.WordToMarkdown.Models"
+    xmlns:validation="clr-namespace:AnEoT.Tools.WordToMarkdown.ValidationRules"
+    x:Name="Self"
+    Title="添加 Front Matter 信息"
+    MinWidth="300"
+    MinHeight="200"
+    d:DataContext="{d:DesignInstance Type=local:FrontMatterInfoDialog}"
+    ResizeMode="CanResize"
+    ShowInTaskbar="False"
+    SizeToContent="WidthAndHeight"
+    WindowStartupLocation="CenterOwner"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <Style x:Key="TextBoxInValidationFail" TargetType="{x:Type TextBox}">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)/ErrorContent}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer>
+            <StackPanel>
+                <GroupBox Header="基本信息">
+                    <StackPanel>
+                        <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                            <TextBlock
+                                MinWidth="53"
+                                Margin="0,0,5,0"
+                                VerticalAlignment="Center"
+                                Text="标题" />
+                            <TextBox
+                                Grid.Column="1"
+                                MinWidth="100"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Text="{Binding ArticleTitle, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                            <TextBlock
+                                MinWidth="53"
+                                Margin="0,0,5,0"
+                                VerticalAlignment="Center"
+                                Text="短标题" />
+                            <TextBox
+                                Grid.Column="1"
+                                MinWidth="100"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Text="{Binding ArticleShortTitle, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                            <TextBlock
+                                MinWidth="53"
+                                Margin="0,0,5,0"
+                                VerticalAlignment="Center"
+                                Text="作者" />
+                            <TextBox
+                                Grid.Column="1"
+                                MinWidth="100"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Text="{Binding Author, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                            <TextBlock
+                                MinWidth="53"
+                                Margin="0,0,5,0"
+                                VerticalAlignment="Center"
+                                Text="描述" />
+                            <TextBox
+                                Grid.Column="1"
+                                MinWidth="100"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Text="{Binding Description, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                            <TextBlock
+                                MinWidth="53"
+                                Margin="0,0,5,0"
+                                VerticalAlignment="Center"
+                                Text="日期" />
+                            <DatePicker
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                SelectedDate="{Binding ArticleDate}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,5">
+                            <Grid Margin="0,0,0,5" VerticalAlignment="Center">
+                                <TextBlock
+                                    Margin="0,0,5,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    Text="分类" />
+                                <Button
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Background="Transparent"
+                                    Command="{Binding AddCategoryItemCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path
+                                            MaxHeight="13"
+                                            Margin="0,0,3,0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Data="F1 M 20 9.375 L 20 10.625 L 10.625 10.625 L 10.625 20 L 9.375 20 L 9.375 10.625 L 0 10.625 L 0 9.375 L 9.375 9.375 L 9.375 0 L 10.625 0 L 10.625 9.375 Z "
+                                            Fill="Black"
+                                            Stretch="Uniform" />
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontSize="10"
+                                            Text="添加" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <ListView
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                ItemsSource="{Binding Categories}">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        <Setter Property="Padding" Value="0" />
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+
+                                <ListView.ItemTemplate>
+                                    <DataTemplate DataType="models:StringView">
+                                        <Grid HorizontalAlignment="Stretch">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBox Text="{Binding StringContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            <Button
+                                                Grid.Column="1"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Command="{Binding ElementName=Self, Path=RemoveCategoryItemCommand}"
+                                                CommandParameter="{Binding}">
+                                                <Path Data="F1 M 10.888672 10 L 17.626953 16.748047 L 16.748047 17.626953 L 10 10.888672 L 3.251953 17.626953 L 2.373047 16.748047 L 9.111328 10 L 2.373047 3.251953 L 3.251953 2.373047 L 10 9.111328 L 16.748047 2.373047 L 17.626953 3.251953 Z " Fill="Black" />
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,5">
+                            <Grid Margin="0,0,0,5" VerticalAlignment="Center">
+                                <TextBlock
+                                    Margin="0,0,5,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    Text="标签" />
+                                <Button
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Background="Transparent"
+                                    Command="{Binding AddTagItemCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path
+                                            MaxHeight="13"
+                                            Margin="0,0,3,0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Data="F1 M 20 9.375 L 20 10.625 L 10.625 10.625 L 10.625 20 L 9.375 20 L 9.375 10.625 L 0 10.625 L 0 9.375 L 9.375 9.375 L 9.375 0 L 10.625 0 L 10.625 9.375 Z "
+                                            Fill="Black"
+                                            Stretch="Uniform" />
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontSize="10"
+                                            Text="添加" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <ListView
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                ItemsSource="{Binding Tags}">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        <Setter Property="Padding" Value="0" />
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+
+                                <ListView.ItemTemplate>
+                                    <DataTemplate DataType="models:StringView">
+                                        <Grid HorizontalAlignment="Stretch">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBox Text="{Binding StringContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            <Button
+                                                Grid.Column="1"
+                                                VerticalAlignment="Center"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Command="{Binding ElementName=Self, Path=RemoveTagItemCommand}"
+                                                CommandParameter="{Binding}">
+                                                <Path Data="F1 M 10.888672 10 L 17.626953 16.748047 L 16.748047 17.626953 L 10 10.888672 L 3.251953 17.626953 L 2.373047 16.748047 L 9.111328 10 L 2.373047 3.251953 L 3.251953 2.373047 L 10 9.111328 L 16.748047 2.373047 L 17.626953 3.251953 Z " Fill="Black" />
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="额外元数据">
+                    <StackPanel>
+                        <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                            <TextBlock
+                                MinWidth="53"
+                                Margin="0,0,5,0"
+                                VerticalAlignment="Center"
+                                Text="图标字符串" />
+                            <TextBox
+                                Grid.Column="1"
+                                MinWidth="100"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Text="{Binding IconString, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                            <TextBlock
+                                MinWidth="53"
+                                Margin="0,0,5,0"
+                                VerticalAlignment="Center"
+                                Text="序号" />
+                            <TextBox
+                                x:Name="OrderTextBox"
+                                Grid.Column="1"
+                                MinWidth="100"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource TextBoxInValidationFail}">
+                                <Binding
+                                    Converter="{StaticResource Int32ToStringConverter}"
+                                    Mode="TwoWay"
+                                    Path="Order"
+                                    UpdateSourceTrigger="PropertyChanged">
+                                    <Binding.ValidationRules>
+                                        <validation:StringInInt32ValidationRule />
+                                    </Binding.ValidationRules>
+                                </Binding>
+                            </TextBox>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel
+            Grid.Row="1"
+            Margin="0,5,0,0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Orientation="Horizontal">
+            <Button
+                Width="40"
+                Height="20"
+                Margin="0,0,5,0"
+                Click="OnOkButtonClicked"
+                Content="确定"
+                IsDefault="True" />
+            <Button
+                Width="40"
+                Height="20"
+                Content="取消"
+                IsCancel="True" />
+        </StackPanel>
+    </Grid>
+
+</Window>

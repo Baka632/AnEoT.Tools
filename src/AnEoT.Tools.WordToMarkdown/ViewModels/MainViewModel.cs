@@ -1,13 +1,18 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using AnEoT.Tools.WordToMarkdown.Models;
 using AnEoT.Tools.WordToMarkdown.Services;
 using AnEoT.Tools.WordToMarkdown.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DocumentFormat.OpenXml.Packaging;
 using Microsoft.Win32;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
+using YamlDotNet.Serialization.TypeInspectors;
 
 namespace AnEoT.Tools.WordToMarkdown.ViewModels;
 
@@ -124,7 +129,7 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task AddEditorInfoToTextBox(TextBox textBox)
+    private void AddEditorInfoToTextBox(TextBox textBox)
     {
         if (IsTextBoxReadOnly)
         {
@@ -133,7 +138,10 @@ public sealed partial class MainViewModel : ObservableObject
 
         ArgumentNullException.ThrowIfNull(textBox);
 
-        EditorsInfoDialog dialog = new();
+        EditorsInfoDialog dialog = new()
+        {
+            Owner = Application.Current.MainWindow
+        };
 
         if (dialog.ShowDialog() == true)
         {
@@ -166,9 +174,41 @@ public sealed partial class MainViewModel : ObservableObject
 
             textBox.AppendText(builder.ToString());
 
-            await Task.Delay(500);
-
             textBox.Select(MarkdownString.Length - 1, 0);
+        }
+    }
+
+    [RelayCommand]
+    private void AddFrontMatterToTextBox(TextBox textBox)
+    {
+        if (IsTextBoxReadOnly)
+        {
+            return;
+        }
+
+        ArgumentNullException.ThrowIfNull(textBox);
+        FrontMatterInfoDialog dialog = new()
+        {
+            Owner = Application.Current.MainWindow
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            ArticleInfo articleInfo = dialog.FrontMatter;
+            ISerializer serializer = new SerializerBuilder()
+                .WithIndentedSequences()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+            string yamlString = serializer.Serialize(articleInfo).Trim();
+            string yamlHeader =$"""
+                ---
+                {yamlString}
+                ---
+
+                """;
+
+            MarkdownString = MarkdownString.Insert(0, yamlHeader);
+            textBox.Select(0, 0);
         }
     }
 }

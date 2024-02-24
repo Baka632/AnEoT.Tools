@@ -12,5 +12,6 @@
             <mdhtml:HtmlPluginSetup />
         </mdplug:MdXamlPlugins>
         <converter:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converter:Int32ToStringConverter x:Key="Int32ToStringConverter" />
     </Application.Resources>
 </Application>
