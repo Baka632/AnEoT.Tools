@@ -170,6 +170,7 @@ public sealed partial class MainViewModel : ObservableObject
 
             string editorInfos = string.Join('；', editorsInfoPart);
             builder.AppendLine();
+            builder.AppendLine();
             builder.Append($"（{editorInfos}）");
 
             textBox.AppendText(builder.ToString());
@@ -204,6 +205,7 @@ public sealed partial class MainViewModel : ObservableObject
                 ---
                 {yamlString}
                 ---
+
 
                 """;
 
