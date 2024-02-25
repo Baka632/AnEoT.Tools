@@ -57,7 +57,7 @@ public readonly record struct ArticleInfo
 
     [YamlMember(Order = 8, DefaultValuesHandling = DefaultValuesHandling.OmitNull)]
     /// <summary>
-    /// 页面描述
+    /// 文章描述
     /// </summary>
     public string? Description { get; init; }
 }

@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:AnEoT.Tools.WordToMarkdown"
     xmlns:mdhtml="clr-namespace:MdXaml.Html;assembly=MdXaml.Html"
     xmlns:mdplug="clr-namespace:MdXaml.Plugins;assembly=MdXaml.Plugins"
-    StartupUri="/Views/MainWindow.xaml">
+    Startup="OnStartup">
     <Application.Resources>
         <mdplug:MdXamlPlugins x:Key="MdXamlPlugins">
             <mdhtml:HtmlPluginSetup />

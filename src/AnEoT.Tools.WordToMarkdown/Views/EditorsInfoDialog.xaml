@@ -36,7 +36,7 @@
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
-                Text="{Binding EditorString, Mode=TwoWay}" />
+                Text="{Binding EditorString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
 
         <Grid Grid.Row="1">
@@ -53,7 +53,7 @@
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
-                Text="{Binding WebsiteLayoutDesigner, Mode=TwoWay}" />
+                Text="{Binding WebsiteLayoutDesigner, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
 
         <Grid Grid.Row="2">
@@ -70,7 +70,7 @@
                 Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
-                Text="{Binding Illustrator, Mode=TwoWay}" />
+                Text="{Binding Illustrator, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
 
         <StackPanel

@@ -11,6 +11,7 @@
     Title="Word to Markdown for AnEoT"
     Width="800"
     Height="450"
+    MinWidth="300"
     d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
     mc:Ignorable="d">
     <Window.InputBindings>
@@ -97,7 +98,7 @@
                         <TextBlock
                             Margin="5,0,0,0"
                             VerticalAlignment="Center"
-                            Text="插入文编" />
+                            Text="插入文编信息" />
                     </StackPanel>
                 </Button>
             </ToolBar>

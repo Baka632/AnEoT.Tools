@@ -1,57 +1,33 @@
 ﻿using System.Windows;
+using AnEoT.Tools.WordToMarkdown.Models;
+using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace AnEoT.Tools.WordToMarkdown.Views
+namespace AnEoT.Tools.WordToMarkdown.Views;
+
+[INotifyPropertyChanged]
+/// <summary>
+/// EditorsInfoDialog.xaml 的交互逻辑
+/// </summary>
+public partial class EditorsInfoDialog : Window
 {
-    /// <summary>
-    /// EditorsInfoDialog.xaml 的交互逻辑
-    /// </summary>
-    public partial class EditorsInfoDialog : Window
+    public EditorsInfo EditorsInfo { get; internal set; }
+
+    [ObservableProperty]
+    private string editorString = string.Empty;
+    [ObservableProperty]
+    public string websiteLayoutDesigner = string.Empty;
+    [ObservableProperty]
+    private string illustrator = string.Empty;
+
+    public EditorsInfoDialog()
     {
-        public static readonly DependencyProperty EditorStringProperty =
-            DependencyProperty.Register("EditorString",
-                                        typeof(string),
-                                        typeof(EditorsInfoDialog),
-                                        new PropertyMetadata(string.Empty));
+        DataContext = this;
+        InitializeComponent();
+    }
 
-        public static readonly DependencyProperty WebsiteLayoutDesignerProperty =
-            DependencyProperty.Register("WebsiteLayoutDesigner",
-                                        typeof(string),
-                                        typeof(EditorsInfoDialog),
-                                        new PropertyMetadata(string.Empty));
-
-        public static readonly DependencyProperty IllustratorProperty =
-            DependencyProperty.Register("Illustrator",
-                                        typeof(string),
-                                        typeof(EditorsInfoDialog),
-                                        new PropertyMetadata(string.Empty));
-
-        public string EditorString
-        {
-            get => (string)GetValue(EditorStringProperty);
-            set => SetValue(EditorStringProperty, value);
-        }
-
-        public string WebsiteLayoutDesigner
-        {
-            get => (string)GetValue(WebsiteLayoutDesignerProperty);
-            set => SetValue(WebsiteLayoutDesignerProperty, value);
-        }
-
-        public string Illustrator
-        {
-            get => (string)GetValue(IllustratorProperty);
-            set => SetValue(IllustratorProperty, value);
-        }
-
-        public EditorsInfoDialog()
-        {
-            DataContext = this;
-            InitializeComponent();
-        }
-
-        private void OnOkButtonClicked(object sender, RoutedEventArgs e)
-        {
-            DialogResult = true;
-        }
+    private void OnOkButtonClicked(object sender, RoutedEventArgs e)
+    {
+        EditorsInfo = new EditorsInfo(EditorString, WebsiteLayoutDesigner, Illustrator);
+        DialogResult = true;
     }
 }
