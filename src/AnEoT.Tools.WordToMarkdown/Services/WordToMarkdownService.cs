@@ -239,7 +239,7 @@ public static class WordToMarkdownService
                     }
                     #endregion
 
-                    if (classList.Count != 0)
+                    if (classList.Count != 0 && string.IsNullOrWhiteSpace(paragraph.InnerText) != true)
                     {
                         stringBuilder.Append('{');
 
