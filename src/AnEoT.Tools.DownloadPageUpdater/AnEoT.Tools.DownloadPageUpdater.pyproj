@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>8f21a481-8494-4273-a531-62fba13bf13d</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>AnEoT.Tools.DownloadPageUpdater.py</StartupFile>
+    <StartupFile>download_page_ppdater.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,7 +22,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AnEoT.Tools.DownloadPageUpdater.py" />
+    <Compile Include="download_page_ppdater.py" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">
