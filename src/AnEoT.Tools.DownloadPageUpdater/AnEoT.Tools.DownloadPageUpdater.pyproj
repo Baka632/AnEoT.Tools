@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>8f21a481-8494-4273-a531-62fba13bf13d</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>download_page_updater.py</StartupFile>
+    <StartupFile>main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -12,6 +12,10 @@
     <Name>AnEoT.Tools.DownloadPageUpdater</Name>
     <RootNamespace>AnEoT.Tools.DownloadPageUpdater</RootNamespace>
     <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <CommandLineArguments>
+    </CommandLineArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,7 +26,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="download_page_updater.py" />
+    <Compile Include="main.py" />
     <Compile Include="markdown_writer.py" />
   </ItemGroup>
   <ItemGroup>

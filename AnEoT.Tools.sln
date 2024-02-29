@@ -7,6 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnEoT.Tools.WordToMarkdown"
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "AnEoT.Tools.DownloadPageUpdater", "src\AnEoT.Tools.DownloadPageUpdater\AnEoT.Tools.DownloadPageUpdater.pyproj", "{8F21A481-8494-4273-A531-62FBA13BF13D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Soultion Files", "Soultion Files", "{F57FE41F-AA89-4E71-B963-5ED52A5C8A68}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -21,3 +21,4 @@ def appendDownloadTableToFile(path: str, issueTitle: str, singlePagePdfFileName:
         
         downloadMarkdownFile.seek(0)
         downloadMarkdownFile.writelines(markdownLines);
+        print(f"成功将信息写入到 {path} 中")
