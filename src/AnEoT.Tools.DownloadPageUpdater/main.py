@@ -8,11 +8,10 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("--lanzou-ylogin", type=str, required=True, help="用于蓝奏云网盘登陆，此项位于 woozooo.com -> Cookie -> ylogin")
     parser.add_argument("--lanzou-phpdisk-info", type=str, required=True, help="用于蓝奏云网盘登陆，此项位于 pc.woozooo.com -> Cookie -> phpdisk_info")
     parser.add_argument("--lanzou-target-folder-path", type=str, help="蓝奏云网盘中，用于保存上传文件的文件夹目标路径，这应当是一个相对路径")
-    parser.add_argument("--lanzou-user-id", type=str, required=True, help="蓝奏云网盘的用户 ID")
     parser.add_argument("--lanzou-share-folder-password", type=str, required=True, help="蓝奏云共享文件夹的密码")
-    parser.add_argument("--single-page-file-name", type=str, required=True, help="单页文件名")
+    parser.add_argument("--single-page-file-name", type=str, required=True, help="单页文件名，此参数不涉及到蓝奏云网盘，只用于写入到 download.md 文件中")
     parser.add_argument("--folder-path", type=str, required=True, help="要上传到蓝奏云网盘的文件夹路径")
-    parser.add_argument("--issue-title", type=str, required=True, help="期刊名称")
+    parser.add_argument("--issue-title", type=str, required=True, help="期刊名称，此参数不涉及到蓝奏云网盘，只用于写入到 download.md 文件中")
     parser.add_argument("--download-md-path", type=str, required=True, help="download.md 文件的路径")
     return parser
 
