@@ -68,7 +68,7 @@ if  __name__ == "__main__":
     if lzy.set_passwd(parent_id, args.lanzou_share_folder_password, False) != LanZouCloud.SUCCESS:
         print("警告：设置自定义文件夹密码失败")
     share_info = lzy.get_share_info(parent_id, False)
-    print(f"上传信息：\n文件名：{share_info.name}\n共享链接：{share_info.url}\n密码：{share_info.pwd}")
+    print(f"上传信息：\n文件夹名：{share_info.name}\n共享链接：{share_info.url}\n密码：{share_info.pwd}")
     if share_info.pwd != args.lanzou_share_folder_password:
         print("警告：实际的共享密码与预先指定的密码不同")
         print(f"预先指定的密码为：{args.lanzou_share_folder_password}")
