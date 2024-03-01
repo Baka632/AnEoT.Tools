@@ -1,7 +1,7 @@
 ﻿namespace AnEoT.Tools.WordToMarkdown.Models;
 
 /// <summary>
-/// 表示文章相关编辑者信息的类
+/// 表示文章相关编辑者信息的结构
 /// </summary>
 /// <param name="Editor">责任编辑名称</param>
 /// <param name="WebsiteLayoutDesigner">网页排版者名称</param>
