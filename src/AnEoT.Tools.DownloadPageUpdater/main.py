@@ -20,7 +20,7 @@ def parse_config(cfg_path: str) -> tuple[str, str]:
         return ("", "")
 
 def create_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(epilog="Download page updater for AnEoT", description="一个自动将 PDF 文件上传到指定位置，并自动更新 download.md 的程序")
+    parser = argparse.ArgumentParser(epilog="Download page updater for AnEoT\nEureka, my beloved ——Baka632", description="一个自动将 PDF 文件上传到指定位置，并自动更新 download.md 的程序")
     
     no_config_group = parser.add_argument_group("不带配置文件")
     no_config_group.add_argument("--lanzou-ylogin", default="", type=str, help="用于蓝奏云网盘登陆，此项位于 woozooo.com -> Cookie -> ylogin")
