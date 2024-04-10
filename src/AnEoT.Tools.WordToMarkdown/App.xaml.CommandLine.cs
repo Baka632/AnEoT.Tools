@@ -69,7 +69,6 @@ partial class App
             HideConsole();
             mainWindow.Show();
             Console.WriteLine("已加载图形界面。");
-            Console.WriteLine("Dear master, this is the greeting from CoreCLR...");
             Console.WriteLine("啊啊啊，你为什么在看这里！看图形界面，看图形界面啊！");
         }
         else if (options is CliOptions cli)
