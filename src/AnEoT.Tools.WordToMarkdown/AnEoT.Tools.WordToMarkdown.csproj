@@ -8,6 +8,7 @@
     <UseWPF>true</UseWPF>
     <DisableWinExeOutputInference>true</DisableWinExeOutputInference>
     <Deterministic>true</Deterministic>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

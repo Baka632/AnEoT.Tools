@@ -101,6 +101,19 @@
                             Text="插入文编信息" />
                     </StackPanel>
                 </Button>
+                
+                <Button Command="{Binding AddArticleQuoteToTextBoxCommand}" CommandParameter="{Binding ElementName=MarkdownTextBox}">
+                    <StackPanel Orientation="Horizontal">
+                        <Path
+                            VerticalAlignment="Center"
+                            Data="F1 M 20 1.25 L 20 2.5 L 0 2.5 L 0 1.25 Z M 20 17.5 L 0 17.5 L 0 16.25 L 20 16.25 Z M 20 10 L 0 10 L 0 8.75 L 20 8.75 Z M 15 6.25 L 0 6.25 L 0 5 L 15 5 Z M 15 13.75 L 0 13.75 L 0 12.5 L 15 12.5 Z"
+                            Fill="Black" />
+                        <TextBlock
+                            Margin="5,0,0,0"
+                            VerticalAlignment="Center"
+                            Text="添加文章引言" />
+                    </StackPanel>
+                </Button>
             </ToolBar>
         </ToolBarTray>
 
