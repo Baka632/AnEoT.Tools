@@ -25,6 +25,7 @@ public sealed partial class MainViewModel : ObservableObject
     #region 通过命令行传递的参数
     public string? WordFilePath { get; set; }
     public string? OutputFilePath { get; set; }
+    public string? ArticleQuote { get; set; }
     public ArticleInfo? FrontMatter { get; set; }
     public EditorsInfo? EditorsInfo { get; set; }
     #endregion
@@ -124,6 +125,7 @@ public sealed partial class MainViewModel : ObservableObject
                     MarkdownString += editorInfo;
                 }
             });
+            EditorsInfo = null;
             IsLoading = false;
             return;
         }
@@ -146,6 +148,75 @@ public sealed partial class MainViewModel : ObservableObject
             }
         }
     }
+    
+    [RelayCommand]
+    private async Task AddArticleQuoteToTextBox(TextBox? textBox)
+    {
+        if (IsTextBoxReadOnly)
+        {
+            return;
+        }
+        else if (string.IsNullOrWhiteSpace(ArticleQuote) != true)
+        {
+            IsLoading = true;
+            await Task.Run(() =>
+            {
+                int index = 0;
+                if (MarkdownString.StartsWith("---"))
+                {
+                    int targetIndex = MarkdownString.IndexOf("---", 3);
+                    if (targetIndex != -1)
+                    {
+                        index = targetIndex + 3;
+                    }
+                }
+
+                string value = $"""
+                {ArticleQuote.ReplaceLineEndings($"{Environment.NewLine}{Environment.NewLine}")}
+
+                <!-- more -->
+
+
+                """;
+                MarkdownString = MarkdownString.Insert(index, value);
+            });
+            IsLoading = false;
+            ArticleQuote = null;
+            return;
+        }
+
+        ArgumentNullException.ThrowIfNull(textBox);
+
+        ArticleQuoteDialog dialog = new()
+        {
+            Owner = Application.Current.MainWindow
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            if (string.IsNullOrWhiteSpace(dialog.ArticleQuote) != true)
+            {
+                string value = $"""
+                {dialog.ArticleQuote.ReplaceLineEndings($"{Environment.NewLine}{Environment.NewLine}")}
+
+                <!-- more -->
+
+
+                """;
+                int index = 0;
+                if (MarkdownString.StartsWith("---"))
+                {
+                    int targetIndex = MarkdownString.IndexOf("---", 3);
+                    if (targetIndex != -1)
+                    {
+                        index = targetIndex + 3;
+                        value = $"{Environment.NewLine}{Environment.NewLine}{value}";
+                    }
+                }
+                MarkdownString = MarkdownString.Insert(index, value);
+            }
+        }
+    }
 
     [RelayCommand]
     private async Task AddFrontMatterToTextBox(TextBox? textBox)
@@ -163,6 +234,7 @@ public sealed partial class MainViewModel : ObservableObject
                 MarkdownString = MarkdownString.Insert(0, yamlHeader);
             });
             IsLoading = false;
+            FrontMatter = null;
             return;
         }
 

@@ -27,6 +27,7 @@ partial class App
         string? iconString = options.IconString;
         string? date = options.DateString;
         string? description = options.Description;
+        string? articleQuote = options.ArticleQuote;
         int order = options.Order;
         IEnumerable<string>? categories = options.Categories;
         IEnumerable<string>? tags = options.Tag;
@@ -55,6 +56,7 @@ partial class App
             viewModel.WordFilePath = filePath;
             viewModel.EditorsInfo = editorsInfo;
             viewModel.FrontMatter = articleInfo;
+            viewModel.ArticleQuote = articleQuote;
 
             if (string.IsNullOrEmpty(filePath) != true && gui.DisableAutoStart != true)
             {
@@ -92,11 +94,7 @@ partial class App
                 Console.WriteLine("警告：指定的输出路径已存在同名文件，将覆盖目标。");
             }
 
-            string markdown = GetMarkdownString(filePath, articleInfo, editorsInfo);
-            if (cli.AutoAppendEod)
-            {
-                markdown = markdown.Insert(markdown.Length - 1, "<eod />");
-            }
+            string markdown = GetMarkdownString(filePath, articleInfo, editorsInfo, articleQuote, cli.AutoAppendEod);
 
             if (await WriteMarkdownToFile(outputPath, markdown))
             {
@@ -129,7 +127,7 @@ partial class App
         }
     }
 
-    private static string GetMarkdownString(string filePath, ArticleInfo articleInfo, EditorsInfo editorsInfo)
+    private static string GetMarkdownString(string filePath, ArticleInfo articleInfo, EditorsInfo editorsInfo, string? articleQuote, bool autoAppendEod)
     {
         string? markdown = null;
         try
@@ -155,10 +153,35 @@ partial class App
 
 
             {editorsInfo}
-            """;
+            """
+        ;
 
         StringBuilder stringBuilder = new(markdown);
         stringBuilder.Insert(0, yamlHeader);
+        if (string.IsNullOrWhiteSpace(articleQuote) != true)
+        {
+            string articleQuoteString = $"""
+
+
+                {articleQuote.ReplaceLineEndings($"{Environment.NewLine}{Environment.NewLine}")}
+
+                <!-- more -->
+
+
+                """;
+            int targetIndex = yamlHeader.IndexOf("---", 3);
+
+            if (targetIndex != -1)
+            {
+                stringBuilder.Insert(targetIndex + 3, articleQuoteString);
+            }
+        }
+
+        if (autoAppendEod)
+        {
+            stringBuilder.Insert(stringBuilder.Length - 1, "<eod />");
+        }
+
         stringBuilder.Append(editorsInfoString);
 
         return stringBuilder.ToString();
@@ -235,10 +258,10 @@ internal class CommonOptions
     [Option("date", HelpText = "以 'yyyy-MM-dd' 为格式的文章日期。")]
     public string? DateString { get; set; }
 
-    [Option("category", HelpText = "文章类别。")]
+    [Option("category", HelpText = "以空格分隔的文章类别。")]
     public IEnumerable<string>? Categories { get; set; }
 
-    [Option("tag", HelpText = "文章标签。")]
+    [Option("tag", HelpText = "以空格分隔的文章标签。")]
     public IEnumerable<string>? Tag { get; set; }
 
     [Option("order", HelpText = "文章在本期期刊的顺序。")]
@@ -257,5 +280,10 @@ internal class CommonOptions
 
     [Option("illustrator", HelpText = "绘图者名称。")]
     public string? Illustrator { get; set; }
+    #endregion
+
+    #region ArticleQuote
+    [Option("article-quote", HelpText = "文章引言。")]
+    public string? ArticleQuote { get; set; }
     #endregion
 }
