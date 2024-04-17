@@ -70,7 +70,7 @@ folderCommand.AddOption(recursiveOption);
 rootCommand.Add(singleFileCommand);
 rootCommand.Add(folderCommand);
 
-singleFileCommand.SetHandler((path, rootPath) =>
+singleFileCommand.SetHandler(async (path, rootPath) =>
 {
     appLogger.LogNormalInfomation("检查已开始...");
 
@@ -79,9 +79,17 @@ singleFileCommand.SetHandler((path, rootPath) =>
         appLogger.LogWarningInfomation("未配置根路径，检查过程可能会出现错误。");
     }
 
-    return FileChecker.CheckSingleFile(path, rootPath);
+    bool isSuccess = await FileChecker.CheckSingleFile(path, rootPath);
+    if (isSuccess)
+    {
+        appLogger.LogNormalInfomation("检查完成，未发现错误。");
+    }
+    else
+    {
+        appLogger.LogErrorInfomation("检查完成，发现错误。");
+    }
 }, pathOption, rootPathOption);
-folderCommand.SetHandler((path, rootPath, isRecursive) =>
+folderCommand.SetHandler(async (path, rootPath, isRecursive) =>
 {
     appLogger.LogNormalInfomation("检查已开始...");
 
@@ -90,11 +98,18 @@ folderCommand.SetHandler((path, rootPath, isRecursive) =>
         appLogger.LogWarningInfomation("未配置根路径，检查过程可能会出现错误。");
     }
 
-    return FolderChecker.CheckDirectory(path, rootPath, isRecursive);
+    int errorCount = await FolderChecker.CheckDirectory(path, rootPath, isRecursive);
+    if (errorCount == 0)
+    {
+        appLogger.LogNormalInfomation("检查完成，未发现错误。");
+    }
+    else
+    {
+        appLogger.LogErrorInfomation($"检查完成，发现 {errorCount} 个错误。");
+    }
 }, pathOption, rootPathOption, recursiveOption);
 
 int result = await rootCommand.InvokeAsync(args);
-appLogger.LogNormalInfomation("检查完成。");
 return result;
 
 internal sealed partial class AppLogger
@@ -104,7 +119,7 @@ internal sealed partial class AppLogger
     public AppLogger()
     {
         using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
-        ILogger logger = factory.CreateLogger("AnEoT.Tools.MarkdownChecker");
+        ILogger logger = factory.CreateLogger("主程序");
         _logger = logger;
     }
 
@@ -113,4 +128,7 @@ internal sealed partial class AppLogger
     
     [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "{msgWarning}")]
     public partial void LogWarningInfomation(string msgWarning);
+    
+    [LoggerMessage(EventId = 2, Level = LogLevel.Error, Message = "{msgError}")]
+    public partial void LogErrorInfomation(string msgError);
 }

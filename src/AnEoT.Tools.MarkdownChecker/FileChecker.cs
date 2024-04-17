@@ -6,8 +6,9 @@ namespace AnEoT.Tools.MarkdownChecker;
 
 internal sealed class FileChecker : CheckerBase
 {
-    public static async Task CheckSingleFile(string path, string? rootPath)
+    public static async Task<bool> CheckSingleFile(string path, string? rootPath)
     {
+        bool result = true;
         string markdown = await File.ReadAllTextAsync(path);
         MarkdownDocument document = Markdown.Parse(markdown, MarkdownPipeline);
 
@@ -30,11 +31,13 @@ internal sealed class FileChecker : CheckerBase
                             if (httpMessage.IsSuccessStatusCode != true)
                             {
                                 LogCannotAccessLink(Logger, path, line, urlString);
+                                result = false;
                             }
                         }
                         catch (HttpRequestException)
                         {
                             LogCannotAccessLink(Logger, path, line, urlString);
+                            result = false;
                         }
                     }
                 }
@@ -73,10 +76,13 @@ internal sealed class FileChecker : CheckerBase
                         if (!fileExt.Equals(".html", StringComparison.OrdinalIgnoreCase) || !Path.Exists(targetPath.Replace(".html", ".md")))
                         {
                             LogCannotFindFile(Logger, path, line, urlString, targetPath);
+                            result = false;
                         }
                     }
                 }
             }
         }
+
+        return result;
     }
 }
