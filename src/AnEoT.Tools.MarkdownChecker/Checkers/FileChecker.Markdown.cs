@@ -3,6 +3,7 @@ using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using AnEoT.Tools.MarkdownChecker.Models;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 
 namespace AnEoT.Tools.MarkdownChecker.Checkers;
 
@@ -116,13 +117,29 @@ partial class FileChecker
             string paragraph = rawMarkdown.Substring(inlineSpan.Start, inlineSpan.Length);
             int paraLine = para.Line + 1;
 
-            Regex regex = CheckWrongChineseQuotationMark();
+            Regex wrongDoubleQutationMark = CheckWrongDoubleChineseQuotationMark();
+            Regex wrongSingleQutationMark = CheckWrongChineseSingleQuotationMark();
+            Regex wrongQuoteStyle = CheckWrongChineseQuoteStyle();
 
-            if (regex.IsMatch(paragraph))
+            if (wrongDoubleQutationMark.IsMatch(paragraph))
             {
-                LogWrongChineseQuotationMark(Logger, path, paraLine);
+                LogWrongChineseDoubleQuotationMark(Logger, path, paraLine);
                 checkResult.WarningCount++;
             }
+
+            if (wrongSingleQutationMark.IsMatch(paragraph))
+            {
+                LogWrongChineseSingleQuotationMark(Logger, path, paraLine);
+                checkResult.WarningCount++;
+            }
+
+            // TODO: 有问题
+            /*
+            if (wrongQuoteStyle.IsMatch(paragraph))
+            {
+                LogWrongQuoteStyle(Logger, path, paraLine);
+                checkResult.WarningCount++;
+            }*/
 
             foreach (KeyValuePair<string, string> pair in WrongCorrectOperatorNamePairs)
             {
@@ -138,5 +155,31 @@ partial class FileChecker
     }
 
     [GeneratedRegex(@"(?<!.*”)”(.*)“(?!.*”)")]
-    private static partial Regex CheckWrongChineseQuotationMark();
+    private static partial Regex CheckWrongDoubleChineseQuotationMark();
+    
+    [GeneratedRegex(@"(?<!.*‘)’(.*)‘(?!.*’)")]
+    private static partial Regex CheckWrongChineseSingleQuotationMark();
+
+    [GeneratedRegex("[‘“].*[“”].*[’”]")]
+    private static partial Regex CheckWrongChineseQuoteStyle();
+
+    /* ============================================ */
+
+    [LoggerMessage(EventId = 0, Level = LogLevel.Error, Message = "{FilePath}(第 {TargetLine} 行): 无法访问链接：{Link}")]
+    public static partial void LogCannotAccessLink(ILogger logger, string filePath, int targetLine, string link);
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "{FilePath}(第 {TargetLine} 行): 找不到文件：{Link}。已尝试在以下路径中寻找：{TriedFilePath}")]
+    public static partial void LogCannotFindFile(ILogger logger, string filePath, int targetLine, string link, string triedFilePath);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：“{WrongItem}”应为“{CorrectItem}”。")]
+    public static partial void LogWrongItem(ILogger logger, string filePath, int targetLine, string WrongItem, string CorrectItem);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：双引号顺序错误（是否缺失了后引号？）")]
+    public static partial void LogWrongChineseDoubleQuotationMark(ILogger logger, string filePath, int targetLine);
+
+    [LoggerMessage(EventId = 4, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：单引号顺序错误（是否缺失了后引号？）")]
+    public static partial void LogWrongChineseSingleQuotationMark(ILogger logger, string filePath, int targetLine);
+
+    [LoggerMessage(EventId = 5, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：引号内的引号应使用单引号。")]
+    public static partial void LogWrongQuoteStyle(ILogger logger, string filePath, int targetLine);
 }
