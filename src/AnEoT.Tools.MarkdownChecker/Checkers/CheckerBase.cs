@@ -29,4 +29,10 @@ internal partial class CheckerBase
     
     [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "{FilePath}(第 {TargetLine} 行): 找不到文件：{Link}。已尝试在以下路径中寻找：{TriedFilePath}")]
     public static partial void LogCannotFindFile(ILogger logger, string filePath, int targetLine, string link, string triedFilePath);
+    
+    [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：“{WrongItem}”应为“{CorrectItem}”。")]
+    public static partial void LogWrongItem(ILogger logger, string filePath, int targetLine, string WrongItem, string CorrectItem);
+    
+    [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：中文引号顺序错误。")]
+    public static partial void LogWrongChineseQuotationMark(ILogger logger, string filePath, int targetLine);
 }

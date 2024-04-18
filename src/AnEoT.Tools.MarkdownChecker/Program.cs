@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
-using AnEoT.Tools.MarkdownChecker;
 using Microsoft.Extensions.Logging;
+using AnEoT.Tools.MarkdownChecker.Checkers;
+using AnEoT.Tools.MarkdownChecker.Models;
 
 AppLogger appLogger = new();
 
@@ -79,14 +80,18 @@ singleFileCommand.SetHandler(async (path, rootPath) =>
         appLogger.LogWarningInfomation("未配置根路径，检查过程可能会出现错误。");
     }
 
-    bool isSuccess = await FileChecker.CheckSingleFile(path, rootPath);
-    if (isSuccess)
+    CheckResult result = await FileChecker.CheckSingleFile(path, rootPath);
+    if (result.IsNoErrorOrWarning)
     {
         appLogger.LogNormalInfomation("检查完成，未发现错误。");
     }
+    else if (result.HasError)
+    {
+        appLogger.LogErrorInfomation($"检查完成，发现 {result.ErrorCount} 个错误，{result.WarningCount} 个警告。");
+    }
     else
     {
-        appLogger.LogErrorInfomation("检查完成，发现错误。");
+        appLogger.LogWarningInfomation($"检查完成，存在 {result.WarningCount} 个警告。");
     }
 }, pathOption, rootPathOption);
 folderCommand.SetHandler(async (path, rootPath, isRecursive) =>
@@ -98,14 +103,18 @@ folderCommand.SetHandler(async (path, rootPath, isRecursive) =>
         appLogger.LogWarningInfomation("未配置根路径，检查过程可能会出现错误。");
     }
 
-    int errorCount = await FolderChecker.CheckDirectory(path, rootPath, isRecursive);
-    if (errorCount == 0)
+    CheckResult result = await FolderChecker.CheckDirectory(path, rootPath, isRecursive);
+    if (result.IsNoErrorOrWarning)
     {
         appLogger.LogNormalInfomation("检查完成，未发现错误。");
     }
+    else if(result.HasError)
+    {
+        appLogger.LogErrorInfomation($"检查完成，发现 {result.ErrorCount} 个错误，{result.WarningCount} 个警告。");
+    }
     else
     {
-        appLogger.LogErrorInfomation($"检查完成，发现 {errorCount} 个错误。");
+        appLogger.LogWarningInfomation($"检查完成，存在 {result.WarningCount} 个警告。");
     }
 }, pathOption, rootPathOption, recursiveOption);
 
