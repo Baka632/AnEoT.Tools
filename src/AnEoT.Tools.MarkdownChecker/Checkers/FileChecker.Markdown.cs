@@ -21,17 +21,32 @@ partial class FileChecker
         string markdown = await File.ReadAllTextAsync(path);
         MarkdownDocument document = Markdown.Parse(markdown, MarkdownPipeline);
 
+        int imageLinkCount = 0;
         foreach (MarkdownObject obj in document.Descendants())
         {
             if (obj is LinkInline link && string.IsNullOrWhiteSpace(link.Url) != true)
             {
                 checkResult += await CheckLinkInline(link, path, rootPath);
+
+                if (link.IsImage)
+                {
+                    imageLinkCount++;
+                }
             }
             else if (obj is ParagraphBlock paragraph)
             {
-                checkResult += CheckParagraph(paragraph, path, rootPath, markdown);
+                checkResult += CheckParagraph(paragraph, path, markdown);
             }
         }
+
+        // HACK: 先禁用这个检查吧
+        /*
+        string fileName = Path.GetFileName(path);
+        if (imageLinkCount == 0 && fileName != "README.md")
+        {
+            LogNoImageInArticle(Logger, path);
+            checkResult.WarningCount++;
+        }*/
 
         return checkResult;
     }
@@ -39,6 +54,7 @@ partial class FileChecker
     private static async Task<CheckResult> CheckLinkInline(LinkInline link, string path, string? rootPath)
     {
         CheckResult checkResult = new();
+        string fileName = Path.GetFileName(path);
         string urlString = link.Url!;
         int line = link.Line + 1;
 
@@ -66,48 +82,48 @@ partial class FileChecker
         }
         else
         {
-            string targetPath;
-            if (urlString.StartsWith('/'))
-            {
-                if (rootPath is not null)
+                string targetPath;
+                if (urlString.StartsWith('/'))
                 {
-                    if (rootPath.EndsWith('/') || rootPath.EndsWith('\\'))
+                    if (rootPath is not null)
                     {
-                        rootPath = rootPath[..^1];
+                        if (rootPath.EndsWith('/') || rootPath.EndsWith('\\'))
+                        {
+                            rootPath = rootPath[..^1];
+                        }
+                        targetPath = $"{rootPath}{urlString}";
                     }
-                    targetPath = $"{rootPath}{urlString}";
+                    else
+                    {
+                        string dirName = Path.GetDirectoryName(path) ?? string.Empty;
+                        if (dirName.EndsWith('/') || dirName.EndsWith('\\'))
+                        {
+                            dirName = dirName[..^1];
+                        }
+                        targetPath = $"{dirName}{urlString}";
+                    }
                 }
                 else
                 {
                     string dirName = Path.GetDirectoryName(path) ?? string.Empty;
-                    if (dirName.EndsWith('/') || dirName.EndsWith('\\'))
-                    {
-                        dirName = dirName[..^1];
-                    }
-                    targetPath = $"{dirName}{urlString}";
+                    targetPath = Path.Combine(dirName, urlString);
                 }
-            }
-            else
-            {
-                string dirName = Path.GetDirectoryName(path) ?? string.Empty;
-                targetPath = Path.Combine(dirName, urlString);
-            }
 
-            if (Path.Exists(targetPath) != true)
-            {
-                string fileExt = Path.GetExtension(targetPath);
-                if (!fileExt.Equals(".html", StringComparison.OrdinalIgnoreCase) || !Path.Exists(targetPath.Replace(".html", ".md")))
+                if (Path.Exists(targetPath) != true && fileName != "description.md" && fileName != "subscription.md")
                 {
-                    LogCannotFindFile(Logger, path, line, urlString, targetPath);
-                    checkResult.ErrorCount++;
+                    string fileExt = Path.GetExtension(targetPath);
+                    if (!fileExt.Equals(".html", StringComparison.OrdinalIgnoreCase) || !Path.Exists(targetPath.Replace(".html", ".md")))
+                    {
+                        LogCannotFindFile(Logger, path, line, urlString, targetPath);
+                        checkResult.ErrorCount++;
+                    }
                 }
-            }
         }
 
         return checkResult;
     }
 
-    private static CheckResult CheckParagraph(ParagraphBlock para, string path, string? rootPath, string rawMarkdown)
+    private static CheckResult CheckParagraph(ParagraphBlock para, string path, string rawMarkdown)
     {
         CheckResult checkResult = new();
 
@@ -167,7 +183,7 @@ partial class FileChecker
 
     [LoggerMessage(EventId = 4, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：单引号顺序错误（是否缺失了后引号？）")]
     public static partial void LogWrongChineseSingleQuotationMark(ILogger logger, string filePath, int targetLine);
-
-    [LoggerMessage(EventId = 5, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：引号内的引号应使用单引号。")]
-    public static partial void LogWrongQuoteStyle(ILogger logger, string filePath, int targetLine);
+    
+    [LoggerMessage(EventId = 5, Level = LogLevel.Warning, Message = "{FilePath}：文章内没有图片。")]
+    public static partial void LogNoImageInArticle(ILogger logger, string filePath);
 }
