@@ -1,7 +1,7 @@
 ﻿using System.CommandLine;
 using Microsoft.Extensions.Logging;
-using AnEoT.Tools.MarkdownChecker.Checkers;
 using AnEoT.Tools.MarkdownChecker.Models;
+using AnEoT.Tools.MarkdownChecker.Checkers;
 
 AppLogger appLogger = new();
 

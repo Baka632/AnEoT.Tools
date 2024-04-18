@@ -2,7 +2,7 @@
 
 namespace AnEoT.Tools.MarkdownChecker.Checkers;
 
-internal sealed class FolderChecker : CheckerBase
+public static class FolderChecker
 {
     public static async Task<CheckResult> CheckDirectory(string path, string? rootPath, bool isRecursive)
     {
@@ -16,7 +16,7 @@ internal sealed class FolderChecker : CheckerBase
     private static async Task<CheckResult> CheckDirectoryCore(DirectoryInfo directoryInfo, string rootPath, bool isRecursive)
     {
         CheckResult result = new();
-        foreach (FileInfo file in directoryInfo.EnumerateFiles())
+        foreach (FileInfo file in directoryInfo.EnumerateFiles("*.md"))
         {
             CheckResult checkResult = await FileChecker.CheckSingleFile(file.FullName, rootPath);
             result += checkResult;

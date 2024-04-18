@@ -1,9 +1,9 @@
 ﻿using Markdig;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
-using AnEoT.Tools.MarkdownChecker.Models;
-using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
+using AnEoT.Tools.MarkdownChecker.Models;
 
 namespace AnEoT.Tools.MarkdownChecker.Checkers;
 
