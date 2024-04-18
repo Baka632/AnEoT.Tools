@@ -116,14 +116,13 @@ partial class FileChecker
             string paragraph = rawMarkdown.Substring(inlineSpan.Start, inlineSpan.Length);
             int paraLine = para.Line + 1;
 
-            // TODO: 这里的匹配有问题
-            /*Regex regex = CheckWrongChineseQuotationMark();
+            Regex regex = CheckWrongChineseQuotationMark();
 
             if (regex.IsMatch(paragraph))
             {
                 LogWrongChineseQuotationMark(Logger, path, paraLine);
                 checkResult.WarningCount++;
-            }*/
+            }
 
             foreach (KeyValuePair<string, string> pair in WrongCorrectOperatorNamePairs)
             {
@@ -138,6 +137,6 @@ partial class FileChecker
         return checkResult;
     }
 
-    [GeneratedRegex(@"”(.*)“")]
+    [GeneratedRegex(@"(?<!.*”)”(.*)“(?!.*”)")]
     private static partial Regex CheckWrongChineseQuotationMark();
 }

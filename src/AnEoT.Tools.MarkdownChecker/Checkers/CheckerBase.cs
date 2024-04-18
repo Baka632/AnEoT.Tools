@@ -33,6 +33,6 @@ internal partial class CheckerBase
     [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：“{WrongItem}”应为“{CorrectItem}”。")]
     public static partial void LogWrongItem(ILogger logger, string filePath, int targetLine, string WrongItem, string CorrectItem);
     
-    [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：中文引号顺序错误。")]
+    [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：中文引号顺序错误（是否缺失了后引号？）")]
     public static partial void LogWrongChineseQuotationMark(ILogger logger, string filePath, int targetLine);
 }
