@@ -1,0 +1,4 @@
+﻿[*.{cs,vb}]
+
+# CA1826，排除 FirstOrDefault 和 LastOrDefault 方法
+dotnet_code_quality.CA1826.exclude_ordefault_methods = true

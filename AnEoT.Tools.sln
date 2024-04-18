@@ -7,10 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnEoT.Tools.WordToMarkdown"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Soultion Files", "Soultion Files", "{F57FE41F-AA89-4E71-B963-5ED52A5C8A68}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnEoT.Tools.MarkdownChecker", "src\AnEoT.Tools.MarkdownChecker\AnEoT.Tools.MarkdownChecker.csproj", "{9825BD59-5F85-45EF-AB97-2F83C623FEDA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,6 +25,10 @@ Global
 		{2E299DC2-60D4-49CB-921D-6B7A281F0167}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E299DC2-60D4-49CB-921D-6B7A281F0167}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E299DC2-60D4-49CB-921D-6B7A281F0167}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9825BD59-5F85-45EF-AB97-2F83C623FEDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9825BD59-5F85-45EF-AB97-2F83C623FEDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9825BD59-5F85-45EF-AB97-2F83C623FEDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9825BD59-5F85-45EF-AB97-2F83C623FEDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
