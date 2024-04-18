@@ -13,6 +13,12 @@ partial class FileChecker
     {
         ["缪尔赛斯"] = "缪尔赛思",
         ["克洛斯"] = "克洛丝",
+        ["凯尔西"] = "凯尔希",
+        ["塞雷亚"] = "塞雷娅",
+        ["饲夜"] = "伺夜",
+        ["魁影"] = "傀影",
+        ["桑椹"] = "桑葚",
+        ["广英与荣耀"] = "广英和荣耀",
     };
 
     public static async Task<CheckResult> CheckMarkdown(string path, string? rootPath)
@@ -76,6 +82,14 @@ partial class FileChecker
                 catch (HttpRequestException)
                 {
                     LogCannotAccessLink(Logger, path, line, urlString);
+                    checkResult.ErrorCount++;
+                }
+            }
+            else if (uri.IsFile)
+            {
+                if (Path.Exists(uri.AbsolutePath) != true)
+                {
+                    LogCannotFindFile(Logger, path, line, urlString);
                     checkResult.ErrorCount++;
                 }
             }
@@ -172,18 +186,21 @@ partial class FileChecker
     [LoggerMessage(EventId = 0, Level = LogLevel.Error, Message = "{FilePath}(第 {TargetLine} 行): 无法访问链接：{Link}")]
     public static partial void LogCannotAccessLink(ILogger logger, string filePath, int targetLine, string link);
 
-    [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "{FilePath}(第 {TargetLine} 行): 找不到文件：{Link}。已尝试在以下路径中寻找：{TriedFilePath}")]
+    [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "{FilePath}(第 {TargetLine} 行): 找不到文件：{Link}。")]
+    public static partial void LogCannotFindFile(ILogger logger, string filePath, int targetLine, string link);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Error, Message = "{FilePath}(第 {TargetLine} 行): 找不到文件：{Link}。已尝试在以下路径中寻找：{TriedFilePath}")]
     public static partial void LogCannotFindFile(ILogger logger, string filePath, int targetLine, string link, string triedFilePath);
 
-    [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：“{WrongItem}”应为“{CorrectItem}”。")]
+    [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：“{WrongItem}”应为“{CorrectItem}”。")]
     public static partial void LogWrongItem(ILogger logger, string filePath, int targetLine, string WrongItem, string CorrectItem);
 
-    [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：双引号顺序错误（是否缺失了后引号？）")]
+    [LoggerMessage(EventId = 4, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：双引号顺序错误（是否缺失了后引号？）")]
     public static partial void LogWrongChineseDoubleQuotationMark(ILogger logger, string filePath, int targetLine);
 
-    [LoggerMessage(EventId = 4, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：单引号顺序错误（是否缺失了后引号？）")]
+    [LoggerMessage(EventId = 5, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：单引号顺序错误（是否缺失了后引号？）")]
     public static partial void LogWrongChineseSingleQuotationMark(ILogger logger, string filePath, int targetLine);
     
-    [LoggerMessage(EventId = 5, Level = LogLevel.Warning, Message = "{FilePath}：文章内没有图片。")]
+    [LoggerMessage(EventId = 6, Level = LogLevel.Warning, Message = "{FilePath}：文章内没有图片。")]
     public static partial void LogNoImageInArticle(ILogger logger, string filePath);
 }
