@@ -118,8 +118,7 @@ partial class FileChecker
             int paraLine = para.Line + 1;
 
             Regex wrongDoubleQutationMark = CheckWrongDoubleChineseQuotationMark();
-            Regex wrongSingleQutationMark = CheckWrongChineseSingleQuotationMark();
-            Regex wrongQuoteStyle = CheckWrongChineseQuoteStyle();
+            Regex wrongSingleQutationMark = CheckWrongSingleChineseQuotationMark();
 
             if (wrongDoubleQutationMark.IsMatch(paragraph))
             {
@@ -132,14 +131,6 @@ partial class FileChecker
                 LogWrongChineseSingleQuotationMark(Logger, path, paraLine);
                 checkResult.WarningCount++;
             }
-
-            // TODO: 有问题
-            /*
-            if (wrongQuoteStyle.IsMatch(paragraph))
-            {
-                LogWrongQuoteStyle(Logger, path, paraLine);
-                checkResult.WarningCount++;
-            }*/
 
             foreach (KeyValuePair<string, string> pair in WrongCorrectOperatorNamePairs)
             {
@@ -154,14 +145,11 @@ partial class FileChecker
         return checkResult;
     }
 
-    [GeneratedRegex(@"(?<!.*”)”(.*)“(?!.*”)")]
+    [GeneratedRegex(@"(?<!.*“)”(.*)“(?!.*”)")]
     private static partial Regex CheckWrongDoubleChineseQuotationMark();
     
     [GeneratedRegex(@"(?<!.*‘)’(.*)‘(?!.*’)")]
-    private static partial Regex CheckWrongChineseSingleQuotationMark();
-
-    [GeneratedRegex("[‘“].*[“”].*[’”]")]
-    private static partial Regex CheckWrongChineseQuoteStyle();
+    private static partial Regex CheckWrongSingleChineseQuotationMark();
 
     /* ============================================ */
 
