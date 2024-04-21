@@ -4,6 +4,7 @@ using Markdig.Syntax.Inlines;
 using Microsoft.Extensions.Logging;
 using System.Text.RegularExpressions;
 using AnEoT.Tools.MarkdownChecker.Models;
+using System.Globalization;
 
 namespace AnEoT.Tools.MarkdownChecker.Checkers;
 
@@ -20,12 +21,16 @@ partial class FileChecker
         ["桑椹"] = "桑葚",
         ["赫墨"] = "赫默",
         ["特雷西娅"] = "特蕾西娅",
+        ["罗得岛"] = "罗德岛",
         ["广英与荣耀"] = "广英和荣耀",
     };
 
     public static async Task<CheckResult> CheckMarkdown(string path, string? rootPath)
     {
         CheckResult checkResult = new();
+        string? parentFolderPath = Path.GetDirectoryName(path);
+        string fileName = Path.GetFileName(path);
+
         string markdown = await File.ReadAllTextAsync(path);
         MarkdownDocument document = Markdown.Parse(markdown, MarkdownPipeline);
 
@@ -47,14 +52,29 @@ partial class FileChecker
             }
         }
 
-        // HACK: 先禁用这个检查吧
-        /*
-        string fileName = Path.GetFileName(path);
-        if (imageLinkCount == 0 && fileName != "README.md")
+        if (fileName.Equals("README.md", StringComparison.OrdinalIgnoreCase) && parentFolderPath is not null)
         {
-            LogNoImageInArticle(Logger, path);
-            checkResult.WarningCount++;
-        }*/
+            DirectoryInfo volumeFolder = new(parentFolderPath);
+            if (volumeFolder.Exists && DateOnly.TryParse(volumeFolder.Name, CultureInfo.InvariantCulture, out _))
+            {
+                // 在期刊文件夹中
+                IEnumerable<FileInfo> files = volumeFolder.EnumerateFiles("*.md")
+                                                      .Where(file => file.Name != fileName);
+                IEnumerable<LinkInline> links = document.Descendants<LinkInline>()
+                                                        .Where(link => link.IsImage != true);
+
+                foreach (FileInfo file in files)
+                {
+                    bool isArticleInContents = links.Where(link => link.Url is not null)
+                                          .Any(link => link.Url!.Replace(".html", ".md").Equals(file.Name, StringComparison.OrdinalIgnoreCase));
+                    if (isArticleInContents != true)
+                    {
+                        LogNotAllFilesInContents(Logger, path, file.Name);
+                        checkResult.ErrorCount++;
+                    }
+                }
+            }
+        }
 
         return checkResult;
     }
@@ -202,7 +222,7 @@ partial class FileChecker
 
     [LoggerMessage(EventId = 5, Level = LogLevel.Warning, Message = "{FilePath}(第 {TargetLine} 行)：单引号顺序错误（是否缺失了后引号？）")]
     public static partial void LogWrongChineseSingleQuotationMark(ILogger logger, string filePath, int targetLine);
-    
-    [LoggerMessage(EventId = 6, Level = LogLevel.Warning, Message = "{FilePath}：文章内没有图片。")]
-    public static partial void LogNoImageInArticle(ILogger logger, string filePath);
+
+    [LoggerMessage(EventId = 6, Level = LogLevel.Error, Message = "{FilePath}：{FileNotIncluded} 位于当前期刊的文件夹中，但未包含在此期的目录页。")]
+    public static partial void LogNotAllFilesInContents(ILogger logger, string filePath, string fileNotIncluded);
 }
