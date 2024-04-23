@@ -71,7 +71,7 @@ folderCommand.AddOption(recursiveOption);
 rootCommand.Add(singleFileCommand);
 rootCommand.Add(folderCommand);
 
-singleFileCommand.SetHandler(async (path, rootPath) =>
+singleFileCommand.SetHandler(async (filePath, rootPath) =>
 {
     appLogger.LogNormalInfomation("检查已开始...");
 
@@ -80,7 +80,7 @@ singleFileCommand.SetHandler(async (path, rootPath) =>
         appLogger.LogWarningInfomation("未配置根路径，检查过程可能会出现错误。");
     }
 
-    CheckResult result = await FileChecker.CheckSingleFile(path, rootPath);
+    CheckResult result = await FileChecker.CheckSingleFile(filePath, rootPath);
     if (result.IsNoErrorOrWarning)
     {
         appLogger.LogNormalInfomation("检查完成，未发现错误。");

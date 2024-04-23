@@ -25,9 +25,9 @@ public static partial class FileChecker
         Logger = logger;
     }
 
-    public static async Task<CheckResult> CheckSingleFile(string path, string? rootPath)
+    public static async Task<CheckResult> CheckSingleFile(string filePath, string? rootPath)
     {
-        CheckResult result = await CheckMarkdown(path, rootPath);
+        CheckResult result = await CheckMarkdown(filePath, rootPath);
         return result;
     }
 }
