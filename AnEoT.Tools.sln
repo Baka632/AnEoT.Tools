@@ -15,6 +15,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Soultion Files", "Soultion 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnEoT.Tools.MarkdownChecker", "src\AnEoT.Tools.MarkdownChecker\AnEoT.Tools.MarkdownChecker.csproj", "{9825BD59-5F85-45EF-AB97-2F83C623FEDA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnEoT.Tools.Template", "src\AnEoT.Tools.Template\AnEoT.Tools.Template.csproj", "{2DF7B1F5-E0D7-4824-9E81-D03870C442C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnEoT.Tools.Shared", "src\AnEoT.Tools.Shared\AnEoT.Tools.Shared.csproj", "{836EB1A6-5869-4FA6-B809-CF786A28B7C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +33,14 @@ Global
 		{9825BD59-5F85-45EF-AB97-2F83C623FEDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9825BD59-5F85-45EF-AB97-2F83C623FEDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9825BD59-5F85-45EF-AB97-2F83C623FEDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DF7B1F5-E0D7-4824-9E81-D03870C442C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DF7B1F5-E0D7-4824-9E81-D03870C442C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DF7B1F5-E0D7-4824-9E81-D03870C442C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DF7B1F5-E0D7-4824-9E81-D03870C442C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{836EB1A6-5869-4FA6-B809-CF786A28B7C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{836EB1A6-5869-4FA6-B809-CF786A28B7C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{836EB1A6-5869-4FA6-B809-CF786A28B7C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{836EB1A6-5869-4FA6-B809-CF786A28B7C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

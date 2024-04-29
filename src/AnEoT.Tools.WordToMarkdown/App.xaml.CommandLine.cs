@@ -1,17 +1,17 @@
-﻿using AnEoT.Tools.WordToMarkdown.ViewModels;
-using AnEoT.Tools.WordToMarkdown.Views;
-using System.Diagnostics.CodeAnalysis;
-using CommandLine;
-using System.IO;
-using AnEoT.Tools.WordToMarkdown.Models;
-using System.Globalization;
-using AnEoT.Tools.WordToMarkdown.Services;
-using DocumentFormat.OpenXml.Packaging;
+﻿using System.IO;
 using System.Text;
-using YamlDotNet.Serialization.NamingConventions;
+using System.Globalization;
+using System.Diagnostics.CodeAnalysis;
+using DocumentFormat.OpenXml.Packaging;
 using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
+using CommandLine;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using AnEoT.Tools.Shared;
+using AnEoT.Tools.WordToMarkdown.Models;
+using AnEoT.Tools.WordToMarkdown.Views;
+using AnEoT.Tools.WordToMarkdown.ViewModels;
 
 namespace AnEoT.Tools.WordToMarkdown;
 

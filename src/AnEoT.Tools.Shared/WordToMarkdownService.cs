@@ -5,10 +5,18 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 
-namespace AnEoT.Tools.WordToMarkdown.Services;
+namespace AnEoT.Tools.Shared;
 
 public static class WordToMarkdownService
 {
+    public static string GetMarkdown(string documentPath, bool leaveOpen = false)
+    {
+        WordprocessingDocument doc = WordprocessingDocument.Open(documentPath, false);
+        string md = GetMarkdown(doc, leaveOpen);
+
+        return md;
+    }
+
     public static string GetMarkdown(WordprocessingDocument document, bool leaveOpen = true)
     {
         StringBuilder stringBuilder = new();

@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using AnEoT.Tools.Shared;
 using AnEoT.Tools.WordToMarkdown.Models;
-using AnEoT.Tools.WordToMarkdown.Services;
 using AnEoT.Tools.WordToMarkdown.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
