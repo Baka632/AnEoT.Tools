@@ -279,7 +279,11 @@ public static class WordToMarkdownService
             document.Dispose();
         }
 
-        return stringBuilder.ToString();
+        string markdownString = stringBuilder.ToString();
+        markdownString = markdownString.Trim().ReplaceLineEndings();
+        string[] parts = markdownString.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+
+        return string.Join($"{Environment.NewLine}{Environment.NewLine}", parts);
     }
 
     private static void DetermineRunPropertiesByChildElement(OpenXmlElementList childElements, ref bool isBold, ref bool isStrike, ref bool isItalic, ref bool isUnderline)

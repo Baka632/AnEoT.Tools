@@ -9,6 +9,7 @@ using CommandLine;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using AnEoT.Tools.Shared;
+using AnEoT.Tools.Shared.Models;
 using AnEoT.Tools.WordToMarkdown.Models;
 using AnEoT.Tools.WordToMarkdown.Views;
 using AnEoT.Tools.WordToMarkdown.ViewModels;
@@ -33,7 +34,7 @@ partial class App
         IEnumerable<string>? tags = options.Tag;
 
         EditorsInfo editorsInfo = new(options.EditorName, options.WebsiteLayoutDesigner, options.Illustrator);
-        ArticleInfo articleInfo = new()
+        FrontMatter frontMatter = new()
         {
             Author = author,
             Title = title ?? string.Empty,
@@ -55,7 +56,7 @@ partial class App
             viewModel.OutputFilePath = outputPath;
             viewModel.WordFilePath = filePath;
             viewModel.EditorsInfo = editorsInfo;
-            viewModel.FrontMatter = articleInfo;
+            viewModel.FrontMatter = frontMatter;
             viewModel.ArticleQuote = articleQuote;
 
             if (string.IsNullOrEmpty(filePath) != true && gui.DisableAutoStart != true)
@@ -94,7 +95,7 @@ partial class App
                 Console.WriteLine("警告：指定的输出路径已存在同名文件，将覆盖目标。");
             }
 
-            string markdown = GetMarkdownString(filePath, articleInfo, editorsInfo, articleQuote, cli.AutoAppendEod);
+            string markdown = GetMarkdownString(filePath, frontMatter, editorsInfo, articleQuote, cli.AutoAppendEod);
 
             if (await WriteMarkdownToFile(outputPath, markdown))
             {
@@ -127,7 +128,7 @@ partial class App
         }
     }
 
-    private static string GetMarkdownString(string filePath, ArticleInfo articleInfo, EditorsInfo editorsInfo, string? articleQuote, bool autoAppendEod)
+    private static string GetMarkdownString(string filePath, FrontMatter frontMatter, EditorsInfo editorsInfo, string? articleQuote, bool autoAppendEod)
     {
         string? markdown = null;
         try
@@ -148,7 +149,7 @@ partial class App
             PrintErrorAndExist($"出现未知错误：\n{ex}");
         }
 
-        string yamlHeader = GetYamlFrontMatterString(articleInfo);
+        string yamlHeader = GetYamlFrontMatterString(frontMatter);
         string editorsInfoString = $"""
 
 
@@ -187,13 +188,13 @@ partial class App
         return stringBuilder.ToString();
     }
 
-    private static string GetYamlFrontMatterString(ArticleInfo articleInfo)
+    private static string GetYamlFrontMatterString(FrontMatter frontMatter)
     {
         ISerializer serializer = new SerializerBuilder()
                         .WithIndentedSequences()
                         .WithNamingConvention(CamelCaseNamingConvention.Instance)
                         .Build();
-        string yamlString = serializer.Serialize(articleInfo).Trim();
+        string yamlString = serializer.Serialize(frontMatter).Trim();
         string yamlHeader = $"""
                 ---
                 {yamlString}
