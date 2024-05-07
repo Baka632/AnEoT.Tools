@@ -150,20 +150,17 @@
 
                         <controls:SettingsExpander.ItemTemplate>
                             <DataTemplate x:DataType="models:MarkdownWarpper">
-                                <controls:SettingsCard Header="{x:Bind File.DisplayName}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Button
-                                            Margin="0,0,5,0"
-                                            helpers:AncestorSource.AncestorType="Page"
-                                            Command="{Binding DataContext.ViewWordFileItemCommand}"
-                                            CommandParameter="{x:Bind}"
-                                            Content="看看你的 Markdown" />
-                                        <Button
-                                            helpers:AncestorSource.AncestorType="Page"
-                                            Command="{Binding DataContext.RemoveWordFileItemCommand}"
-                                            CommandParameter="{x:Bind}"
-                                            Content="移除" />
-                                    </StackPanel>
+                                <controls:SettingsCard
+                                    helpers:AncestorSource.AncestorType="Page"
+                                    Command="{Binding DataContext.ViewWordFileItemCommand}"
+                                    CommandParameter="{x:Bind}"
+                                    Header="{x:Bind File.DisplayName}"
+                                    IsClickEnabled="True">
+                                    <Button
+                                        helpers:AncestorSource.AncestorType="Page"
+                                        Command="{Binding DataContext.RemoveWordFileItemCommand}"
+                                        CommandParameter="{x:Bind}"
+                                        Content="移除" />
                                 </controls:SettingsCard>
                             </DataTemplate>
                         </controls:SettingsExpander.ItemTemplate>
