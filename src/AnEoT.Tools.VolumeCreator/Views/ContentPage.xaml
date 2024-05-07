@@ -2,6 +2,7 @@
     x:Class="AnEoT.Tools.VolumeCreator.Views.ContentPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:AnEoT.Tools.VolumeCreator.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -46,14 +47,17 @@
             </Grid.ColumnDefinitions>
 
             <Button
+                x:Name="CoverSelectButton"
                 Grid.Column="0"
                 Padding="0"
                 HorizontalAlignment="Stretch"
-                VerticalAlignment="Top"
+                VerticalAlignment="{x:Bind ViewModel.CoverImageVerticalAlignmentMode, Mode=OneWay}"
                 AllowDrop="True"
                 Background="Transparent"
                 BorderThickness="2"
-                Command="{x:Bind ViewModel.PickImageCommand}">
+                Command="{x:Bind ViewModel.PickImageCommand}"
+                DragOver="OnCoverButtonDragOver"
+                Drop="OnCoverButtonDrop">
                 <Grid CornerRadius="2">
                     <ScrollViewer ZoomMode="Enabled">
                         <Image Source="{x:Bind ViewModel.VolumeCover, Mode=OneWay}" Stretch="UniformToFill" />
@@ -62,22 +66,55 @@
                 </Grid>
             </Button>
 
-            <StackPanel Grid.Column="1" Margin="10,0,10,0">
-                <TextBox
-                    Margin="0,0,0,5"
-                    Header="期刊文件夹名称"
-                    IsSpellCheckEnabled="False" />
-                <TextBox
-                    Margin="0,0,0,5"
-                    Header="期刊正式名称"
-                    IsSpellCheckEnabled="False" />
-                <ListView Header="文件列表">
-                    <ListViewItem>测试1</ListViewItem>
-                    <ListViewItem>测试2</ListViewItem>
-                    <ListViewItem>测试3</ListViewItem>
-                    <ListViewItem>测试4</ListViewItem>
-                </ListView>
-            </StackPanel>
+            <TeachingTip
+                Title="文件不是图像"
+                IsLightDismissEnabled="True"
+                IsOpen="{x:Bind ViewModel.IsVolumeCoverError, Mode=TwoWay}"
+                PreferredPlacement="Right"
+                Subtitle="请重新选择。"
+                Target="{x:Bind CoverSelectButton}">
+                <TeachingTip.IconSource>
+                    <FontIconSource Glyph="&#xE783;" />
+                </TeachingTip.IconSource>
+            </TeachingTip>
+
+            <ScrollViewer
+                Grid.Column="1"
+                Margin="10,0,10,0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+                <StackPanel HorizontalAlignment="Stretch">
+                    <StackPanel.ChildrenTransitions>
+                        <TransitionCollection>
+                            <EntranceThemeTransition FromVerticalOffset="50" />
+                            <RepositionThemeTransition IsStaggeringEnabled="False" />
+                        </TransitionCollection>
+                    </StackPanel.ChildrenTransitions>
+
+                    <controls:SettingsExpander Description="设置期刊名称、期刊文件夹名称等基本设置。" Header="基本设置">
+                        <controls:SettingsExpander.HeaderIcon>
+                            <SymbolIcon Symbol="List" />
+                        </controls:SettingsExpander.HeaderIcon>
+
+                        <controls:SettingsExpander.Items>
+                            <controls:SettingsCard Header="期刊文件夹名称">
+                                <controls:SettingsCard.HeaderIcon>
+                                    <SymbolIcon Symbol="Folder" />
+                                </controls:SettingsCard.HeaderIcon>
+
+                                <TextBox MinWidth="200" IsSpellCheckEnabled="False" />
+                            </controls:SettingsCard>
+                            <controls:SettingsCard Header="期刊正式名称">
+                                <controls:SettingsCard.HeaderIcon>
+                                    <SymbolIcon Symbol="Page" />
+                                </controls:SettingsCard.HeaderIcon>
+
+                                <TextBox MinWidth="200" IsSpellCheckEnabled="False" />
+                            </controls:SettingsCard>
+                        </controls:SettingsExpander.Items>
+                    </controls:SettingsExpander>
+                </StackPanel>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </Page>

@@ -5,20 +5,13 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Windows.Storage;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Storage.Streams;
+using System.Runtime.InteropServices;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
-public sealed partial class ContentPageViewModel() : ObservableObject
+public sealed partial class ContentPageViewModel : ObservableObject
 {
     private StorageFolder? _targetFolder = null;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsVolumeCoverNotExist))]
-    private BitmapImage? _volumeCover;
-    [ObservableProperty]
-    private bool _showContent;
-
-    public bool IsVolumeCoverNotExist { get => VolumeCover is null; }
 
     [RelayCommand]
     private async Task OpenTargetFolder()
@@ -51,14 +44,31 @@ public sealed partial class ContentPageViewModel() : ObservableObject
         picker.FileTypeFilter.Add(".webp");
 
         StorageFile file = await picker.PickSingleFileAsync();
+        await SetCoverByFile(file);
+    }
 
+    internal async Task SetCoverByFile(StorageFile? file)
+    {
         if (file != null)
         {
             IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
+            await SetCoverByStream(stream);
+        }
+    }
+
+    internal async Task SetCoverByStream(IRandomAccessStream stream)
+    {
+        try
+        {
             BitmapImage bitmapImage = new();
             await bitmapImage.SetSourceAsync(stream);
 
             VolumeCover = bitmapImage;
+            IsVolumeCoverError = false;
+        }
+        catch (COMException ex) when (ex.ErrorCode == -2003292336)
+        {
+            IsVolumeCoverError = true;
         }
     }
 
@@ -71,7 +81,7 @@ public sealed partial class ContentPageViewModel() : ObservableObject
     /// <param name="secondaryText">第二按钮文本</param>
     /// <param name="closeText">关闭按钮文本</param>
     /// <returns>指示对话框结果的<seealso cref="ContentDialogResult"/></returns>
-    private async Task<ContentDialogResult> ShowDialogAsync(string title, string message, string? primaryText = null, string? secondaryText = null, string? closeText = null)
+    private static async Task<ContentDialogResult> ShowDialogAsync(string title, string message, string? primaryText = null, string? secondaryText = null, string? closeText = null)
     {
         // null-coalescing 操作符——当 closeText 为空时才赋值
         closeText ??= "关闭";
