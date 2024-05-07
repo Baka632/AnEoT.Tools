@@ -4,8 +4,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:AnEoT.Tools.VolumeCreator.Helpers"
     xmlns:local="using:AnEoT.Tools.VolumeCreator.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:AnEoT.Tools.VolumeCreator.Models"
+    xmlns:viewmodels="using:AnEoT.Tools.VolumeCreator.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:ContentPageViewModel}"
     mc:Ignorable="d">
 
     <Grid>
@@ -83,7 +87,7 @@
                 Margin="10,0,10,0"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch">
-                <StackPanel HorizontalAlignment="Stretch">
+                <StackPanel HorizontalAlignment="Stretch" Spacing="5">
                     <StackPanel.ChildrenTransitions>
                         <TransitionCollection>
                             <EntranceThemeTransition FromVerticalOffset="50" />
@@ -91,7 +95,10 @@
                         </TransitionCollection>
                     </StackPanel.ChildrenTransitions>
 
-                    <controls:SettingsExpander Description="设置期刊名称、期刊文件夹名称等基本设置。" Header="基本设置">
+                    <controls:SettingsExpander
+                        Description="设置期刊名称、期刊文件夹名称等基本设置。"
+                        Header="基本设置"
+                        IsExpanded="True">
                         <controls:SettingsExpander.HeaderIcon>
                             <SymbolIcon Symbol="List" />
                         </controls:SettingsExpander.HeaderIcon>
@@ -102,16 +109,64 @@
                                     <SymbolIcon Symbol="Folder" />
                                 </controls:SettingsCard.HeaderIcon>
 
-                                <TextBox MinWidth="200" IsSpellCheckEnabled="False" />
+                                <TextBox
+                                    MinWidth="200"
+                                    IsSpellCheckEnabled="False"
+                                    Text="{x:Bind ViewModel.VolumeFolderName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             </controls:SettingsCard>
                             <controls:SettingsCard Header="期刊正式名称">
                                 <controls:SettingsCard.HeaderIcon>
                                     <SymbolIcon Symbol="Page" />
                                 </controls:SettingsCard.HeaderIcon>
 
-                                <TextBox MinWidth="200" IsSpellCheckEnabled="False" />
+                                <TextBox
+                                    MinWidth="200"
+                                    IsSpellCheckEnabled="False"
+                                    Text="{x:Bind ViewModel.VolumeName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             </controls:SettingsCard>
                         </controls:SettingsExpander.Items>
+                    </controls:SettingsExpander>
+
+                    <controls:SettingsExpander
+                        Description="添加要转换为 Markdown 文件的 DOCX 文件。"
+                        Header="DOCX 文件列表"
+                        IsExpanded="True"
+                        ItemsSource="{x:Bind ViewModel.WordFiles}">
+                        <controls:SettingsExpander.HeaderIcon>
+                            <FontIcon Glyph="&#xE8FD;" />
+                        </controls:SettingsExpander.HeaderIcon>
+
+                        <Button Command="{x:Bind ViewModel.AddWordFileItemCommand}" Content="添加文件" />
+
+                        <controls:SettingsExpander.ItemsHeader>
+                            <InfoBar
+                                Title="请添加一些文件。"
+                                BorderThickness="0"
+                                CornerRadius="0"
+                                IsClosable="False"
+                                IsOpen="{x:Bind ViewModel.ShowNotifyAddWordFile, Mode=OneWay}"
+                                Severity="Informational" />
+                        </controls:SettingsExpander.ItemsHeader>
+
+                        <controls:SettingsExpander.ItemTemplate>
+                            <DataTemplate x:DataType="models:MarkdownWarpper">
+                                <controls:SettingsCard Header="{x:Bind File.DisplayName}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button
+                                            Margin="0,0,5,0"
+                                            helpers:AncestorSource.AncestorType="Page"
+                                            Command="{Binding DataContext.ViewWordFileItemCommand}"
+                                            CommandParameter="{x:Bind}"
+                                            Content="看看你的 Markdown" />
+                                        <Button
+                                            helpers:AncestorSource.AncestorType="Page"
+                                            Command="{Binding DataContext.RemoveWordFileItemCommand}"
+                                            CommandParameter="{x:Bind}"
+                                            Content="移除" />
+                                    </StackPanel>
+                                </controls:SettingsCard>
+                            </DataTemplate>
+                        </controls:SettingsExpander.ItemTemplate>
                     </controls:SettingsExpander>
                 </StackPanel>
             </ScrollViewer>

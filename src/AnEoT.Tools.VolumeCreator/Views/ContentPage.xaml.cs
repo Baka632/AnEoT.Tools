@@ -16,6 +16,7 @@ public sealed partial class ContentPage : Page
     public ContentPage()
     {
         this.InitializeComponent();
+        DataContext = ViewModel;
     }
 
     private void OnCoverButtonDragOver(object sender, DragEventArgs e)

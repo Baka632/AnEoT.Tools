@@ -6,12 +6,19 @@ using Windows.Storage;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Storage.Streams;
 using System.Runtime.InteropServices;
+using AnEoT.Tools.VolumeCreator.Models;
+using AnEoT.Tools.Shared;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
-public sealed partial class ContentPageViewModel : ObservableObject
+public sealed partial class ContentPageViewModel : ObservableValidator
 {
     private StorageFolder? _targetFolder = null;
+
+    public ContentPageViewModel()
+    {
+        WordFiles.CollectionChanged += OnWordFilesCollectionChanged;
+    }
 
     [RelayCommand]
     private async Task OpenTargetFolder()
@@ -54,6 +61,42 @@ public sealed partial class ContentPageViewModel : ObservableObject
             IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
             await SetCoverByStream(stream);
         }
+    }
+
+    [RelayCommand]
+    private async Task AddWordFileItem()
+    {
+        nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
+
+        FileOpenPicker picker = new();
+
+        InitializeWithWindow.Initialize(picker, hwnd);
+
+        picker.FileTypeFilter.Add(".docx");
+
+        IReadOnlyList<StorageFile> files = await picker.PickMultipleFilesAsync();
+
+        if (files is not null)
+        {
+            foreach (StorageFile file in files)
+            {
+                string markdown = await Task.Run(() => WordToMarkdownService.GetMarkdown(file.Path));
+                MarkdownWarpper toMarkdownFile = new(file, markdown);
+                WordFiles.Add(toMarkdownFile);
+            }
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveWordFileItem(MarkdownWarpper target)
+    {
+        WordFiles.Remove(target);
+    }
+    
+    [RelayCommand]
+    private static async Task ViewWordFileItem(MarkdownWarpper target)
+    {
+        await ShowDialogAsync(target.File.DisplayName, target.Markdown[..20]);
     }
 
     internal async Task SetCoverByStream(IRandomAccessStream stream)
