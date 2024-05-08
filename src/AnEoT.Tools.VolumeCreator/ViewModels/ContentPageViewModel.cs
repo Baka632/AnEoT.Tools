@@ -8,6 +8,8 @@ using Windows.Storage.Streams;
 using System.Runtime.InteropServices;
 using AnEoT.Tools.VolumeCreator.Models;
 using AnEoT.Tools.Shared;
+using AnEoT.Tools.VolumeCreator.Views;
+using Microsoft.UI.Windowing;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -113,9 +115,14 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     }
     
     [RelayCommand]
-    private static async Task ViewWordFileItem(MarkdownWrapper target)
+    private static void ViewWordFileItem(MarkdownWrapper wrapper)
     {
-        await ShowDialogAsync(target.File.DisplayName, target.Markdown[..20]);
+        MarkdownEditWindow window = new()
+        {
+            Model = wrapper,
+            Title = $"{wrapper.File.DisplayName} - Markdown 编辑窗口"
+        };
+        window.Activate();
     }
 
     internal async Task SetCoverByStream(IRandomAccessStream stream)

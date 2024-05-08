@@ -1,0 +1,83 @@
+<Page
+    x:Class="AnEoT.Tools.VolumeCreator.Views.MarkdownEditPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:AnEoT.Tools.VolumeCreator.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mdControl="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:viewmodels="using:AnEoT.Tools.VolumeCreator.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:MarkdownEditViewModel}"
+    mc:Ignorable="d">
+
+    <Grid Margin="0,0,0,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <CommandBar
+            Grid.Row="0"
+            HorizontalAlignment="Left"
+            DefaultLabelPosition="Right">
+            <AppBarButton Icon="ContactInfo" Label="插入 Front Matter" />
+            <AppBarButton Label="插入 &lt;eod /&gt; 标签">
+                <AppBarButton.Icon>
+                    <PathIcon HorizontalAlignment="Center" Data="M 161.03 154.06 305.81 154.06 305.81 240.52 371.61 240.52 371.61 154.06 483.87 154.06 516.39 92.13 53.27 93.53 339.1 603.1 681.29 0 0 0 34.21 60.53 569.03 61.16 371.61 411.87 370.84 278.71 305.81 279.23 305.81 412.39 161.03 154.06 Z" />
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton Label="插入文编信息">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xEDFB;" />
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton Icon="AlignLeft" Label="添加文章引言" />
+        </CommandBar>
+
+        <Grid Grid.Row="1" Margin="5,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <TextBlock Margin="0,0,0,5" Text="Markdown 文本" />
+                <TextBox
+                    Grid.Row="1"
+                    AcceptsReturn="True"
+                    Text="{x:Bind ViewModel.MarkdownString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    TextWrapping="Wrap" />
+            </Grid>
+
+            <controls:GridSplitter
+                Grid.Column="1"
+                Margin="5,0,5,0"
+                ResizeBehavior="BasedOnAlignment"
+                ResizeDirection="Auto" />
+
+            <Grid Grid.Column="2" Margin="0,0,5,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <TextBlock Margin="0,0,0,5" Text="预览" />
+                <Border
+                    Grid.Row="1"
+                    Padding="10,5,5,5"
+                    BorderBrush="{ThemeResource TextControlElevationBorderBrush}"
+                    BorderThickness="{ThemeResource TextControlBorderThemeThickness}"
+                    CornerRadius="{ThemeResource ControlCornerRadius}">
+                    <mdControl:MarkdownTextBlock Background="Transparent" Text="{x:Bind ViewModel.MarkdownString, Mode=OneWay}" />
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

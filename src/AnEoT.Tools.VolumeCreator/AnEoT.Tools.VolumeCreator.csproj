@@ -28,6 +28,8 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\ContentPage.xaml" />
+    <None Remove="Views\MarkdownEditPage.xaml" />
+    <None Remove="Views\MarkdownEditWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,7 +45,9 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.0.240109" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.Sizers" Version="8.0.240109" />
     <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.0.240109" />
+    <PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Markdown" Version="7.1.2" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240428000" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
     <PackageReference Include="WinUIEx" Version="2.3.4" />
@@ -72,6 +76,16 @@
     <Using Include="Windows.Foundation" />
     <Using Include="Windows.Foundation.Collections" />
     <Using Include="System.Runtime.InteropServices.WindowsRuntime" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\MarkdownEditPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\MarkdownEditWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\ContentPage.xaml">
