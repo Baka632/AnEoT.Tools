@@ -1,8 +1,7 @@
-using AnEoT.Tools.VolumeCreator.ViewModels;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using Windows.ApplicationModel.DataTransfer;
+using AnEoT.Tools.VolumeCreator.ViewModels;
 
 namespace AnEoT.Tools.VolumeCreator.Views;
 
@@ -16,7 +15,6 @@ public sealed partial class ContentPage : Page
     public ContentPage()
     {
         this.InitializeComponent();
-        DataContext = ViewModel;
     }
 
     private void OnCoverButtonDragOver(object sender, DragEventArgs e)
@@ -57,5 +55,31 @@ public sealed partial class ContentPage : Page
         }
 
         ViewModel.IsVolumeCoverError = true;
+    }
+
+    private void OnWordFileListDragOver(object sender, DragEventArgs e)
+    {
+        if (e.DataView.Contains(StandardDataFormats.StorageItems))
+        {
+            e.AcceptedOperation = DataPackageOperation.Link;
+            e.DragUIOverride.Caption = "添加 DOCX 文件";
+        }
+        else
+        {
+            e.AcceptedOperation = DataPackageOperation.None;
+        }
+    }
+
+    private async void OnWordFileListDrop(object sender, DragEventArgs e)
+    {
+        if (e.DataView.Contains(StandardDataFormats.StorageItems))
+        {
+            IReadOnlyList<IStorageItem> items = await e.DataView.GetStorageItemsAsync();
+            foreach (StorageFile file in items.Where(item => item.IsOfType(StorageItemTypes.File))
+                                              .Select(item => (StorageFile)item))
+            {
+                await ViewModel.AddSingleWordFileItem(file);
+            }
+        }
     }
 }

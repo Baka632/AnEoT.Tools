@@ -2,4 +2,4 @@
 
 namespace AnEoT.Tools.VolumeCreator.Models;
 
-public sealed record MarkdownWarpper(StorageFile File, string Markdown);
+public sealed record MarkdownWrapper(StorageFile File, string Markdown);

@@ -1,4 +1,6 @@
-﻿namespace AnEoT.Tools.VolumeCreator.Helpers;
+﻿// Source: https://blog.magnusmontin.net/2022/01/20/bind-to-a-parent-element-in-winui-3/
+
+namespace AnEoT.Tools.VolumeCreator.Helpers;
 
 public static class AncestorSource
 {

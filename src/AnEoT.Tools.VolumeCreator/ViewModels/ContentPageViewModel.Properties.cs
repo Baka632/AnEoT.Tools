@@ -33,7 +33,7 @@ partial class ContentPageViewModel
     [ObservableProperty]
     [Required, NotifyDataErrorInfo]
     [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateWordFiles))]
-    private ObservableCollection<MarkdownWarpper> wordFiles = [];
+    private ObservableCollection<MarkdownWrapper> wordFiles = [];
 
     private void OnWordFilesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
@@ -52,7 +52,7 @@ partial class ContentPageViewModel
         }
     }
 
-    public static ValidationResult ValidateWordFiles(ObservableCollection<MarkdownWarpper> files)
+    public static ValidationResult ValidateWordFiles(ObservableCollection<MarkdownWrapper> files)
     {
         if (files.Count > 0)
         {

@@ -80,21 +80,40 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         {
             foreach (StorageFile file in files)
             {
-                string markdown = await Task.Run(() => WordToMarkdownService.GetMarkdown(file.Path));
-                MarkdownWarpper toMarkdownFile = new(file, markdown);
-                WordFiles.Add(toMarkdownFile);
+                await AddSingleWordFileItem(file);
             }
         }
     }
 
+    public async Task AddSingleWordFileItem(StorageFile file)
+    {
+        if (WordFiles.Any(wrapper => wrapper.File.Path == file.Path))
+        {
+            return;
+        }
+
+        MarkdownWrapper toMarkdownFile;
+
+        try
+        {
+            string markdown = await Task.Run(() => WordToMarkdownService.GetMarkdown(file.Path));
+            toMarkdownFile = new(file, markdown);
+            WordFiles.Add(toMarkdownFile);
+        }
+        catch (FileFormatException ex)
+        {
+            await ShowDialogAsync($"文件 {file.DisplayName} 不是有效的 DOCX 文件", $"错误信息：{ex.Message}");
+        }
+    }
+
     [RelayCommand]
-    private void RemoveWordFileItem(MarkdownWarpper target)
+    private void RemoveWordFileItem(MarkdownWrapper target)
     {
         WordFiles.Remove(target);
     }
     
     [RelayCommand]
-    private static async Task ViewWordFileItem(MarkdownWarpper target)
+    private static async Task ViewWordFileItem(MarkdownWrapper target)
     {
         await ShowDialogAsync(target.File.DisplayName, target.Markdown[..20]);
     }
