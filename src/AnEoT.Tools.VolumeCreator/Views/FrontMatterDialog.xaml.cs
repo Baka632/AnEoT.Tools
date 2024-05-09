@@ -23,9 +23,9 @@ public sealed partial class FrontMatterDialog : ContentDialog
     [ObservableProperty]
     private DateTimeOffset? articleDate = DateTimeOffset.UtcNow;
     [ObservableProperty]
-    private ObservableCollection<StringView> categories = ["ÇëÊäÈëÄÚÈÝ"];
+    private ObservableCollection<StringView> categories = [string.Empty];
     [ObservableProperty]
-    private ObservableCollection<StringView> tags = ["ÇëÊäÈëÄÚÈÝ"];
+    private ObservableCollection<StringView> tags = [string.Empty];
     [ObservableProperty]
     private int order = 1;
     [ObservableProperty]

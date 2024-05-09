@@ -24,10 +24,12 @@ public sealed partial class MarkdownEditViewModel(MarkdownWrapper wrapper, Markd
     [RelayCommand]
     private void AddEodTagToText(TextBox textBox)
     {
+        const string eodTag = "<eod />";
+
         ArgumentNullException.ThrowIfNull(textBox);
         int position = textBox.SelectionStart;
-        MarkdownString = MarkdownString.Insert(position, "<eod />");
-        textBox.Select(position, 0);
+        MarkdownString = MarkdownString.Insert(position, eodTag);
+        textBox.Select(position + eodTag.Length, 0);
     }
 
     [RelayCommand]
@@ -48,6 +50,35 @@ public sealed partial class MarkdownEditViewModel(MarkdownWrapper wrapper, Markd
         }
     }
 
+    [RelayCommand]
+    private async Task AddEditorsInfoToText(TextBox textBox)
+    {
+        EditorsInfoDialog dialog = new()
+        {
+            XamlRoot = view.XamlRoot
+        };
+
+        ContentDialogResult result = await dialog.ShowAsync();
+
+        if (result == ContentDialogResult.Primary)
+        {
+            EditorsInfo editorsInfo = dialog.EditorsInfo;
+
+            StringBuilder stringBuilder = new(70);
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine();
+            stringBuilder.Append(editorsInfo.ToString());
+
+            string editorsInfoLiteral = stringBuilder.ToString();
+
+            if (string.IsNullOrWhiteSpace(editorsInfoLiteral) != true)
+            {
+                MarkdownString += editorsInfoLiteral;
+                textBox.Select(MarkdownString.Length, 0);
+            }
+        }
+    }
+
     private static string GetYamlFrontMatterString(FrontMatter frontMatter)
     {
         ISerializer serializer = new SerializerBuilder()
@@ -56,11 +87,10 @@ public sealed partial class MarkdownEditViewModel(MarkdownWrapper wrapper, Markd
                         .Build();
         string yamlString = serializer.Serialize(frontMatter).Trim();
 
-        StringBuilder stringBuilder = new(150);
+        StringBuilder stringBuilder = new(200);
         stringBuilder.AppendLine("---");
         stringBuilder.AppendLine(yamlString);
         stringBuilder.AppendLine("---");
-        stringBuilder.AppendLine();
         stringBuilder.AppendLine();
 
         return stringBuilder.ToString();

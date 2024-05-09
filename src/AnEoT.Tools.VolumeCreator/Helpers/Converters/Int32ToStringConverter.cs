@@ -13,6 +13,6 @@ public sealed class Int32ToStringConverter : IValueConverter
     {
         return value is string str && int.TryParse(str, out int integer)
             ? integer
-            : DependencyProperty.UnsetValue;
+            : -1;
     }
 }
