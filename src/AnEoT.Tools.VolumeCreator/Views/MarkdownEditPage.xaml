@@ -42,7 +42,28 @@
                     <FontIcon Glyph="&#xEDFB;" />
                 </AppBarButton.Icon>
             </AppBarButton>
-            <AppBarButton Icon="AlignLeft" Label="添加文章引言" />
+            <AppBarButton
+                AllowFocusOnInteraction="True"
+                Icon="AlignLeft"
+                Label="添加文章引言">
+                <AppBarButton.Flyout>
+                    <Flyout x:Name="ArticleQuoteFlyout">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox
+                                MaxWidth="200"
+                                AcceptsReturn="True"
+                                IsSpellCheckEnabled="False"
+                                PlaceholderText="输入文章引言"
+                                Text="{x:Bind ViewModel.ArticleQuote, Mode=TwoWay}"
+                                TextWrapping="Wrap" />
+                            <Button
+                                Margin="5,0,0,0"
+                                Click="OnCloseArticleQuoteFlyoutButtonClicked"
+                                Content="确定" />
+                        </StackPanel>
+                    </Flyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
         </CommandBar>
 
         <Grid Grid.Row="1" Margin="5,0,0,0">
@@ -64,6 +85,7 @@
                     Grid.Row="1"
                     AcceptsReturn="True"
                     IsSpellCheckEnabled="False"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
                     Text="{x:Bind ViewModel.MarkdownString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     TextWrapping="Wrap" />
             </Grid>
@@ -87,7 +109,10 @@
                     BorderBrush="{ThemeResource TextControlElevationBorderBrush}"
                     BorderThickness="{ThemeResource TextControlBorderThemeThickness}"
                     CornerRadius="{ThemeResource ControlCornerRadius}">
-                    <mdControl:MarkdownTextBlock Background="Transparent" Text="{x:Bind ViewModel.MarkdownString, Mode=OneWay}" />
+                    <mdControl:MarkdownTextBlock
+                        x:Name="MarkdownRenderTextBlock"
+                        Background="Transparent"
+                        Text="{x:Bind ViewModel.MarkdownString, Mode=OneWay}" />
                 </ScrollViewer>
             </Grid>
         </Grid>

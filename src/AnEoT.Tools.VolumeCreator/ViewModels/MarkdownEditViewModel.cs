@@ -15,10 +15,34 @@ public sealed partial class MarkdownEditViewModel(MarkdownWrapper wrapper, Markd
 
     [ObservableProperty]
     private string markdownString = wrapper.Markdown;
+    [ObservableProperty]
+    private string articleQuote = string.Empty;
 
     partial void OnMarkdownStringChanged(string value)
     {
         MarkdownWrapper.Markdown = value;
+    }
+
+    partial void OnArticleQuoteChanged(string value)
+    {
+        int index = 0;
+        if (MarkdownString.StartsWith("---"))
+        {
+            int targetIndex = MarkdownString.IndexOf("---", 3);
+            if (targetIndex != -1)
+            {
+                index = targetIndex + 3;
+            }
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.AppendLine(value.ReplaceLineEndings($"{Environment.NewLine}{Environment.NewLine}"));
+        stringBuilder.AppendLine();
+        stringBuilder.AppendLine("<!-- more -->");
+        stringBuilder.AppendLine();
+
+        string quoteLiteral = stringBuilder.ToString();
+        MarkdownString = MarkdownString.Insert(index, quoteLiteral);
     }
 
     [RelayCommand]

@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Controls;
 using AnEoT.Tools.Shared;
 using AnEoT.Tools.Shared.Models;
-using AnEoT.Tools.WordToMarkdown.Models;
 using AnEoT.Tools.WordToMarkdown.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;

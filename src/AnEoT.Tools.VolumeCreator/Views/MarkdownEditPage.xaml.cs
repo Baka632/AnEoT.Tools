@@ -1,5 +1,6 @@
 #pragma warning disable CS8618
 
+using AnEoT.Tools.VolumeCreator.Helpers;
 using AnEoT.Tools.VolumeCreator.Models;
 using AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -15,6 +16,7 @@ public sealed partial class MarkdownEditPage : Page
     public MarkdownEditPage()
     {
         this.InitializeComponent();
+        MarkdownRenderTextBlock.SetRenderer<AnEoTMarkdownRenderer>();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -25,5 +27,10 @@ public sealed partial class MarkdownEditPage : Page
         }
 
         base.OnNavigatedTo(e);
+    }
+
+    private void OnCloseArticleQuoteFlyoutButtonClicked(object sender, RoutedEventArgs e)
+    {
+        ArticleQuoteFlyout.Hide();
     }
 }
