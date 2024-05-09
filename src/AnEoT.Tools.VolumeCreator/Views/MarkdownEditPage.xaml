@@ -21,8 +21,15 @@
             Grid.Row="0"
             HorizontalAlignment="Left"
             DefaultLabelPosition="Right">
-            <AppBarButton Icon="ContactInfo" Label="插入 Front Matter" />
-            <AppBarButton Label="插入 &lt;eod /&gt; 标签">
+            <AppBarButton
+                Command="{x:Bind ViewModel.AddFrontMatterToTextCommand}"
+                CommandParameter="{x:Bind MarkdownTextBox}"
+                Icon="ContactInfo"
+                Label="插入 Front Matter" />
+            <AppBarButton
+                Command="{x:Bind ViewModel.AddEodTagToTextCommand}"
+                CommandParameter="{x:Bind MarkdownTextBox}"
+                Label="插入 &lt;eod /&gt; 标签">
                 <AppBarButton.Icon>
                     <PathIcon HorizontalAlignment="Center" Data="M 161.03 154.06 305.81 154.06 305.81 240.52 371.61 240.52 371.61 154.06 483.87 154.06 516.39 92.13 53.27 93.53 339.1 603.1 681.29 0 0 0 34.21 60.53 569.03 61.16 371.61 411.87 370.84 278.71 305.81 279.23 305.81 412.39 161.03 154.06 Z" />
                 </AppBarButton.Icon>
@@ -41,7 +48,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-
+            <ContentDialog />
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -50,8 +57,10 @@
 
                 <TextBlock Margin="0,0,0,5" Text="Markdown 文本" />
                 <TextBox
+                    x:Name="MarkdownTextBox"
                     Grid.Row="1"
                     AcceptsReturn="True"
+                    IsSpellCheckEnabled="False"
                     Text="{x:Bind ViewModel.MarkdownString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     TextWrapping="Wrap" />
             </Grid>
@@ -69,14 +78,14 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Margin="0,0,0,5" Text="预览" />
-                <Border
+                <ScrollViewer
                     Grid.Row="1"
                     Padding="10,5,5,5"
                     BorderBrush="{ThemeResource TextControlElevationBorderBrush}"
                     BorderThickness="{ThemeResource TextControlBorderThemeThickness}"
                     CornerRadius="{ThemeResource ControlCornerRadius}">
                     <mdControl:MarkdownTextBlock Background="Transparent" Text="{x:Bind ViewModel.MarkdownString, Mode=OneWay}" />
-                </Border>
+                </ScrollViewer>
             </Grid>
         </Grid>
     </Grid>

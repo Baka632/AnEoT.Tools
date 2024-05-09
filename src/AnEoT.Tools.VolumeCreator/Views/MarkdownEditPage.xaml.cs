@@ -21,7 +21,7 @@ public sealed partial class MarkdownEditPage : Page
     {
         if (e.Parameter is MarkdownWrapper wrapper)
         {
-            ViewModel = new MarkdownEditViewModel(wrapper);
+            ViewModel = new MarkdownEditViewModel(wrapper, this);
         }
 
         base.OnNavigatedTo(e);

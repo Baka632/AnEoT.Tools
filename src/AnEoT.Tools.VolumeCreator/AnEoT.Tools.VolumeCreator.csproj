@@ -28,6 +28,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\ContentPage.xaml" />
+    <None Remove="Views\FrontMatterDialog.xaml" />
     <None Remove="Views\MarkdownEditPage.xaml" />
     <None Remove="Views\MarkdownEditWindow.xaml" />
   </ItemGroup>
@@ -76,6 +77,11 @@
     <Using Include="Windows.Foundation" />
     <Using Include="Windows.Foundation.Collections" />
     <Using Include="System.Runtime.InteropServices.WindowsRuntime" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\FrontMatterDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\MarkdownEditPage.xaml">
