@@ -6,12 +6,16 @@ using AnEoT.Tools.Shared.Models;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
 using System.Text;
+using System.Collections.ObjectModel;
+using Windows.Storage;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
-public sealed partial class MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage view) : ObservableObject
+public sealed partial class MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage view, ObservableCollection<ImageListNode> imageFiles) : ObservableObject
 {
     public MarkdownWrapper MarkdownWrapper { get; } = wrapper;
+    public ObservableCollection<ImageListNode> ImageFiles { get; } = imageFiles;
+    public Dictionary<string, StorageFile> MarkdownImageUriToFileMapping { get; } = new(10);
 
     [ObservableProperty]
     private string markdownString = wrapper.Markdown;
@@ -105,6 +109,38 @@ public sealed partial class MarkdownEditViewModel(MarkdownWrapper wrapper, Markd
         ArgumentNullException.ThrowIfNull(textBox);
         MarkdownString += $"{Environment.NewLine}{Environment.NewLine}{fakeAdsTag}";
         textBox.Select(MarkdownString.Length, 0);
+    }
+
+    public void InsertImageToText(TextBox textBox, FileNode fileNode)
+    {
+        List<string> targetParts = new(3);
+        ImageListNode? parentNode = fileNode;
+        while (true)
+        {
+            if (parentNode is null)
+            {
+                break;
+            }
+            targetParts.Add(parentNode.DisplayName);
+
+            if (parentNode.DisplayName.Equals("res", StringComparison.OrdinalIgnoreCase))
+            {
+                break;
+            }
+
+            parentNode = parentNode.Parent;
+        }
+
+        targetParts.Reverse();
+
+        string imageUri = $"./{string.Join('/', targetParts)}";
+        string markdownImageMark = $"![]({imageUri})";
+
+        MarkdownImageUriToFileMapping[imageUri] = fileNode.File;
+
+        int position = textBox.SelectionStart;
+        MarkdownString = MarkdownString.Insert(position, markdownImageMark);
+        textBox.Select(position + markdownImageMark.Length, 0);
     }
 
     private static string GetYamlFrontMatterString(FrontMatter frontMatter)

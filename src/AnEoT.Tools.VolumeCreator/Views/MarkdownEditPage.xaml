@@ -4,12 +4,63 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:AnEoT.Tools.VolumeCreator.Helpers"
     xmlns:local="using:AnEoT.Tools.VolumeCreator.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mdControl="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:models="using:AnEoT.Tools.VolumeCreator.Models"
     xmlns:viewmodels="using:AnEoT.Tools.VolumeCreator.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:MarkdownEditViewModel}"
     mc:Ignorable="d">
+
+    <Page.Resources>
+        <DataTemplate x:Key="FileNodeTemplate" x:DataType="models:ImageListNode">
+            <TreeViewItem ItemsSource="{x:Bind Children}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <SymbolIcon
+                        Grid.Column="0"
+                        Margin="0,0,5,0"
+                        VerticalAlignment="Center"
+                        Symbol="Document" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{x:Bind DisplayName}" />
+                </Grid>
+            </TreeViewItem>
+        </DataTemplate>
+
+        <DataTemplate x:Key="FolderNodeTemplate" x:DataType="models:ImageListNode">
+            <TreeViewItem Background="Transparent" ItemsSource="{x:Bind Children}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <FontIcon
+                        Grid.Column="0"
+                        Margin="0,0,5,0"
+                        VerticalAlignment="Center"
+                        Glyph="&#xE8B7;" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{x:Bind DisplayName}" />
+                </Grid>
+            </TreeViewItem>
+        </DataTemplate>
+
+        <helpers:ImageNodeDataTemplateSelector
+            x:Key="NodeTemplateSelector"
+            FileTemplate="{StaticResource FileNodeTemplate}"
+            FolderTemplate="{StaticResource FolderNodeTemplate}" />
+    </Page.Resources>
 
     <Grid Margin="0,0,0,10">
         <Grid.RowDefinitions>
@@ -78,6 +129,25 @@
                     <KeyboardAccelerator Key="F" Modifiers="Control" />
                 </AppBarButton.KeyboardAccelerators>
             </AppBarButton>
+            <AppBarButton Label="插入图像">
+                <AppBarButton.Icon>
+                    <SymbolIcon Symbol="Caption" />
+                </AppBarButton.Icon>
+                <AppBarButton.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="I" Modifiers="Control" />
+                </AppBarButton.KeyboardAccelerators>
+                <AppBarButton.Flyout>
+                    <Flyout>
+                        <TreeView
+                            CanDragItems="False"
+                            CanReorderItems="False"
+                            ItemInvoked="OnFileTreeViewItemInvoked"
+                            ItemTemplateSelector="{StaticResource NodeTemplateSelector}"
+                            ItemsSource="{x:Bind ViewModel.ImageFiles, Mode=OneWay}"
+                            SelectionMode="None" />
+                    </Flyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
         </CommandBar>
 
         <Grid Grid.Row="1" Margin="5,0,0,0">
@@ -126,6 +196,7 @@
                     <mdControl:MarkdownTextBlock
                         x:Name="MarkdownRenderTextBlock"
                         Background="Transparent"
+                        ImageResolving="OnMarkdownRenderTextBlockImageResolving"
                         ParagraphMargin="0,10,0,10"
                         Text="{x:Bind ViewModel.MarkdownString, Mode=OneWay}" />
                 </ScrollViewer>

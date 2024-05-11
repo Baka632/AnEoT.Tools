@@ -13,8 +13,8 @@ public sealed class ImageNodeDataTemplateSelector : DataTemplateSelector
 
         return model.Type switch
         {
-            ImageFileListNodeType.File => FileTemplate!,
-            ImageFileListNodeType.Folder => FolderTemplate!,
+            ImageListNodeType.File => FileTemplate!,
+            ImageListNodeType.Folder => FolderTemplate!,
             _ => throw new NotImplementedException(),
         };
     }

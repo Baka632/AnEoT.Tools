@@ -115,11 +115,11 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     }
     
     [RelayCommand]
-    private static void ViewWordFileItem(MarkdownWrapper wrapper)
+    private void ViewWordFileItem(MarkdownWrapper wrapper)
     {
         MarkdownEditWindow window = new()
         {
-            Model = wrapper,
+            Model = (wrapper, ImageFiles),
             Title = $"{wrapper.File.DisplayName} - Markdown 编辑窗口"
         };
         window.Activate();

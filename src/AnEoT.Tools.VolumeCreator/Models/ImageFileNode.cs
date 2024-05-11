@@ -11,7 +11,7 @@ public abstract class ImageListNode
 
     public ImageListNode? Parent { get; set; } = null;
 
-    public ImageFileListNodeType Type { get; set; }
+    public ImageListNodeType Type { get; set; }
 
     public override string ToString() => DisplayName;
 }
@@ -24,7 +24,7 @@ public sealed class FileNode : ImageListNode
     {
         File = file;
         DisplayName = file.Name;
-        Type = ImageFileListNodeType.File;
+        Type = ImageListNodeType.File;
         Parent = parent;
     }
 }
@@ -34,14 +34,12 @@ public sealed class FolderNode : ImageListNode
     public FolderNode(string folderName, ImageListNode? parent)
     {
         DisplayName = folderName;
-        Type = ImageFileListNodeType.Folder;
+        Type = ImageListNodeType.Folder;
         Parent = parent;
     }
-
-    public override string ToString() => $"{DisplayName} 文件夹";
 }
 
-public enum ImageFileListNodeType
+public enum ImageListNodeType
 {
     /// <summary>
     /// 文件节点

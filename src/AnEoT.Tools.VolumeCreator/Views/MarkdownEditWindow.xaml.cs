@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using AnEoT.Tools.VolumeCreator.Models;
 using Microsoft.UI.Composition.SystemBackdrops;
 using WinUIEx;
@@ -9,7 +10,7 @@ namespace AnEoT.Tools.VolumeCreator.Views;
 /// </summary>
 public sealed partial class MarkdownEditWindow : WindowEx
 {
-    public MarkdownWrapper? Model { get; set; }
+    public (MarkdownWrapper?, ObservableCollection<ImageListNode>) Model { get; set; }
 
     public MarkdownEditWindow()
     {
@@ -30,9 +31,6 @@ public sealed partial class MarkdownEditWindow : WindowEx
 
     private void OnGridLoaded(object sender, RoutedEventArgs e)
     {
-        if (Model is not null)
-        {
-            ContentFrame.Navigate(typeof(MarkdownEditPage), Model);
-        }
+        ContentFrame.Navigate(typeof(MarkdownEditPage), Model);
     }
 }

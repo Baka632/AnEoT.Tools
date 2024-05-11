@@ -43,6 +43,7 @@ partial class ContentPageViewModel
         root.Children.Add(new FolderNode("comic", root));
         root.Children.Add(new FolderNode("illustration", root));
         root.Children.Add(new FolderNode("ope_sec", root));
+        root.Children.Add(new FolderNode("interview", root));
 
         ImageFiles.Add(root);
     }
