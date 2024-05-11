@@ -9,7 +9,6 @@ using System.Runtime.InteropServices;
 using AnEoT.Tools.VolumeCreator.Models;
 using AnEoT.Tools.Shared;
 using AnEoT.Tools.VolumeCreator.Views;
-using Microsoft.UI.Windowing;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -23,7 +22,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    private async Task OpenTargetFolder()
+    private async Task SaveVolume()
     {
         nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
         FolderPicker picker = new();
@@ -35,7 +34,6 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         if (folder != null)
         {
             _targetFolder = folder;
-            ShowContent = true;
         }
     }
 

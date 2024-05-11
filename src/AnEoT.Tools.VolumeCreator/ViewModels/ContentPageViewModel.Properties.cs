@@ -19,8 +19,6 @@ partial class ContentPageViewModel
     [NotifyPropertyChangedFor(nameof(CoverImageVerticalAlignmentMode))]
     private BitmapImage? _volumeCover;
     [ObservableProperty]
-    private bool _showContent;
-    [ObservableProperty]
     private bool _isVolumeCoverError;
 
     [ObservableProperty]

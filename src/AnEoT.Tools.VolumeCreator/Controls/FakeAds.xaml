@@ -1,0 +1,41 @@
+<UserControl
+    x:Class="AnEoT.Tools.VolumeCreator.Controls.FakeAds"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:AnEoT.Tools.VolumeCreator.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Width="600">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            HorizontalAlignment="Right"
+            FontSize="10"
+            FontStyle="Italic">
+            <Run Text="此处可能展示...额，临时广告？" />
+            <Hyperlink>了解详情（但是点了也没用）</Hyperlink>
+        </TextBlock>
+
+        <Grid Grid.Row="1" HorizontalAlignment="Center">
+            <!--<Image />-->
+            <TextBlock
+                FontSize="20"
+                FontWeight="Bold"
+                Foreground="Red"
+                TextDecorations="Underline">
+                <Run>你们一定要看回归线啊！！！</Run>
+                <LineBreak />
+                <Span Foreground="AliceBlue">一定要看</Span>
+                <Span Foreground="SkyBlue">泰拉最大</Span>
+                <Span Foreground="Orange">的杂志社出版的</Span>
+                <Span Foreground="LightCoral">回↗归↘线↗啊！！！↝</Span>
+            </TextBlock>
+        </Grid>
+    </Grid>
+</UserControl>

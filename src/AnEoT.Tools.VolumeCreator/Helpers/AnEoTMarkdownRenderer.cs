@@ -1,20 +1,17 @@
 ﻿#pragma warning disable CS0618
 #pragma warning disable IDE0290
 
+using Microsoft.UI.Xaml.Documents;
+using AnEoT.Tools.VolumeCreator.Controls;
 using CommunityToolkit.Common.Parsers.Markdown;
-using CommunityToolkit.Common.Parsers.Markdown.Blocks;
 using CommunityToolkit.Common.Parsers.Markdown.Inlines;
 using CommunityToolkit.Common.Parsers.Markdown.Render;
 using CommunityToolkit.WinUI.UI.Controls.Markdown.Render;
-using Microsoft.UI.Text;
-using Microsoft.UI.Xaml.Documents;
-using Microsoft.UI.Xaml.Markup;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.UI.Xaml.Shapes;
+using System.Text.RegularExpressions;
 
 namespace AnEoT.Tools.VolumeCreator.Helpers;
 
-public class AnEoTMarkdownRenderer : MarkdownRenderer
+public partial class AnEoTMarkdownRenderer : MarkdownRenderer
 {
     public AnEoTMarkdownRenderer(MarkdownDocument document, ILinkRegister linkRegister, IImageResolver imageResolver, ICodeBlockResolver codeBlockResolver) : base(document, linkRegister, imageResolver, codeBlockResolver)
     {
@@ -22,32 +19,95 @@ public class AnEoTMarkdownRenderer : MarkdownRenderer
 
     protected override void RenderTextRun(TextRunInline element, IRenderContext context)
     {
-        if (element.Text.Replace(" ", string.Empty).Equals("<eod/>"))
+        string text = element.Text;
+        Match tagsMatch = GetTagsRegex().Match(text);
+        Regex eodMatch = GetEodRegex();
+        Regex fakeAdsMatch = GetFakeAdsRegex();
+
+        if (tagsMatch.Success)
         {
-            InlineRenderContext localContext = (InlineRenderContext)context;
-            InlineCollection inlineCollection = localContext.InlineCollection;
+            ReadOnlySpan<char> textSpan = text.AsSpan();
 
-            const string pathIconXaml = $"""<PathIcon xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" HorizontalAlignment="Center" Data="M 161.03 154.06 305.81 154.06 305.81 240.52 371.61 240.52 371.61 154.06 483.87 154.06 516.39 92.13 53.27 93.53 339.1 603.1 681.29 0 0 0 34.21 60.53 569.03 61.16 371.61 411.87 370.84 278.71 305.81 279.23 305.81 412.39 161.03 154.06 Z" />""";
+            List<(Range, string) > tagsRanges = new(10);
 
-            PathIcon? icon = XamlReader.Load(pathIconXaml) as PathIcon;
-
-            Viewbox viewbox = new()
+            while (tagsMatch.Success)
             {
-                Child = icon,
-                Stretch = Stretch.Uniform,
-                Height = 15,
-                Width = 15,
-            };
+                Range tagRange = new(tagsMatch.Index, tagsMatch.Index + tagsMatch.Length);
+                tagsRanges.Add((tagRange, tagsMatch.Value));
+                tagsMatch = tagsMatch.NextMatch();
+            }
 
-            InlineUIContainer item = new()
+            Range lastTagRange = new(0, 0);
+
+            for (int i = 0; i < tagsRanges.Count; i++)
             {
-                Child = viewbox,
-            };
-            inlineCollection.Add(item);
+                (Range tagRange, string tagString) = tagsRanges[i];
+                bool hasNextTag = i + 1 < tagsRanges.Count;
+
+                ReadOnlySpan<char> normalTextSpan = textSpan[lastTagRange.End.Value..tagRange.Start.Value];
+
+                if (normalTextSpan.Length > 0)
+                {
+                    TextRunInline newRunInline = new()
+                    {
+                        Text = normalTextSpan.ToString(),
+                        Type = element.Type
+                    };
+                    base.RenderTextRun(newRunInline, context);
+                }
+
+                if (eodMatch.IsMatch(tagString))
+                {
+                    InlineRenderContext localContext = (InlineRenderContext)context;
+                    InlineCollection inlineCollection = localContext.InlineCollection;
+
+                    InlineUIContainer item = new()
+                    {
+                        Child = new Eod(),
+                    };
+                    inlineCollection.Add(item);
+                }
+                else if (fakeAdsMatch.IsMatch(tagString))
+                {
+                    InlineRenderContext localContext = (InlineRenderContext)context;
+                    InlineCollection inlineCollection = localContext.InlineCollection;
+
+                    InlineUIContainer item = new()
+                    {
+                        Child = new FakeAds(),
+                    };
+                    inlineCollection.Add(item);
+                }
+
+                if (hasNextTag == false)
+                {
+                    ReadOnlySpan<char> remainingTextSpan = textSpan[tagRange.End.Value..];
+                    if (remainingTextSpan.Length > 0)
+                    {
+                        TextRunInline newRunInline = new()
+                        {
+                            Text = remainingTextSpan.ToString(),
+                            Type = element.Type
+                        };
+                        base.RenderTextRun(newRunInline, context);
+                    }
+                }
+
+                lastTagRange = tagRange;
+            }
         }
         else
         {
             base.RenderTextRun(element, context);
         }
     }
+
+    [GeneratedRegex(@"(<eod( *)/>)|(<FakeAds( *)/>)")]
+    private static partial Regex GetTagsRegex();
+
+    [GeneratedRegex(@"<eod( *)/>")]
+    private static partial Regex GetEodRegex();
+    
+    [GeneratedRegex(@"<FakeAds( *)/>")]
+    private static partial Regex GetFakeAdsRegex();
 }

@@ -23,16 +23,8 @@
             HorizontalAlignment="Left"
             DefaultLabelPosition="Right">
             <AppBarButton
-                AccessKey="O"
-                Command="{x:Bind ViewModel.OpenTargetFolderCommand}"
-                Icon="OpenLocal"
-                Label="打开目标文件夹">
-                <AppBarButton.KeyboardAccelerators>
-                    <KeyboardAccelerator Key="O" Modifiers="Control" />
-                </AppBarButton.KeyboardAccelerators>
-            </AppBarButton>
-            <AppBarButton
                 AccessKey="S"
+                Command="{x:Bind ViewModel.SaveVolumeCommand}"
                 Icon="Save"
                 Label="保存">
                 <AppBarButton.KeyboardAccelerators>
@@ -41,10 +33,7 @@
             </AppBarButton>
         </CommandBar>
 
-        <Grid
-            Grid.Row="1"
-            Margin="0,0,0,10"
-            Visibility="{x:Bind ViewModel.ShowContent, Converter={StaticResource BoolToVisibilityConverter}, Mode=TwoWay}">
+        <Grid Grid.Row="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MaxWidth="350" />
                 <ColumnDefinition />

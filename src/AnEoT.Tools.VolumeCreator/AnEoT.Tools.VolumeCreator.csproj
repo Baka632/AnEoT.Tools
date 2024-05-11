@@ -27,6 +27,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Controls\Eod.xaml" />
+    <None Remove="Controls\FakeAds.xaml" />
     <None Remove="Views\ContentPage.xaml" />
     <None Remove="Views\EditorsInfoDialog.xaml" />
     <None Remove="Views\FrontMatterDialog.xaml" />
@@ -80,6 +82,11 @@
     <Using Include="System.Runtime.InteropServices.WindowsRuntime" />
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Controls\FakeAds.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Views\EditorsInfoDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -101,6 +108,11 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\ContentPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\Eod.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
