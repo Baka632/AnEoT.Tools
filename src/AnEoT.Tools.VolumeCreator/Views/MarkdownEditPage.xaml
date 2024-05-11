@@ -126,6 +126,7 @@
                     <mdControl:MarkdownTextBlock
                         x:Name="MarkdownRenderTextBlock"
                         Background="Transparent"
+                        ParagraphMargin="0,10,0,10"
                         Text="{x:Bind ViewModel.MarkdownString, Mode=OneWay}" />
                 </ScrollViewer>
             </Grid>
