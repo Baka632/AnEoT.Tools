@@ -87,13 +87,7 @@ public sealed partial class MarkdownEditViewModel(MarkdownWrapper wrapper, Markd
         if (result == ContentDialogResult.Primary)
         {
             EditorsInfo editorsInfo = dialog.EditorsInfo;
-
-            StringBuilder stringBuilder = new(70);
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine();
-            stringBuilder.Append(editorsInfo.ToString());
-
-            string editorsInfoLiteral = stringBuilder.ToString();
+            string editorsInfoLiteral = $"{Environment.NewLine}{Environment.NewLine}{editorsInfo}";
 
             if (string.IsNullOrWhiteSpace(editorsInfoLiteral) != true)
             {
@@ -101,6 +95,16 @@ public sealed partial class MarkdownEditViewModel(MarkdownWrapper wrapper, Markd
                 textBox.Select(MarkdownString.Length, 0);
             }
         }
+    }
+
+    [RelayCommand]
+    private void AddFakeAdsTagToText(TextBox textBox)
+    {
+        const string fakeAdsTag = "<FakeAds />";
+
+        ArgumentNullException.ThrowIfNull(textBox);
+        MarkdownString += $"{Environment.NewLine}{Environment.NewLine}{fakeAdsTag}";
+        textBox.Select(MarkdownString.Length, 0);
     }
 
     private static string GetYamlFrontMatterString(FrontMatter frontMatter)

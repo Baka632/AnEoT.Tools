@@ -5,9 +5,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:AnEoT.Tools.VolumeCreator.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Loaded="OnUserControlLoaded"
     mc:Ignorable="d">
 
-    <Grid Width="600">
+    <Grid Margin="0,10,0,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition />
@@ -15,27 +16,33 @@
 
         <TextBlock
             Grid.Row="0"
+            Margin="0,0,0,10"
             HorizontalAlignment="Right"
             FontSize="10"
             FontStyle="Italic">
-            <Run Text="此处可能展示...额，临时广告？" />
-            <Hyperlink>了解详情（但是点了也没用）</Hyperlink>
+            <Run Text="{x:Bind AdTips, Mode=OneWay}" />
+            <Hyperlink Click="OnHyperlinkClicked">
+                <Run Text="{x:Bind AdAbout, Mode=OneWay}" />
+            </Hyperlink>
         </TextBlock>
 
-        <Grid Grid.Row="1" HorizontalAlignment="Center">
-            <!--<Image />-->
-            <TextBlock
-                FontSize="20"
-                FontWeight="Bold"
-                Foreground="Red"
-                TextDecorations="Underline">
-                <Run>你们一定要看回归线啊！！！</Run>
-                <LineBreak />
-                <Span Foreground="AliceBlue">一定要看</Span>
-                <Span Foreground="SkyBlue">泰拉最大</Span>
-                <Span Foreground="Orange">的杂志社出版的</Span>
-                <Span Foreground="LightCoral">回↗归↘线↗啊！！！↝</Span>
-            </TextBlock>
+        <Grid
+            x:Name="AdContentGrid"
+            Grid.Row="1"
+            HorizontalAlignment="Center"
+            x:Load="{x:Bind ShowCustomAdXaml, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
+            Tapped="OnAdContentGridTapped">
+            <Image HorizontalAlignment="Center" Stretch="Uniform">
+                <Image.Source>
+                    <BitmapImage UriSource="{x:Bind AdImageUri, Mode=OneWay}" />
+                </Image.Source>
+            </Image>
         </Grid>
+
+        <Viewbox
+            x:Name="CustomXamlAdViewbox"
+            Grid.Row="1"
+            HorizontalAlignment="Center"
+            x:Load="{x:Bind ShowCustomAdXaml, Mode=OneWay}" />
     </Grid>
 </UserControl>
