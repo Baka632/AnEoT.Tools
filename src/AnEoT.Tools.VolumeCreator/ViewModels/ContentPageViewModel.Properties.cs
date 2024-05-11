@@ -1,10 +1,10 @@
-﻿using Microsoft.UI.Xaml.Media.Imaging;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
+using Microsoft.UI.Xaml.Media.Imaging;
 using AnEoT.Tools.VolumeCreator.Models;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Globalization;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -13,6 +13,7 @@ partial class ContentPageViewModel
     public bool IsVolumeCoverNotExist => VolumeCover is null;
     public VerticalAlignment CoverImageVerticalAlignmentMode => VolumeCover is null ? VerticalAlignment.Stretch : VerticalAlignment.Top;
     public bool ShowNotifyAddWordFile => WordFiles.Count <= 0;
+    public bool ShowNotifyAddImagesFile => ImageFiles.Count <= 0;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsVolumeCoverNotExist))]
@@ -32,10 +33,28 @@ partial class ContentPageViewModel
     [Required, NotifyDataErrorInfo]
     [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateWordFiles))]
     private ObservableCollection<MarkdownWrapper> wordFiles = [];
+    [ObservableProperty]
+    [Required]
+    private ObservableCollection<ImageListNode> imageFiles = [];
+
+    private void InitializeImageFiles()
+    {
+        FolderNode root = new("res", null);
+        root.Children.Add(new FolderNode("comic", root));
+        root.Children.Add(new FolderNode("illustration", root));
+        root.Children.Add(new FolderNode("ope_sec", root));
+
+        ImageFiles.Add(root);
+    }
 
     private void OnWordFilesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(ShowNotifyAddWordFile));
+    }
+
+    private void OnImagesFilesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(ShowNotifyAddImagesFile));
     }
 
     public static ValidationResult ValidateVolumeFolderName(string folderName)

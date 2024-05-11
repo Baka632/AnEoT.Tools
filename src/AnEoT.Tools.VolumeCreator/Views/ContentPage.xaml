@@ -12,6 +12,90 @@
     d:DataContext="{d:DesignInstance Type=viewmodels:ContentPageViewModel}"
     mc:Ignorable="d">
 
+    <Page.Resources>
+        <DataTemplate x:Key="FileNodeTemplate" x:DataType="models:ImageListNode">
+            <TreeViewItem ItemsSource="{x:Bind Children}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <SymbolIcon
+                        Grid.Column="0"
+                        Margin="0,0,5,0"
+                        VerticalAlignment="Center"
+                        Symbol="Document" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{x:Bind DisplayName}" />
+                    <Button
+                        Grid.Column="2"
+                        Width="35"
+                        Height="35"
+                        Margin="0,0,20,0"
+                        Padding="0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        helpers:AncestorSource.AncestorType="Page"
+                        Background="Transparent"
+                        Command="{Binding ViewModel.RemoveImageFileCommand}"
+                        CommandParameter="{x:Bind}">
+                        <SymbolIcon Symbol="Delete" />
+                    </Button>
+                </Grid>
+            </TreeViewItem>
+        </DataTemplate>
+
+        <DataTemplate x:Key="FolderNodeTemplate" x:DataType="models:ImageListNode">
+            <TreeViewItem
+                AllowDrop="True"
+                Background="Transparent"
+                DragOver="OnFolderNodeItemDragOver"
+                Drop="OnFolderNodeItemDrop"
+                ItemsSource="{x:Bind Children}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <FontIcon
+                        Grid.Column="0"
+                        Margin="0,0,5,0"
+                        VerticalAlignment="Center"
+                        Glyph="&#xE8B7;" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{x:Bind DisplayName}" />
+                    <Button
+                        Grid.Column="2"
+                        Width="35"
+                        Height="35"
+                        Margin="0,0,10,0"
+                        Padding="0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        helpers:AncestorSource.AncestorType="Page"
+                        Background="Transparent"
+                        Command="{Binding ViewModel.AddImageFileCommand}"
+                        CommandParameter="{x:Bind}">
+                        <SymbolIcon Symbol="Add" />
+                    </Button>
+                </Grid>
+            </TreeViewItem>
+        </DataTemplate>
+
+        <helpers:ImageNodeDataTemplateSelector
+            x:Key="NodeTemplateSelector"
+            FileTemplate="{StaticResource FileNodeTemplate}"
+            FolderTemplate="{StaticResource FolderNodeTemplate}" />
+    </Page.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -155,6 +239,40 @@
                                 </controls:SettingsCard>
                             </DataTemplate>
                         </controls:SettingsExpander.ItemTemplate>
+                    </controls:SettingsExpander>
+
+                    <controls:SettingsExpander
+                        AllowDrop="True"
+                        Description="添加期刊中使用的图像文件。"
+                        Header="图像文件列表"
+                        IsExpanded="True">
+                        <controls:SettingsExpander.HeaderIcon>
+                            <SymbolIcon Symbol="Pictures" />
+                        </controls:SettingsExpander.HeaderIcon>
+
+                        <controls:SettingsExpander.ItemsHeader>
+                            <InfoBar
+                                Title="请添加一些文件。"
+                                BorderThickness="0"
+                                CornerRadius="0"
+                                IsClosable="False"
+                                IsOpen="{x:Bind ViewModel.ShowNotifyAddImagesFile, Mode=OneWay}"
+                                Severity="Informational" />
+                        </controls:SettingsExpander.ItemsHeader>
+
+                        <controls:SettingsExpander.Items>
+                            <controls:SettingsCard
+                                HorizontalContentAlignment="Stretch"
+                                ContentAlignment="Vertical"
+                                Header="文件列表">
+                                <TreeView
+                                    CanDragItems="False"
+                                    CanReorderItems="False"
+                                    ItemTemplateSelector="{StaticResource NodeTemplateSelector}"
+                                    ItemsSource="{x:Bind ViewModel.ImageFiles, Mode=OneWay}"
+                                    SelectionMode="None" />
+                            </controls:SettingsCard>
+                        </controls:SettingsExpander.Items>
                     </controls:SettingsExpander>
                 </StackPanel>
             </ScrollViewer>

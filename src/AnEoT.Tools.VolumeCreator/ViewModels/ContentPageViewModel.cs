@@ -19,6 +19,8 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     public ContentPageViewModel()
     {
         WordFiles.CollectionChanged += OnWordFilesCollectionChanged;
+        ImageFiles.CollectionChanged += OnImagesFilesCollectionChanged;
+        InitializeImageFiles();
     }
 
     [RelayCommand]
@@ -121,6 +123,39 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             Title = $"{wrapper.File.DisplayName} - Markdown 编辑窗口"
         };
         window.Activate();
+    }
+
+    [RelayCommand]
+    private static async Task AddImageFile(FolderNode node)
+    {
+        nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
+
+        FileOpenPicker picker = new();
+
+        InitializeWithWindow.Initialize(picker, hwnd);
+
+        picker.FileTypeFilter.Add(".jpg");
+        picker.FileTypeFilter.Add(".png");
+        picker.FileTypeFilter.Add(".webp");
+
+        IReadOnlyList<StorageFile> files = await picker.PickMultipleFilesAsync();
+
+        if (files is not null)
+        {
+            foreach (StorageFile file in files)
+            {
+                if (!node.Children.Any(node => node is FileNode fileNode && fileNode.File.Path == file.Path))
+                {
+                    node.Children.Add(new FileNode(file, node));
+                }
+            }
+        }
+    }
+
+    [RelayCommand]
+    private static void RemoveImageFile(FileNode node)
+    {
+        node.Parent?.Children.Remove(node);
     }
 
     internal async Task SetCoverByStream(IRandomAccessStream stream)

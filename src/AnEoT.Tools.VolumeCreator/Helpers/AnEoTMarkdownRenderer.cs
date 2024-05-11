@@ -2,12 +2,12 @@
 #pragma warning disable IDE0290
 
 using Microsoft.UI.Xaml.Documents;
+using System.Text.RegularExpressions;
 using AnEoT.Tools.VolumeCreator.Controls;
 using CommunityToolkit.Common.Parsers.Markdown;
 using CommunityToolkit.Common.Parsers.Markdown.Inlines;
 using CommunityToolkit.Common.Parsers.Markdown.Render;
 using CommunityToolkit.WinUI.UI.Controls.Markdown.Render;
-using System.Text.RegularExpressions;
 
 namespace AnEoT.Tools.VolumeCreator.Helpers;
 
