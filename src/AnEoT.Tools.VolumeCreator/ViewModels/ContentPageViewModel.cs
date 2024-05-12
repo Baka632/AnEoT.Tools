@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using AnEoT.Tools.VolumeCreator.Models;
 using AnEoT.Tools.Shared;
 using AnEoT.Tools.VolumeCreator.Views;
+using ColorCode.Compilation.Languages;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -87,9 +88,16 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         }
     }
 
+    [RelayCommand]
+    private void AddEmptyWordFileItem()
+    {
+        MarkdownWrapper toMarkdownFile = new(null, string.Empty);
+        WordFiles.Add(toMarkdownFile);
+    }
+
     public async Task AddSingleWordFileItem(StorageFile file)
     {
-        if (WordFiles.Any(wrapper => wrapper.File.Path == file.Path))
+        if (WordFiles.Any(wrapper => wrapper?.File?.Path == file.Path))
         {
             return;
         }
@@ -120,7 +128,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         MarkdownEditWindow window = new()
         {
             Model = (wrapper, ImageFiles),
-            Title = $"{wrapper.File.DisplayName} - Markdown 编辑窗口"
+            Title = $"{wrapper.DisplayName} - Markdown 编辑窗口"
         };
         window.Activate();
     }

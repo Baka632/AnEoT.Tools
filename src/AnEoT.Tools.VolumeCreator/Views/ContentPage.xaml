@@ -212,7 +212,10 @@
                             <FontIcon Glyph="&#xE8FD;" />
                         </controls:SettingsExpander.HeaderIcon>
 
-                        <Button Command="{x:Bind ViewModel.AddWordFileItemCommand}" Content="添加文件" />
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <Button Command="{x:Bind ViewModel.AddEmptyWordFileItemCommand}" Content="添加自定义文件" />
+                            <Button Command="{x:Bind ViewModel.AddWordFileItemCommand}" Content="添加文件" />
+                        </StackPanel>
 
                         <controls:SettingsExpander.ItemsHeader>
                             <InfoBar
@@ -227,15 +230,46 @@
                         <controls:SettingsExpander.ItemTemplate>
                             <DataTemplate x:DataType="models:MarkdownWrapper">
                                 <controls:SettingsCard
+                                    HorizontalContentAlignment="Left"
                                     helpers:AncestorSource.AncestorType="Page"
                                     Command="{Binding ViewModel.ViewWordFileItemCommand}"
                                     CommandParameter="{x:Bind}"
-                                    Header="{x:Bind File.DisplayName}"
+                                    ContentAlignment="Vertical"
+                                    Header="{x:Bind DisplayName, Mode=OneWay}"
                                     IsClickEnabled="True">
-                                    <Button
-                                        Command="{Binding ViewModel.RemoveWordFileItemCommand}"
-                                        CommandParameter="{x:Bind}"
-                                        Content="移除" />
+                                    <ScrollViewer
+                                        Padding="0,0,0,10"
+                                        HorizontalScrollBarVisibility="Auto"
+                                        HorizontalScrollMode="Auto">
+                                        <StackPanel
+                                            Margin="0,5,0,0"
+                                            Orientation="Horizontal"
+                                            Spacing="8">
+                                            <ComboBox
+                                                VerticalAlignment="Center"
+                                                Header="文章类型"
+                                                ItemsSource="{x:Bind models:MarkdownWrapper.AvailableTypes}"
+                                                SelectedIndex="{x:Bind TypeIndex, Mode=TwoWay}">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate x:DataType="models:MarkdownWrapperType">
+                                                        <TextBlock Text="{x:Bind Converter={StaticResource MarkdownWrapperTypeToStringConverter}}" />
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
+
+                                            <TextBox
+                                                VerticalAlignment="Center"
+                                                Header="自定义导出文件名（不设置此项将自动生成）"
+                                                PlaceholderText="不需要添加扩展名"
+                                                Text="{x:Bind OutputTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                            <Button
+                                                VerticalAlignment="Bottom"
+                                                Command="{Binding ViewModel.RemoveWordFileItemCommand}"
+                                                CommandParameter="{x:Bind}"
+                                                Content="移除" />
+                                        </StackPanel>
+                                    </ScrollViewer>
                                 </controls:SettingsCard>
                             </DataTemplate>
                         </controls:SettingsExpander.ItemTemplate>
@@ -261,13 +295,20 @@
                         </controls:SettingsExpander.ItemsHeader>
 
                         <controls:SettingsExpander.Items>
+                            <controls:SettingsCard ContentAlignment="Left">
+                                <CheckBox
+                                    Content="将图像转换为 WebP 图像"
+                                    IsChecked="{x:Bind ViewModel.ConvertToWebp, Mode=TwoWay}"
+                                    IsThreeState="False" />
+                            </controls:SettingsCard>
+
                             <controls:SettingsCard
                                 HorizontalContentAlignment="Stretch"
                                 ContentAlignment="Vertical"
                                 Header="文件列表">
                                 <TreeView
-                                    CanDragItems="False"
-                                    CanReorderItems="False"
+                                    CanDragItems="True"
+                                    CanReorderItems="True"
                                     ItemTemplateSelector="{StaticResource NodeTemplateSelector}"
                                     ItemsSource="{x:Bind ViewModel.ImageFiles, Mode=OneWay}"
                                     SelectionMode="None" />

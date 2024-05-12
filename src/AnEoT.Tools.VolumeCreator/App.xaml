@@ -13,8 +13,9 @@
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-            <helperConverters:Int32ToStringConverter x:Key="Int32ToStringConverter" />
             <converters:BoolNegationConverter x:Key="BoolNegationConverter" />
+            <helperConverters:Int32ToStringConverter x:Key="Int32ToStringConverter" />
+            <helperConverters:MarkdownWrapperTypeToStringConverter x:Key="MarkdownWrapperTypeToStringConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -21,6 +21,8 @@ partial class ContentPageViewModel
     private BitmapImage? _volumeCover;
     [ObservableProperty]
     private bool _isVolumeCoverError;
+    [ObservableProperty]
+    private bool convertToWebp = true;
 
     [ObservableProperty]
     [Required, NotifyDataErrorInfo]
