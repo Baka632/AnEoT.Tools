@@ -60,6 +60,76 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             StorageFolder volumeFolder = await folder.CreateFolderAsync(VolumeFolderName, CreationCollisionOption.ReplaceExisting);
 
             await CreateResourcesFolder(volumeFolder);
+            await SaveMarkdownContent(volumeFolder);
+        }
+    }
+
+    private async Task SaveMarkdownContent(StorageFolder volumeFolder)
+    {
+        int articleIndex = 1;
+        int comicIndex = 1;
+
+        foreach (MarkdownWrapper wrapper in WordFiles)
+        {
+            string saveFileName = string.Empty;
+
+            switch (wrapper.Type)
+            {
+                case MarkdownWrapperType.Intro:
+                    saveFileName = DetermineSaveName(wrapper, "intro.md");
+                    break;
+                case MarkdownWrapperType.Article:
+                    if (string.IsNullOrWhiteSpace(wrapper.OutputTitle))
+                    {
+                        saveFileName = $"article{articleIndex}.md";
+                        articleIndex++;
+                    }
+                    else
+                    {
+                        saveFileName = $"{wrapper.OutputTitle}.md";
+                    }
+                    break;
+                case MarkdownWrapperType.Interview:
+                    saveFileName = DetermineSaveName(wrapper, "interview.md");
+                    break;
+                case MarkdownWrapperType.Comic:
+                    if (string.IsNullOrWhiteSpace(wrapper.OutputTitle))
+                    {
+                        saveFileName = $"comic{comicIndex}.md";
+                        comicIndex++;
+                    }
+                    else
+                    {
+                        saveFileName = $"{wrapper.OutputTitle}.md";
+                    }
+                    break;
+                case MarkdownWrapperType.OperatorSecret:
+                    saveFileName = DetermineSaveName(wrapper, "ope_sec.md");
+                    break;
+                case MarkdownWrapperType.Paintings:
+                    saveFileName = DetermineSaveName(wrapper, "paintings.md");
+                    break;
+                case MarkdownWrapperType.Others:
+                    saveFileName = $"{wrapper.OutputTitle}.md";
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            StorageFile file = await volumeFolder.CreateFileAsync(saveFileName, CreationCollisionOption.GenerateUniqueName);
+            await FileIO.WriteTextAsync(file, wrapper.Markdown);
+        }
+
+        static string DetermineSaveName(MarkdownWrapper wrapper, string alterFileName)
+        {
+            if (string.IsNullOrWhiteSpace(wrapper.OutputTitle))
+            {
+                return alterFileName;
+            }
+            else
+            {
+                return $"{wrapper.OutputTitle}.md";
+            }
         }
     }
 
