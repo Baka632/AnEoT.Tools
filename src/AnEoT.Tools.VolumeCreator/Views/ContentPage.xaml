@@ -230,7 +230,7 @@
                         <controls:SettingsExpander.ItemTemplate>
                             <DataTemplate x:DataType="models:MarkdownWrapper">
                                 <controls:SettingsCard
-                                    HorizontalContentAlignment="Left"
+                                    HorizontalContentAlignment="Stretch"
                                     helpers:AncestorSource.AncestorType="Page"
                                     Command="{Binding ViewModel.ViewWordFileItemCommand}"
                                     CommandParameter="{x:Bind}"
@@ -239,6 +239,7 @@
                                     IsClickEnabled="True">
                                     <ScrollViewer
                                         Padding="0,0,0,10"
+                                        HorizontalAlignment="Stretch"
                                         HorizontalScrollBarVisibility="Auto"
                                         HorizontalScrollMode="Auto">
                                         <StackPanel
@@ -264,10 +265,46 @@
                                                 Text="{x:Bind OutputTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                                             <Button
+                                                Width="45"
+                                                Height="33"
+                                                Padding="0"
+                                                HorizontalAlignment="Right"
                                                 VerticalAlignment="Bottom"
-                                                Command="{Binding ViewModel.RemoveWordFileItemCommand}"
-                                                CommandParameter="{x:Bind}"
-                                                Content="移除" />
+                                                Background="Transparent">
+                                                <SymbolIcon Symbol="More" />
+
+                                                <Button.Flyout>
+                                                    <MenuFlyout>
+                                                        <MenuFlyoutItem
+                                                            Command="{Binding ViewModel.WordFileItemGoUpCommand}"
+                                                            CommandParameter="{x:Bind}"
+                                                            Text="上移">
+                                                            <MenuFlyoutItem.Icon>
+                                                                <FontIcon Glyph="&#xE74A;" />
+                                                            </MenuFlyoutItem.Icon>
+                                                        </MenuFlyoutItem>
+                                                        <MenuFlyoutItem
+                                                            Command="{Binding ViewModel.WordFileItemGoDownCommand}"
+                                                            CommandParameter="{x:Bind}"
+                                                            Text="下移">
+                                                            <MenuFlyoutItem.Icon>
+                                                                <FontIcon Glyph="&#xE74B;" />
+                                                            </MenuFlyoutItem.Icon>
+                                                        </MenuFlyoutItem>
+
+                                                        <MenuFlyoutSeparator />
+
+                                                        <MenuFlyoutItem
+                                                            Command="{Binding ViewModel.RemoveWordFileItemCommand}"
+                                                            CommandParameter="{x:Bind}"
+                                                            Text="移除">
+                                                            <MenuFlyoutItem.Icon>
+                                                                <SymbolIcon Symbol="Delete" />
+                                                            </MenuFlyoutItem.Icon>
+                                                        </MenuFlyoutItem>
+                                                    </MenuFlyout>
+                                                </Button.Flyout>
+                                            </Button>
                                         </StackPanel>
                                     </ScrollViewer>
                                 </controls:SettingsCard>

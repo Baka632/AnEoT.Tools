@@ -339,6 +339,32 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         node.Parent?.Children.Remove(node);
     }
 
+    [RelayCommand]
+    private void WordFileItemGoUp(MarkdownWrapper wrapper)
+    {
+        int currentItemIndex = WordFiles.IndexOf(wrapper);
+        int upperIndex = currentItemIndex - 1;
+
+        if (currentItemIndex == -1 || upperIndex < 0)
+        {
+            return;
+        }
+        WordFiles.Move(currentItemIndex, upperIndex);
+    }
+
+    [RelayCommand]
+    private void WordFileItemGoDown(MarkdownWrapper wrapper)
+    {
+        int currentItemIndex = WordFiles.IndexOf(wrapper);
+        int downIndex = currentItemIndex + 1;
+
+        if (currentItemIndex == -1 || downIndex + 1 > WordFiles.Count)
+        {
+            return;
+        }
+        WordFiles.Move(currentItemIndex, downIndex);
+    }
+
     /// <summary>
     /// 显示一个对话框
     /// </summary>
