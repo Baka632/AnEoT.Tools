@@ -9,14 +9,13 @@ using System.Runtime.InteropServices;
 using AnEoT.Tools.VolumeCreator.Models;
 using AnEoT.Tools.Shared;
 using AnEoT.Tools.VolumeCreator.Views;
-using ColorCode.Compilation.Languages;
+using ImageSharpImage = SixLabors.ImageSharp.Image;
+using SixLabors.ImageSharp;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
 public sealed partial class ContentPageViewModel : ObservableValidator
 {
-    private StorageFolder? _targetFolder = null;
-
     public ContentPageViewModel()
     {
         WordFiles.CollectionChanged += OnWordFilesCollectionChanged;
@@ -27,6 +26,15 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     [RelayCommand]
     private async Task SaveVolume()
     {
+        ValidateAllProperties();
+
+        if (HasErrors)
+        {
+            string message = string.Join(Environment.NewLine, GetErrors().Select(e => e.ErrorMessage));
+            await ShowDialogAsync("无法保存，存在错误", message);
+            return;
+        }
+
         nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
         FolderPicker picker = new();
 
@@ -36,7 +44,83 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
         if (folder != null)
         {
-            _targetFolder = folder;
+            if (Directory.Exists(Path.Combine(folder.Path, VolumeFolderName)))
+            {
+                ContentDialogResult result = await ShowDialogAsync("指定的文件夹内已经包含同名的期刊文件夹",
+                                      "是否继续操作？如果继续，原文件夹中的内容将被清空。",
+                                      "继续",
+                                      closeText: "取消");
+
+                if (result != ContentDialogResult.Primary)
+                {
+                    return;
+                }
+            }
+
+            StorageFolder volumeFolder = await folder.CreateFolderAsync(VolumeFolderName, CreationCollisionOption.ReplaceExisting);
+
+            await CreateResourcesFolder(volumeFolder);
+        }
+    }
+
+    private async Task CreateResourcesFolder(StorageFolder volumeFolder)
+    {
+        StorageFolder resourceFolder = await volumeFolder.CreateFolderAsync("res", CreationCollisionOption.ReplaceExisting);
+
+        await CoverFile!.CopyAsync(resourceFolder);
+
+        await CopyContentRecursively(ImageFiles.Single(), resourceFolder);
+    }
+
+    private async Task CopyContentRecursively(ImageListNode node, StorageFolder rootFolder)
+    {
+        if (node.Type == ImageListNodeType.Folder)
+        {
+            foreach (ImageListNode item in node.Children)
+            {
+                if (item.Type == ImageListNodeType.Folder)
+                {
+                    if (item.Children.Count > 0)
+                    {
+                        StorageFolder folder = await rootFolder.CreateFolderAsync(item.DisplayName, CreationCollisionOption.OpenIfExists);
+
+                        foreach (ImageListNode subItem in item.Children)
+                        {
+                            await CopyContentRecursively(subItem, folder);
+                        }
+                    }
+                }
+                else if (item.Type == ImageListNodeType.File && item is FileNode fileNode)
+                {
+                    await SaveFileNode(fileNode, rootFolder);
+                }
+            }
+        }
+        else if (node.Type == ImageListNodeType.File && node is FileNode fileNode)
+        {
+            await SaveFileNode(fileNode, rootFolder);
+        }
+#if DEBUG
+        else
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+#endif
+
+        async Task SaveFileNode(FileNode fileNode, StorageFolder rootFolder)
+        {
+            if (ConvertToWebp && fileNode.File.ContentType != "image/webp")
+            {
+                using ImageSharpImage image = await ImageSharpImage.LoadAsync(fileNode.File.Path);
+                StorageFile target = await rootFolder.CreateFileAsync(Path.ChangeExtension(fileNode.DisplayName, ".webp"));
+
+                using Stream targetStream = await target.OpenStreamForWriteAsync();
+                await Task.Run(() => image.SaveAsWebp(targetStream)); // 防止卡主线程，ImageSharp 库自带的异步方法有点问题
+            }
+            else
+            {
+                await fileNode.File.CopyAsync(rootFolder);
+            }
         }
     }
 
@@ -62,7 +146,19 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         if (file != null)
         {
             IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
-            await SetCoverByStream(stream);
+            try
+            {
+                BitmapImage bitmapImage = new();
+                await bitmapImage.SetSourceAsync(stream);
+                CoverFile = file;
+
+                VolumeCover = bitmapImage;
+                IsVolumeCoverError = false;
+            }
+            catch (COMException ex) when (ex.ErrorCode == -2003292336)
+            {
+                IsVolumeCoverError = true;
+            }
         }
     }
 
@@ -91,8 +187,15 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     [RelayCommand]
     private void AddEmptyWordFileItem()
     {
-        MarkdownWrapper toMarkdownFile = new(null, string.Empty);
-        WordFiles.Add(toMarkdownFile);
+        MarkdownWrapper emptyMarkdownFile = new(null, string.Empty, MarkdownWrapperType.Others);
+        WordFiles.Add(emptyMarkdownFile);
+    }
+
+    [RelayCommand]
+    private void AddPaintingWordFileItem()
+    {
+        MarkdownWrapper paintingMarkdownFile = new(null, string.Empty, MarkdownWrapperType.Paintings);
+        WordFiles.Add(paintingMarkdownFile);
     }
 
     public async Task AddSingleWordFileItem(StorageFile file)
@@ -166,22 +269,6 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         node.Parent?.Children.Remove(node);
     }
 
-    internal async Task SetCoverByStream(IRandomAccessStream stream)
-    {
-        try
-        {
-            BitmapImage bitmapImage = new();
-            await bitmapImage.SetSourceAsync(stream);
-
-            VolumeCover = bitmapImage;
-            IsVolumeCoverError = false;
-        }
-        catch (COMException ex) when (ex.ErrorCode == -2003292336)
-        {
-            IsVolumeCoverError = true;
-        }
-    }
-
     /// <summary>
     /// 显示一个对话框
     /// </summary>
@@ -201,7 +288,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         ContentDialog dialog = new()
         {
             Title = title,
-            Content = message,
+            Content = new ScrollViewer() { Content = message },
             PrimaryButtonText = primaryText,
             SecondaryButtonText = secondaryText,
             CloseButtonText = closeText,

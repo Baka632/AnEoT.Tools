@@ -259,7 +259,7 @@
 
                                             <TextBox
                                                 VerticalAlignment="Center"
-                                                Header="自定义导出文件名（不设置此项将自动生成）"
+                                                Header="导出文件名（不设置此项将自动生成）"
                                                 PlaceholderText="不需要添加扩展名"
                                                 Text="{x:Bind OutputTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
