@@ -99,34 +99,18 @@
                     </Flyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
+
+            <AppBarSeparator />
+
             <AppBarButton
-                Command="{x:Bind ViewModel.AddEodTagToTextCommand}"
+                Command="{x:Bind ViewModel.AddBreakLineToTextCommand}"
                 CommandParameter="{x:Bind MarkdownTextBox}"
-                Label="插入 &lt;eod /&gt; 标签">
+                Label="插入分隔线">
                 <AppBarButton.Icon>
-                    <PathIcon HorizontalAlignment="Center" Data="M 161.03 154.06 305.81 154.06 305.81 240.52 371.61 240.52 371.61 154.06 483.87 154.06 516.39 92.13 53.27 93.53 339.1 603.1 681.29 0 0 0 34.21 60.53 569.03 61.16 371.61 411.87 370.84 278.71 305.81 279.23 305.81 412.39 161.03 154.06 Z" />
+                    <FontIcon Glyph="&#xE291;" />
                 </AppBarButton.Icon>
                 <AppBarButton.KeyboardAccelerators>
-                    <KeyboardAccelerator Key="E" Modifiers="Control" />
-                </AppBarButton.KeyboardAccelerators>
-            </AppBarButton>
-            <AppBarButton
-                Command="{x:Bind ViewModel.AddEditorsInfoToTextCommand}"
-                CommandParameter="{x:Bind MarkdownTextBox}"
-                Label="添加文编信息">
-                <AppBarButton.Icon>
-                    <FontIcon Glyph="&#xEDFB;" />
-                </AppBarButton.Icon>
-            </AppBarButton>
-            <AppBarButton
-                Command="{x:Bind ViewModel.AddFakeAdsTagToTextCommand}"
-                CommandParameter="{x:Bind MarkdownTextBox}"
-                Label="添加 &lt;FakeAds /&gt;">
-                <AppBarButton.Icon>
-                    <SymbolIcon Symbol="PostUpdate" />
-                </AppBarButton.Icon>
-                <AppBarButton.KeyboardAccelerators>
-                    <KeyboardAccelerator Key="F" Modifiers="Control" />
+                    <KeyboardAccelerator Key="B" Modifiers="Control" />
                 </AppBarButton.KeyboardAccelerators>
             </AppBarButton>
             <AppBarButton Label="插入图像">
@@ -147,6 +131,39 @@
                             SelectionMode="None" />
                     </Flyout>
                 </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarButton
+                Command="{x:Bind ViewModel.AddEodTagToTextCommand}"
+                CommandParameter="{x:Bind MarkdownTextBox}"
+                Label="插入 &lt;eod /&gt; 标签">
+                <AppBarButton.Icon>
+                    <PathIcon HorizontalAlignment="Center" Data="M 161.03 154.06 305.81 154.06 305.81 240.52 371.61 240.52 371.61 154.06 483.87 154.06 516.39 92.13 53.27 93.53 339.1 603.1 681.29 0 0 0 34.21 60.53 569.03 61.16 371.61 411.87 370.84 278.71 305.81 279.23 305.81 412.39 161.03 154.06 Z" />
+                </AppBarButton.Icon>
+                <AppBarButton.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="E" Modifiers="Control" />
+                </AppBarButton.KeyboardAccelerators>
+            </AppBarButton>
+
+            <AppBarSeparator />
+
+            <AppBarButton
+                Command="{x:Bind ViewModel.AddEditorsInfoToTextCommand}"
+                CommandParameter="{x:Bind MarkdownTextBox}"
+                Label="添加文编信息">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xEDFB;" />
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton
+                Command="{x:Bind ViewModel.AddFakeAdsTagToTextCommand}"
+                CommandParameter="{x:Bind MarkdownTextBox}"
+                Label="添加 &lt;FakeAds /&gt;">
+                <AppBarButton.Icon>
+                    <SymbolIcon Symbol="PostUpdate" />
+                </AppBarButton.Icon>
+                <AppBarButton.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="F" Modifiers="Control" />
+                </AppBarButton.KeyboardAccelerators>
             </AppBarButton>
         </CommandBar>
 

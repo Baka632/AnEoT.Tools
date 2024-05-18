@@ -98,8 +98,19 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
 
         ArgumentNullException.ThrowIfNull(textBox);
         int position = textBox.SelectionStart;
-        MarkdownString = MarkdownString.Insert(position, eodTag);
-        textBox.Select(position + eodTag.Length, 0);
+        MarkdownString = textBox.Text.Insert(position, eodTag);
+        textBox.Select(position, eodTag.Length);
+    }
+
+    [RelayCommand]
+    private void AddBreakLineToText(TextBox textBox)
+    {
+        string breakLine = $"{Environment.NewLine}{Environment.NewLine}{Environment.NewLine}---{Environment.NewLine}";
+
+        ArgumentNullException.ThrowIfNull(textBox);
+        int position = textBox.SelectionStart;
+        MarkdownString = textBox.Text.Insert(position, breakLine);
+        textBox.Select(position + Environment.NewLine.Length * 2, 0);
     }
 
     [RelayCommand]
@@ -116,6 +127,13 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
             (FrontMatter frontMatter, PredefinedCategory? predefinedCategory) = dialog.Result;
             MarkdownWrapper.CategoryInIndexPage = predefinedCategory;
             string yamlHeader = GetYamlFrontMatterString(frontMatter);
+
+            int orderValueIndex = yamlHeader.IndexOf("order:");
+            if (orderValueIndex != -1)
+            {
+                yamlHeader = yamlHeader.Insert(orderValueIndex, Environment.NewLine);
+            }
+
             MarkdownString = MarkdownString.Insert(0, yamlHeader);
             textBox.Select(0, 0);
         }
@@ -151,7 +169,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
 
         ArgumentNullException.ThrowIfNull(textBox);
         MarkdownString += $"{Environment.NewLine}{Environment.NewLine}{fakeAdsTag}";
-        textBox.Select(MarkdownString.Length, 0);
+        textBox.Select(MarkdownString.Length - fakeAdsTag.Length, fakeAdsTag.Length);
     }
 
     public void InsertImageToText(TextBox textBox, FileNode fileNode)
@@ -182,7 +200,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
         MarkdownImageUriToFileMapping[imageUri] = fileNode.File;
 
         int position = textBox.SelectionStart;
-        MarkdownString = MarkdownString.Insert(position, markdownImageMark);
+        MarkdownString = textBox.Text.Insert(position, markdownImageMark);
         textBox.Select(position + markdownImageMark.Length, 0);
     }
 
