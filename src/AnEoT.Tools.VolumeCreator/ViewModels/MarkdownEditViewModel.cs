@@ -11,16 +11,33 @@ using Windows.Storage;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
-public sealed partial class MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage view, ObservableCollection<ImageListNode> imageFiles) : ObservableObject
+public sealed partial class MarkdownEditViewModel : ObservableObject
 {
-    public MarkdownWrapper MarkdownWrapper { get; } = wrapper;
-    public ObservableCollection<ImageListNode> ImageFiles { get; } = imageFiles;
+    public MarkdownWrapper MarkdownWrapper { get; }
+    public ObservableCollection<ImageListNode> ImageFiles { get; }
+    public StorageFile? CoverImageFile { get; }
     public Dictionary<string, StorageFile> MarkdownImageUriToFileMapping { get; } = new(10);
 
+    private readonly MarkdownEditPage view;
+
     [ObservableProperty]
-    private string markdownString = wrapper.Markdown;
+    private string markdownString;
     [ObservableProperty]
     private string articleQuote = string.Empty;
+
+    public MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage viewPage, ObservableCollection<ImageListNode> imageFiles, StorageFile? coverImageFile)
+    {
+        markdownString = wrapper.Markdown;
+        view = viewPage;
+        CoverImageFile = coverImageFile;
+        ImageFiles = imageFiles;
+        MarkdownWrapper = wrapper;
+
+        if (coverImageFile is not null)
+        {
+            MarkdownImageUriToFileMapping["./res/cover.webp"] = coverImageFile;
+        }
+    }
 
     partial void OnMarkdownStringChanged(string value)
     {
@@ -30,7 +47,8 @@ public sealed partial class MarkdownEditViewModel(MarkdownWrapper wrapper, Markd
     partial void OnArticleQuoteChanged(string value)
     {
         int index = 0;
-        if (MarkdownString.StartsWith("---"))
+        bool hasYaml = MarkdownString.StartsWith("---");
+        if (hasYaml)
         {
             int targetIndex = MarkdownString.IndexOf("---", 3);
             if (targetIndex != -1)
@@ -39,14 +57,38 @@ public sealed partial class MarkdownEditViewModel(MarkdownWrapper wrapper, Markd
             }
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.AppendLine(value.ReplaceLineEndings($"{Environment.NewLine}{Environment.NewLine}"));
-        stringBuilder.AppendLine();
-        stringBuilder.AppendLine("<!-- more -->");
-        stringBuilder.AppendLine();
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            string quoteLiteral = hasYaml
+                ? $"{Environment.NewLine}<!-- more -->"
+                : $"<!-- more -->{Environment.NewLine}{Environment.NewLine}";
+            MarkdownString = MarkdownString.Insert(index, quoteLiteral);
+        }
+        else
+        {
+            StringBuilder stringBuilder = new StringBuilder();
 
-        string quoteLiteral = stringBuilder.ToString();
-        MarkdownString = MarkdownString.Insert(index, quoteLiteral);
+            if (hasYaml)
+            {
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine();
+            }
+
+            stringBuilder.AppendLine(value.ReplaceLineEndings($"{Environment.NewLine}{Environment.NewLine}"));
+            stringBuilder.AppendLine();
+            if (hasYaml)
+            {
+                stringBuilder.Append("<!-- more -->");
+            }
+            else
+            {
+                stringBuilder.AppendLine("<!-- more -->");
+                stringBuilder.AppendLine();
+            }
+
+            string quoteLiteral = stringBuilder.ToString();
+            MarkdownString = MarkdownString.Insert(index, quoteLiteral);
+        }
     }
 
     [RelayCommand]
@@ -71,7 +113,8 @@ public sealed partial class MarkdownEditViewModel(MarkdownWrapper wrapper, Markd
 
         if (result == ContentDialogResult.Primary)
         {
-            FrontMatter frontMatter = dialog.FrontMatter;
+            (FrontMatter frontMatter, PredefinedCategory? predefinedCategory) = dialog.Result;
+            MarkdownWrapper.CategoryInIndexPage = predefinedCategory;
             string yamlHeader = GetYamlFrontMatterString(frontMatter);
             MarkdownString = MarkdownString.Insert(0, yamlHeader);
             textBox.Select(0, 0);

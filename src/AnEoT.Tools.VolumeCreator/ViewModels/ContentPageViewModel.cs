@@ -11,6 +11,16 @@ using AnEoT.Tools.Shared;
 using AnEoT.Tools.VolumeCreator.Views;
 using ImageSharpImage = SixLabors.ImageSharp.Image;
 using SixLabors.ImageSharp;
+using System.Text;
+using Markdig;
+using Markdig.Syntax;
+using Markdig.Extensions.Yaml;
+using System.Diagnostics.CodeAnalysis;
+using YamlDotNet.Core;
+using YamlDotNet.Serialization.NamingConventions;
+using YamlDotNet.Serialization;
+using YamlDotNet.Core.Events;
+using AnEoT.Tools.Shared.Models;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -20,6 +30,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     {
         WordFiles.CollectionChanged += OnWordFilesCollectionChanged;
         ImageFiles.CollectionChanged += OnImagesFilesCollectionChanged;
+        IndexMarkdown.CollectionChanged += OnIndexMarkdownCollectionChanged;
         InitializeImageFiles();
     }
 
@@ -61,75 +72,27 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
             await CreateResourcesFolder(volumeFolder);
             await SaveMarkdownContent(volumeFolder);
+
+            await ShowDialogAsync("保存成功",
+                                      $"内容已保存在 {volumeFolder.Path} 中。",
+                                      closeText: "确定");
         }
     }
 
     private async Task SaveMarkdownContent(StorageFolder volumeFolder)
     {
-        int articleIndex = 1;
-        int comicIndex = 1;
-
-        foreach (MarkdownWrapper wrapper in WordFiles)
+        foreach (KeyValuePair<MarkdownWrapper, string> pair in GetOutputFileNameDictionary())
         {
-            string saveFileName = string.Empty;
-
-            switch (wrapper.Type)
-            {
-                case MarkdownWrapperType.Intro:
-                    saveFileName = DetermineSaveName(wrapper, "intro.md");
-                    break;
-                case MarkdownWrapperType.Article:
-                    if (string.IsNullOrWhiteSpace(wrapper.OutputTitle))
-                    {
-                        saveFileName = $"article{articleIndex}.md";
-                        articleIndex++;
-                    }
-                    else
-                    {
-                        saveFileName = $"{wrapper.OutputTitle}.md";
-                    }
-                    break;
-                case MarkdownWrapperType.Interview:
-                    saveFileName = DetermineSaveName(wrapper, "interview.md");
-                    break;
-                case MarkdownWrapperType.Comic:
-                    if (string.IsNullOrWhiteSpace(wrapper.OutputTitle))
-                    {
-                        saveFileName = $"comic{comicIndex}.md";
-                        comicIndex++;
-                    }
-                    else
-                    {
-                        saveFileName = $"{wrapper.OutputTitle}.md";
-                    }
-                    break;
-                case MarkdownWrapperType.OperatorSecret:
-                    saveFileName = DetermineSaveName(wrapper, "ope_sec.md");
-                    break;
-                case MarkdownWrapperType.Paintings:
-                    saveFileName = DetermineSaveName(wrapper, "paintings.md");
-                    break;
-                case MarkdownWrapperType.Others:
-                    saveFileName = $"{wrapper.OutputTitle}.md";
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-
-            StorageFile file = await volumeFolder.CreateFileAsync(saveFileName, CreationCollisionOption.GenerateUniqueName);
-            await FileIO.WriteTextAsync(file, wrapper.Markdown);
+            StorageFile file = await volumeFolder.CreateFileAsync(pair.Value, CreationCollisionOption.GenerateUniqueName);
+            await FileIO.WriteTextAsync(file, pair.Key.Markdown);
         }
 
-        static string DetermineSaveName(MarkdownWrapper wrapper, string alterFileName)
+        if (IndexMarkdown.Count > 0 && IndexMarkdown[0] is not null)
         {
-            if (string.IsNullOrWhiteSpace(wrapper.OutputTitle))
-            {
-                return alterFileName;
-            }
-            else
-            {
-                return $"{wrapper.OutputTitle}.md";
-            }
+            MarkdownWrapper target = IndexMarkdown[0];
+
+            StorageFile file = await volumeFolder.CreateFileAsync("README.md", CreationCollisionOption.GenerateUniqueName);
+            await FileIO.WriteTextAsync(file, target.Markdown);
         }
     }
 
@@ -137,7 +100,18 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     {
         StorageFolder resourceFolder = await volumeFolder.CreateFolderAsync("res", CreationCollisionOption.ReplaceExisting);
 
-        await CoverFile!.CopyAsync(resourceFolder);
+        if (ConvertToWebp && CoverFile!.ContentType != "image/webp")
+        {
+            using ImageSharpImage image = await ImageSharpImage.LoadAsync(CoverFile!.Path);
+            StorageFile target = await resourceFolder.CreateFileAsync("cover.webp");
+
+            using Stream targetStream = await target.OpenStreamForWriteAsync();
+            await Task.Run(() => image.SaveAsWebp(targetStream)); // 防止卡主线程，ImageSharp 库自带的异步方法有点问题
+        }
+        else
+        {
+            await CoverFile!.CopyAsync(resourceFolder, "cover.webp");
+        }
 
         await CopyContentRecursively(ImageFiles.Single(), resourceFolder);
     }
@@ -300,7 +274,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     {
         MarkdownEditWindow window = new()
         {
-            Model = (wrapper, ImageFiles),
+            Model = (wrapper, ImageFiles, CoverFile),
             Title = $"{wrapper.DisplayName} - Markdown 编辑窗口"
         };
         window.Activate();
@@ -365,6 +339,181 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         WordFiles.Move(currentItemIndex, downIndex);
     }
 
+    [RelayCommand]
+    private void GenerateIndexPage()
+    {
+        StringBuilder builder = new(700);
+        builder.AppendLine("---");
+        builder.AppendLine("icon: repo");
+        builder.AppendLine("article: false");
+        builder.AppendLine($"title: {VolumeName}");
+        builder.AppendLine("---");
+        builder.AppendLine();
+        builder.AppendLine("![](./res/cover.webp) {.centering}");
+        builder.AppendLine();
+        builder.AppendLine("## 目录");
+        builder.AppendLine();
+        WriteIndexContent(builder);
+        builder.AppendLine();
+        builder.AppendLine("<FakeAds />");
+
+        string markdown = builder.ToString();
+        MarkdownWrapper wrapper = new(null, markdown, MarkdownWrapperType.Others, "README");
+
+        if (IndexMarkdown.Count == 1)
+        {
+            IndexMarkdown[0] = wrapper;
+        }
+        else
+        {
+            IndexMarkdown.Add(wrapper);
+        }
+    }
+
+    private void WriteIndexContent(StringBuilder builder)
+    {
+        Dictionary<MarkdownWrapper, string> outputFileNameMapping = GetOutputFileNameDictionary();
+
+        if (WordFiles.Any(wrapper => wrapper.Type == MarkdownWrapperType.Intro))
+        {
+            builder.AppendLine("- [**卷首语**](intro.html)");
+        }
+
+        IEnumerable<IGrouping<PredefinedCategory, MarkdownWrapper>> articleGroups = WordFiles
+            .Where(wrapper => wrapper.CategoryInIndexPage.HasValue)
+            .GroupBy(wrapper => wrapper.CategoryInIndexPage!.Value);
+        foreach (IGrouping<PredefinedCategory, MarkdownWrapper> articleGroup in articleGroups)
+        {
+            builder.AppendLine($"- **{articleGroup.Key.AsCategoryString(true)}**");
+            foreach (MarkdownWrapper item in articleGroup)
+            {
+                string fileName = $"{outputFileNameMapping[item].Replace(".md", string.Empty)}.html";
+                string title = GetTitleInMarkdown(item.Markdown) ?? item.DisplayName;
+
+                builder.AppendLine($"  - [{title}]({fileName})");
+            }
+        }
+
+        if (WordFiles.Any(wrapper => wrapper.Type == MarkdownWrapperType.Interview))
+        {
+            builder.AppendLine("- **创作者访谈**");
+            foreach (MarkdownWrapper item in WordFiles.Where(wrapper => wrapper.Type == MarkdownWrapperType.Interview))
+            {
+                string title = GetTitleInMarkdown(item.Markdown) ?? item.DisplayName;
+                builder.AppendLine($"  - [{title}](interview.html)");
+            }
+        }
+
+        if (WordFiles.Any(wrapper => wrapper.Type == MarkdownWrapperType.OperatorSecret))
+        {
+            builder.AppendLine("- **干员秘闻**");
+            foreach (MarkdownWrapper item in WordFiles.Where(wrapper => wrapper.Type == MarkdownWrapperType.OperatorSecret))
+            {
+                string title = GetTitleInMarkdown(item.Markdown) ?? item.DisplayName;
+                builder.AppendLine($"  - [{title}](ope_sec.html)");
+            }
+        }
+
+        foreach (MarkdownWrapper item in WordFiles.Where(item => item.Type == MarkdownWrapperType.Others))
+        {
+            builder.AppendLine($"- **{item.OutputTitle}**");
+        }
+    }
+
+    private static string? GetTitleInMarkdown(string markdown)
+    {
+        MarkdownDocument document = Markdown.Parse(markdown, CommonValues.MarkdownPipeline);
+        YamlFrontMatterBlock? yamlBlock = document.Descendants<YamlFrontMatterBlock>().FirstOrDefault();
+
+        if (yamlBlock is null)
+        {
+            return null;
+        }
+
+        string yaml = markdown.Substring(yamlBlock.Span.Start, yamlBlock.Span.Length);
+
+        if (TryReadYaml(yaml, out FrontMatter result))
+        {
+            return result.Title;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private Dictionary<MarkdownWrapper, string> GetOutputFileNameDictionary()
+    {
+        Dictionary<MarkdownWrapper, string> pairs = new(WordFiles.Count);
+
+        int articleIndex = 1;
+        int comicIndex = 1;
+
+        foreach (MarkdownWrapper wrapper in WordFiles)
+        {
+            string saveFileName = string.Empty;
+
+            switch (wrapper.Type)
+            {
+                case MarkdownWrapperType.Intro:
+                    saveFileName = DetermineSaveName(wrapper, "intro.md");
+                    break;
+                case MarkdownWrapperType.Article:
+                    if (string.IsNullOrWhiteSpace(wrapper.OutputTitle))
+                    {
+                        saveFileName = $"article{articleIndex}.md";
+                        articleIndex++;
+                    }
+                    else
+                    {
+                        saveFileName = $"{wrapper.OutputTitle}.md";
+                    }
+                    break;
+                case MarkdownWrapperType.Interview:
+                    saveFileName = DetermineSaveName(wrapper, "interview.md");
+                    break;
+                case MarkdownWrapperType.Comic:
+                    if (string.IsNullOrWhiteSpace(wrapper.OutputTitle))
+                    {
+                        saveFileName = $"comic{comicIndex}.md";
+                        comicIndex++;
+                    }
+                    else
+                    {
+                        saveFileName = $"{wrapper.OutputTitle}.md";
+                    }
+                    break;
+                case MarkdownWrapperType.OperatorSecret:
+                    saveFileName = DetermineSaveName(wrapper, "ope_sec.md");
+                    break;
+                case MarkdownWrapperType.Paintings:
+                    saveFileName = DetermineSaveName(wrapper, "paintings.md");
+                    break;
+                case MarkdownWrapperType.Others:
+                    saveFileName = $"{wrapper.OutputTitle}.md";
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            pairs[wrapper] = saveFileName;
+        }
+
+        return pairs;
+    }
+
+    private static string DetermineSaveName(MarkdownWrapper wrapper, string alterFileName)
+    {
+        if (string.IsNullOrWhiteSpace(wrapper.OutputTitle))
+        {
+            return alterFileName;
+        }
+        else
+        {
+            return $"{wrapper.OutputTitle}.md";
+        }
+    }
+
     /// <summary>
     /// 显示一个对话框
     /// </summary>
@@ -392,5 +541,38 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         };
 
         return await dialog.ShowAsync();
+    }
+
+    [RequiresDynamicCode("此方法调用了不支持 IL 裁剪的 YamlDotNet.Serialization.DeserializerBuilder.DeserializerBuilder()")]
+    public static bool TryReadYaml<T>(string yaml, [MaybeNullWhen(false)] out T result)
+    {
+        if (string.IsNullOrWhiteSpace(yaml))
+        {
+            result = default;
+            return false;
+        }
+
+        T obj;
+        try
+        {
+            StringReader input = new(yaml);
+            Parser yamlParser = new(input);
+            yamlParser.Consume<StreamStart>();
+            yamlParser.Consume<DocumentStart>();
+
+            IDeserializer yamlDes = new DeserializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                .Build();
+            obj = yamlDes.Deserialize<T>(yamlParser);
+            yamlParser.Consume<DocumentEnd>();
+        }
+        catch
+        {
+            result = default;
+            return false;
+        }
+
+        result = obj;
+        return true;
     }
 }

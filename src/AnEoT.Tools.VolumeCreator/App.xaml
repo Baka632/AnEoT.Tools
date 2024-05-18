@@ -16,6 +16,7 @@
             <converters:BoolNegationConverter x:Key="BoolNegationConverter" />
             <helperConverters:Int32ToStringConverter x:Key="Int32ToStringConverter" />
             <helperConverters:MarkdownWrapperTypeToStringConverter x:Key="MarkdownWrapperTypeToStringConverter" />
+            <helperConverters:PredefinedCategoryWrapperToStringConverter x:Key="PredefinedCategoryWrapperToStringConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

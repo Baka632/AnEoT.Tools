@@ -4,7 +4,7 @@ using Windows.Storage;
 
 namespace AnEoT.Tools.VolumeCreator.Models;
 
-public sealed class MarkdownWrapper(StorageFile? file, string markdown, MarkdownWrapperType type = default, string outputTitle = "") : INotifyPropertyChanged
+public sealed class MarkdownWrapper(StorageFile? file, string markdown, MarkdownWrapperType type = default, string outputTitle = "", PredefinedCategory? categoryInIndexPage = null) : INotifyPropertyChanged
 {
     public static readonly List<MarkdownWrapperType> AvailableTypes =
     [
@@ -22,6 +22,8 @@ public sealed class MarkdownWrapper(StorageFile? file, string markdown, Markdown
     public string Markdown { get; set; } = markdown;
 
     public MarkdownWrapperType Type { get; set; } = type;
+
+    public PredefinedCategory? CategoryInIndexPage { get; set; } = categoryInIndexPage;
 
     public int TypeIndex
     {

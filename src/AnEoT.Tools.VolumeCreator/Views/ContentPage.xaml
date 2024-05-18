@@ -218,13 +218,22 @@
                         </StackPanel>
 
                         <controls:SettingsExpander.ItemsHeader>
-                            <InfoBar
-                                Title="请添加一些文件。"
-                                BorderThickness="0"
-                                CornerRadius="0"
-                                IsClosable="False"
-                                IsOpen="{x:Bind ViewModel.ShowNotifyAddWordFile, Mode=OneWay}"
-                                Severity="Informational" />
+                            <Grid>
+                                <InfoBar
+                                    Title="请添加一些文件。"
+                                    BorderThickness="0"
+                                    CornerRadius="0"
+                                    IsClosable="False"
+                                    IsOpen="{x:Bind ViewModel.ShowNotifyAddWordFile, Mode=OneWay}"
+                                    Severity="Informational" />
+                                <InfoBar
+                                    Title="请记得更改每个项目的文章类型。"
+                                    BorderThickness="0"
+                                    CornerRadius="0"
+                                    IsClosable="False"
+                                    IsOpen="{x:Bind ViewModel.ShowNotifyAddWordFile, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
+                                    Severity="Warning" />
+                            </Grid>
                         </controls:SettingsExpander.ItemsHeader>
 
                         <controls:SettingsExpander.ItemTemplate>
@@ -351,6 +360,48 @@
                                     SelectionMode="None" />
                             </controls:SettingsCard>
                         </controls:SettingsExpander.Items>
+                    </controls:SettingsExpander>
+
+                    <controls:SettingsExpander
+                        Description="根据上面的配置，自动生成目录页。"
+                        Header="目录页"
+                        IsExpanded="True"
+                        ItemsSource="{x:Bind ViewModel.IndexMarkdown}">
+                        <controls:SettingsExpander.HeaderIcon>
+                            <SymbolIcon Symbol="AllApps" />
+                        </controls:SettingsExpander.HeaderIcon>
+
+                        <Button Command="{x:Bind ViewModel.GenerateIndexPageCommand}" Content="生成目录页" />
+
+                        <controls:SettingsExpander.ItemsHeader>
+                            <Grid>
+                                <InfoBar
+                                    Title="在完成上面的配置后，请在这里让程序自动生成目录页。"
+                                    BorderThickness="0"
+                                    CornerRadius="0"
+                                    IsClosable="False"
+                                    IsOpen="{x:Bind ViewModel.ShowNotifyGenerateIndex, Mode=OneWay}"
+                                    Severity="Informational" />
+                                <InfoBar
+                                    Title="如果在生成目录页后更改了上面的配置，请让程序重新生成目录页。"
+                                    BorderThickness="0"
+                                    CornerRadius="0"
+                                    IsClosable="False"
+                                    IsOpen="{x:Bind ViewModel.ShowNotifyGenerateIndex, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
+                                    Severity="Warning" />
+                            </Grid>
+                        </controls:SettingsExpander.ItemsHeader>
+
+                        <controls:SettingsExpander.ItemTemplate>
+                            <DataTemplate x:DataType="models:MarkdownWrapper">
+                                <controls:SettingsCard
+                                    helpers:AncestorSource.AncestorType="Page"
+                                    Command="{Binding ViewModel.ViewWordFileItemCommand}"
+                                    CommandParameter="{x:Bind}"
+                                    Header="查看目录页"
+                                    IsClickEnabled="True" />
+                            </DataTemplate>
+                        </controls:SettingsExpander.ItemTemplate>
                     </controls:SettingsExpander>
                 </StackPanel>
             </ScrollViewer>

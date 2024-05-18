@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using AnEoT.Tools.VolumeCreator.Models;
 using Microsoft.UI.Composition.SystemBackdrops;
+using Windows.Storage;
 using WinUIEx;
 
 namespace AnEoT.Tools.VolumeCreator.Views;
@@ -10,7 +11,7 @@ namespace AnEoT.Tools.VolumeCreator.Views;
 /// </summary>
 public sealed partial class MarkdownEditWindow : WindowEx
 {
-    public (MarkdownWrapper?, ObservableCollection<ImageListNode>) Model { get; set; }
+    public (MarkdownWrapper? Markdown, ObservableCollection<ImageListNode> ImageFiles, StorageFile? CoverImage) Model { get; set; }
 
     public MarkdownEditWindow()
     {

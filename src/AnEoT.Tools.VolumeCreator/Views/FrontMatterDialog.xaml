@@ -74,7 +74,35 @@
                     <SymbolIcon Symbol="ViewAll" />
                 </controls:SettingsExpander.HeaderIcon>
 
-                <Button Command="{x:Bind AddCategoryItemCommand}" Content="添加" />
+                <StackPanel Orientation="Horizontal">
+                    <Button
+                        Margin="0,0,5,0"
+                        Command="{x:Bind AddCategoryItemCommand}"
+                        Content="添加自定义分类" />
+                    <Button Content="选择预定义分类（将影响目录页生成）">
+                        <Button.Flyout>
+                            <Flyout>
+                                <ComboBox ItemsSource="{x:Bind views:FrontMatterDialog.AvailablePredefinedCategories}" SelectedIndex="{x:Bind PredefinedCategoryIndex, Mode=TwoWay}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:PredefinedCategoryWrapper">
+                                            <TextBlock Text="{x:Bind PredefinedCategory, Converter={StaticResource PredefinedCategoryWrapperToStringConverter}}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
+
+                <controls:SettingsExpander.ItemsHeader>
+                    <InfoBar
+                        Title="请添加分类"
+                        BorderThickness="0"
+                        CornerRadius="0"
+                        IsClosable="False"
+                        IsOpen="{x:Bind ShowNotifyAddCategory, Mode=OneWay}"
+                        Severity="Informational" />
+                </controls:SettingsExpander.ItemsHeader>
 
                 <controls:SettingsExpander.ItemTemplate>
                     <DataTemplate x:DataType="models:StringView">
@@ -119,7 +147,26 @@
                     <SymbolIcon Symbol="Tag" />
                 </controls:SettingsExpander.HeaderIcon>
 
-                <Button Command="{x:Bind AddTagItemCommand}" Content="添加" />
+                <StackPanel Orientation="Horizontal">
+                    <Button
+                        Margin="0,0,5,0"
+                        Command="{x:Bind AddTagItemCommand}"
+                        Content="添加" />
+                    <Button
+                        Margin="0,0,5,0"
+                        Command="{x:Bind AddAuthorTagItemCommand}"
+                        Content="添加以作者名称为名的标签" />
+                </StackPanel>
+
+                <controls:SettingsExpander.ItemsHeader>
+                    <InfoBar
+                        Title="请添加标签"
+                        BorderThickness="0"
+                        CornerRadius="0"
+                        IsClosable="False"
+                        IsOpen="{x:Bind ShowNotifyAddTags, Mode=OneWay}"
+                        Severity="Informational" />
+                </controls:SettingsExpander.ItemsHeader>
 
                 <controls:SettingsExpander.ItemTemplate>
                     <DataTemplate x:DataType="models:StringView">

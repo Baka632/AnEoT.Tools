@@ -15,6 +15,7 @@ partial class ContentPageViewModel
     public VerticalAlignment CoverImageVerticalAlignmentMode => VolumeCover is null ? VerticalAlignment.Stretch : VerticalAlignment.Top;
     public bool ShowNotifyAddWordFile => WordFiles.Count <= 0;
     public bool ShowNotifyAddImagesFile => ImageFiles.Count <= 0;
+    public bool ShowNotifyGenerateIndex => IndexMarkdown.Count <= 0;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsVolumeCoverNotExist))]
@@ -43,6 +44,11 @@ partial class ContentPageViewModel
     [ObservableProperty]
     [Required]
     private ObservableCollection<ImageListNode> imageFiles = [];
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowNotifyGenerateIndex))]
+    [NotifyDataErrorInfo]
+    [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateIndexMarkdown))]
+    private ObservableCollection<MarkdownWrapper> indexMarkdown = [];
 
     private void InitializeImageFiles()
     {
@@ -63,6 +69,11 @@ partial class ContentPageViewModel
     private void OnImagesFilesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(ShowNotifyAddImagesFile));
+    }
+    
+    private void OnIndexMarkdownCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(ShowNotifyGenerateIndex));
     }
 
     public static ValidationResult ValidateVolumeDisplayName(string volumeName)
@@ -129,6 +140,25 @@ partial class ContentPageViewModel
         if (file is null)
         {
             return new ValidationResult("【期刊封面图片】没有添加封面图片，无法进行操作。");
+        }
+        else
+        {
+            return ValidationResult.Success!;
+        }
+    }
+    
+    public static ValidationResult ValidateIndexMarkdown(ObservableCollection<MarkdownWrapper> wrapper)
+    {
+#if DEBUG
+        if (wrapper.Count > 1)
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+#endif
+
+        if (wrapper.Count <= 0)
+        {
+            return new ValidationResult("【目录页】尚未生成目录页。");
         }
         else
         {
