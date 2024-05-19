@@ -186,9 +186,11 @@
                     Grid.Row="1"
                     AcceptsReturn="True"
                     IsSpellCheckEnabled="False"
+                    Loaded="OnMarkdownTextBoxLoaded"
                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                     Text="{x:Bind ViewModel.MarkdownString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    TextWrapping="Wrap" />
+                    TextWrapping="Wrap"
+                    Unloaded="OnMarkdownTextBoxUnloaded" />
             </Grid>
 
             <controls:GridSplitter

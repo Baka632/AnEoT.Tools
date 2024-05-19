@@ -172,6 +172,55 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
         textBox.Select(MarkdownString.Length - fakeAdsTag.Length, fakeAdsTag.Length);
     }
 
+    [RelayCommand]
+    private void InsertAlignLeft(TextBox textBox)
+    {
+        ArgumentNullException.ThrowIfNull(textBox);
+
+        string style = GenerateCssClassList("aleft");
+        int position = textBox.SelectionStart;
+        MarkdownString = textBox.Text.Insert(position, style);
+        textBox.Select(position, style.Length);
+    }
+
+    [RelayCommand]
+    private void InsertAlignRight(TextBox textBox)
+    {
+        ArgumentNullException.ThrowIfNull(textBox);
+
+        string style = GenerateCssClassList("aright");
+        int position = textBox.SelectionStart;
+        MarkdownString = textBox.Text.Insert(position, style);
+        textBox.Select(position, style.Length);
+    }
+
+    [RelayCommand]
+    private void InsertAlignCenter(TextBox textBox)
+    {
+        ArgumentNullException.ThrowIfNull(textBox);
+
+        string style = GenerateCssClassList("centering");
+        int position = textBox.SelectionStart;
+        MarkdownString = textBox.Text.Insert(position, style);
+        textBox.Select(position, style.Length);
+    }
+
+    [RelayCommand]
+    private void InsertTextKai(TextBox textBox)
+    {
+        ArgumentNullException.ThrowIfNull(textBox);
+
+        string style = GenerateCssClassList("textkai");
+        int position = textBox.SelectionStart;
+        MarkdownString = textBox.Text.Insert(position, style);
+        textBox.Select(position, style.Length);
+    }
+
+    private static string GenerateCssClassList(string className)
+    {
+        return $"{{.{className}}}";
+    }
+
     public void InsertImageToText(TextBox textBox, FileNode fileNode)
     {
         List<string> targetParts = new(3);
