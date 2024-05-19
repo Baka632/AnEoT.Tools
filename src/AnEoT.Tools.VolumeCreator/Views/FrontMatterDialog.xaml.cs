@@ -24,6 +24,10 @@ public sealed partial class FrontMatterDialog : ContentDialog
         PredefinedCategory.RhineLaboratory,
         PredefinedCategory.Intelligence,
     ];
+    public static readonly string[] SuggestedIconStrings =
+    [
+        "community", "article", "palette", "note", "repo"
+    ];
 
     public bool ShowNotifyAddCategory => Categories.Count <= 0;
     public bool ShowNotifyAddTags => Tags.Count <= 0;
@@ -129,5 +133,32 @@ public sealed partial class FrontMatterDialog : ContentDialog
         };
 
         Result = (frontMatter, PredefinedCategoryValue);
+    }
+
+    private void OnIconStringAutoSuggestBoxTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        IconString = sender.Text;
+
+        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+        {
+            SelectAutoSuggestBoxItemSource(sender);
+        }
+    }
+
+    private void OnIconStringAutoSuggestBoxGotFocus(object sender, RoutedEventArgs e)
+    {
+        SelectAutoSuggestBoxItemSource((AutoSuggestBox)sender);
+    }
+
+    private static void SelectAutoSuggestBoxItemSource(AutoSuggestBox sender)
+    {
+        if (string.IsNullOrWhiteSpace(sender.Text))
+        {
+            sender.ItemsSource = SuggestedIconStrings;
+        }
+        else
+        {
+            sender.ItemsSource = SuggestedIconStrings.Where(suggestion => suggestion.StartsWith(sender.Text));
+        }
     }
 }
