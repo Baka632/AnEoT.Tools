@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using AnEoT.Tools.WordToMarkdown.Models;
-using AnEoT.Tools.WordToMarkdown.Services;
+using AnEoT.Tools.Shared;
+using AnEoT.Tools.Shared.Models;
 using AnEoT.Tools.WordToMarkdown.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -26,7 +26,7 @@ public sealed partial class MainViewModel : ObservableObject
     public string? WordFilePath { get; set; }
     public string? OutputFilePath { get; set; }
     public string? ArticleQuote { get; set; }
-    public ArticleInfo? FrontMatter { get; set; }
+    public FrontMatter? FrontMatter { get; set; }
     public EditorsInfo? EditorsInfo { get; set; }
     #endregion
 
@@ -246,8 +246,8 @@ public sealed partial class MainViewModel : ObservableObject
 
         if (dialog.ShowDialog() == true)
         {
-            ArticleInfo articleInfo = dialog.FrontMatter;
-            string yamlHeader = GetYamlFrontMatterString(articleInfo);
+            FrontMatter frontMatter = dialog.FrontMatter;
+            string yamlHeader = GetYamlFrontMatterString(frontMatter);
             MarkdownString = MarkdownString.Insert(0, yamlHeader);
             textBox.Select(0, 0);
         }
@@ -308,13 +308,13 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
-    private static string GetYamlFrontMatterString(ArticleInfo articleInfo)
+    private static string GetYamlFrontMatterString(FrontMatter frontMatter)
     {
         ISerializer serializer = new SerializerBuilder()
                         .WithIndentedSequences()
                         .WithNamingConvention(CamelCaseNamingConvention.Instance)
                         .Build();
-        string yamlString = serializer.Serialize(articleInfo).Trim();
+        string yamlString = serializer.Serialize(frontMatter).Trim();
         string yamlHeader = $"""
                 ---
                 {yamlString}

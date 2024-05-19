@@ -1,0 +1,48 @@
+<UserControl
+    x:Class="AnEoT.Tools.VolumeCreator.Controls.FakeAds"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:AnEoT.Tools.VolumeCreator.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Loaded="OnUserControlLoaded"
+    mc:Ignorable="d">
+
+    <Grid Margin="0,10,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Margin="0,0,0,10"
+            HorizontalAlignment="Right"
+            FontSize="10"
+            FontStyle="Italic">
+            <Run Text="{x:Bind AdTips, Mode=OneWay}" />
+            <Hyperlink Click="OnHyperlinkClicked">
+                <Run Text="{x:Bind AdAbout, Mode=OneWay}" />
+            </Hyperlink>
+        </TextBlock>
+
+        <Grid
+            x:Name="AdContentGrid"
+            Grid.Row="1"
+            HorizontalAlignment="Center"
+            x:Load="{x:Bind ShowCustomAdXaml, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
+            Tapped="OnAdContentGridTapped">
+            <Image HorizontalAlignment="Center" Stretch="Uniform">
+                <Image.Source>
+                    <BitmapImage UriSource="{x:Bind AdImageUri, Mode=OneWay}" />
+                </Image.Source>
+            </Image>
+        </Grid>
+
+        <Viewbox
+            x:Name="CustomXamlAdViewbox"
+            Grid.Row="1"
+            HorizontalAlignment="Center"
+            x:Load="{x:Bind ShowCustomAdXaml, Mode=OneWay}" />
+    </Grid>
+</UserControl>

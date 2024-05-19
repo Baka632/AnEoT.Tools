@@ -5,10 +5,18 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 
-namespace AnEoT.Tools.WordToMarkdown.Services;
+namespace AnEoT.Tools.Shared;
 
 public static class WordToMarkdownService
 {
+    public static string GetMarkdown(string documentPath, bool leaveOpen = false)
+    {
+        WordprocessingDocument doc = WordprocessingDocument.Open(documentPath, false);
+        string md = GetMarkdown(doc, leaveOpen);
+
+        return md;
+    }
+
     public static string GetMarkdown(WordprocessingDocument document, bool leaveOpen = true)
     {
         StringBuilder stringBuilder = new();
@@ -271,7 +279,11 @@ public static class WordToMarkdownService
             document.Dispose();
         }
 
-        return stringBuilder.ToString();
+        string markdownString = stringBuilder.ToString();
+        markdownString = markdownString.Trim().ReplaceLineEndings();
+        string[] parts = markdownString.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+
+        return string.Join($"{Environment.NewLine}{Environment.NewLine}", parts);
     }
 
     private static void DetermineRunPropertiesByChildElement(OpenXmlElementList childElements, ref bool isBold, ref bool isStrike, ref bool isItalic, ref bool isUnderline)

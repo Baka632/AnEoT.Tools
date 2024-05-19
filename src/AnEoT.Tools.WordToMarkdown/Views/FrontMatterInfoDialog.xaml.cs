@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
+using AnEoT.Tools.Shared.Models;
 using AnEoT.Tools.WordToMarkdown.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,7 +15,7 @@ namespace AnEoT.Tools.WordToMarkdown.Views;
 /// </summary>
 public partial class FrontMatterInfoDialog : Window
 {
-    public ArticleInfo FrontMatter { get; internal set; }
+    public FrontMatter FrontMatter { get; internal set; }
 
     [ObservableProperty]
     private string? articleTitle;
@@ -43,7 +44,7 @@ public partial class FrontMatterInfoDialog : Window
 
     private void OnOkButtonClicked(object sender, RoutedEventArgs e)
     {
-        FrontMatter = new ArticleInfo()
+        FrontMatter = new FrontMatter()
         {
             Title = ArticleTitle ?? string.Empty,
             ShortTitle = ArticleShortTitle,

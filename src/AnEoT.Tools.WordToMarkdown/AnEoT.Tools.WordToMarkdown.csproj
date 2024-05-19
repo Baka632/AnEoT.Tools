@@ -14,11 +14,13 @@
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Include="DocumentFormat.OpenXml" Version="3.0.1" />
     <PackageReference Include="MdXaml" Version="1.27.0" />
     <PackageReference Include="MdXaml.Html" Version="1.27.0" />
     <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.49-beta" PrivateAssets="all" />
-    <PackageReference Include="YamlDotNet" Version="13.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AnEoT.Tools.Shared\AnEoT.Tools.Shared.csproj" />
   </ItemGroup>
 
 </Project>

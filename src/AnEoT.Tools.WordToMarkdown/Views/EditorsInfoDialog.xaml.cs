@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using AnEoT.Tools.WordToMarkdown.Models;
+using AnEoT.Tools.Shared.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AnEoT.Tools.WordToMarkdown.Views;
