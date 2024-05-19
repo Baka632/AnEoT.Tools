@@ -27,6 +27,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="AppPackages\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Controls\Eod.xaml" />
     <None Remove="Controls\FakeAds.xaml" />
     <None Remove="Views\ContentPage.xaml" />
@@ -129,4 +132,7 @@
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
   </PropertyGroup>
+  <ItemGroup>
+    <PRIResource Remove="AppPackages\**" />
+  </ItemGroup>
 </Project>
