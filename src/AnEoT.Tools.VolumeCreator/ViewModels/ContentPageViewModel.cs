@@ -68,10 +68,13 @@ public sealed partial class ContentPageViewModel : ObservableValidator
                 }
             }
 
+            IsSavingVolume = true;
             StorageFolder volumeFolder = await folder.CreateFolderAsync(VolumeFolderName, CreationCollisionOption.ReplaceExisting);
 
             await CreateResourcesFolder(volumeFolder);
             await SaveMarkdownContent(volumeFolder);
+
+            IsSavingVolume = false;
 
             await ShowDialogAsync("保存成功",
                                       $"内容已保存在 {volumeFolder.Path} 中。",

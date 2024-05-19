@@ -94,7 +94,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     [RelayCommand]
     private void AddEodTagToText(TextBox textBox)
     {
-        const string eodTag = "<eod />";
+        const string eodTag = "  <eod />";
 
         ArgumentNullException.ThrowIfNull(textBox);
         int position = textBox.SelectionStart;
@@ -200,8 +200,9 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
         MarkdownImageUriToFileMapping[imageUri] = fileNode.File;
 
         int position = textBox.SelectionStart;
-        MarkdownString = textBox.Text.Insert(position, markdownImageMark);
-        textBox.Select(position + markdownImageMark.Length, 0);
+        string markToInsert = $"{Environment.NewLine}{Environment.NewLine}{Environment.NewLine}{markdownImageMark}{Environment.NewLine}";
+        MarkdownString = textBox.Text.Insert(position, markToInsert);
+        textBox.Select(position + markToInsert.Length, 0);
     }
 
     private static string GetYamlFrontMatterString(FrontMatter frontMatter)

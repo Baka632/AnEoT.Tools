@@ -25,6 +25,8 @@ partial class ContentPageViewModel
     private bool _isVolumeCoverError;
     [ObservableProperty]
     private bool convertToWebp = true;
+    [ObservableProperty]
+    private bool isSavingVolume;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]

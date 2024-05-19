@@ -107,6 +107,7 @@
             HorizontalAlignment="Left"
             DefaultLabelPosition="Right">
             <AppBarButton
+                x:Name="SaveAppBarButton"
                 AccessKey="S"
                 Command="{x:Bind ViewModel.SaveVolumeCommand}"
                 Icon="Save"
@@ -116,6 +117,17 @@
                 </AppBarButton.KeyboardAccelerators>
             </AppBarButton>
         </CommandBar>
+
+        <TeachingTip
+            Title="正在保存..."
+            IsLightDismissEnabled="False"
+            IsOpen="{x:Bind ViewModel.IsSavingVolume, Mode=OneWay}"
+            PreferredPlacement="RightBottom"
+            Subtitle="请不要关闭应用。">
+            <TeachingTip.IconSource>
+                <SymbolIconSource Symbol="More" />
+            </TeachingTip.IconSource>
+        </TeachingTip>
 
         <Grid Grid.Row="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
