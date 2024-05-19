@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Globalization;
 using System.Collections.Specialized;
+using Windows.Globalization.NumberFormatting;
 
 namespace AnEoT.Tools.VolumeCreator.Views;
 
@@ -85,6 +86,14 @@ public sealed partial class FrontMatterDialog : ContentDialog
         this.InitializeComponent();
         Categories.CollectionChanged += OnCategoriesCollectionChanged;
         Tags.CollectionChanged += OnTagsCollectionChanged;
+
+        DecimalFormatter formatter = new()
+        {
+            FractionDigits = 0,
+            IsDecimalPointAlwaysDisplayed = false
+        };
+
+        OrderNumberBox.NumberFormatter = formatter;
     }
 
     [RelayCommand]
