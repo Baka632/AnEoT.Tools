@@ -117,7 +117,10 @@ public sealed partial class FrontMatterDialog : ContentDialog
     [RelayCommand]
     private void AddAuthorTagItem()
     {
-        Tags.Add(new StringView(Author ?? string.Empty));
+        if (!string.IsNullOrWhiteSpace(Author) && !Tags.Contains(Author))
+        {
+            Tags.Add(new StringView(Author));
+        }
     }
 
     [RelayCommand]
