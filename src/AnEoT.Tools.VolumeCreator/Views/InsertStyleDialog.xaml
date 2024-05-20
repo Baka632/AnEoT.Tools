@@ -72,11 +72,6 @@
                                 <ItemsStackPanel HorizontalAlignment="Center" Orientation="Horizontal" />
                             </ItemsPanelTemplate>
                         </ListView.ItemsPanel>
-                        <!--<ListView.ItemContainerStyle>
-                    <Style BasedOn="{StaticResource DefaultListViewItemStyle}" TargetType="ListViewItem">
-                        <Setter Property="Margin" Value="0" />
-                    </Style>
-                </ListView.ItemContainerStyle>-->
                     </ListView>
                     <TextBlock
                         Grid.Column="2"
