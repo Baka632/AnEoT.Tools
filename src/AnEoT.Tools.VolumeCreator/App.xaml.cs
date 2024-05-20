@@ -1,6 +1,7 @@
 ﻿#pragma warning disable CS8618
 
 using AnEoT.Tools.VolumeCreator.Views;
+using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace AnEoT.Tools.VolumeCreator;
 
@@ -18,6 +19,31 @@ public partial class App : Application
     public App()
     {
         this.InitializeComponent();
+        UnhandledException += OnUnhandledException;
+    }
+
+    private void OnUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        e.Handled = true;
+
+        Exception exception = e.Exception;
+
+        if (exception is null)
+        {
+            return;
+        }
+
+        try
+        {
+            new ToastContentBuilder().AddText("出现未处理的异常，欢迎来拷打作者@.@")
+                                 .AddText($"出错方法：{exception.TargetSite?.Name ?? "<未知>"}")
+                                 .AddText($"异常名称：{exception.GetType().Name}")
+                                 .Show();
+        }
+        catch (InvalidOperationException)
+        {
+            // 不要在处理异常时又一次抛出异常...
+        }
     }
 
     /// <summary>
