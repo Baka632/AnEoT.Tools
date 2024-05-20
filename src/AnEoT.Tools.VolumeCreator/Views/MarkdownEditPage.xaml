@@ -165,6 +165,17 @@
                     <KeyboardAccelerator Key="F" Modifiers="Control" />
                 </AppBarButton.KeyboardAccelerators>
             </AppBarButton>
+
+            <CommandBar.SecondaryCommands>
+                <AppBarButton
+                    Command="{x:Bind ViewModel.InsertStylesCommand}"
+                    CommandParameter="{x:Bind MarkdownTextBox}"
+                    Label="插入样式">
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xE943;" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+            </CommandBar.SecondaryCommands>
         </CommandBar>
 
         <Grid Grid.Row="1" Margin="5,0,0,0">

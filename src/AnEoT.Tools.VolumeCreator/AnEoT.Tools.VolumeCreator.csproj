@@ -35,6 +35,7 @@
     <None Remove="Views\ContentPage.xaml" />
     <None Remove="Views\EditorsInfoDialog.xaml" />
     <None Remove="Views\FrontMatterDialog.xaml" />
+    <None Remove="Views\InsertStyleDialog.xaml" />
     <None Remove="Views\MarkdownEditPage.xaml" />
     <None Remove="Views\MarkdownEditWindow.xaml" />
   </ItemGroup>
@@ -134,5 +135,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PRIResource Remove="AppPackages\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\InsertStyleDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 </Project>

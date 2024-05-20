@@ -86,13 +86,13 @@ public sealed partial class MarkdownEditPage : Page
             {
                 Command = ViewModel.AddEodTagToTextCommand,
                 CommandParameter = MarkdownTextBox,
-                Label = "≤Â»Î <eod /> ±Í«©",
+                Label = "ÊèíÂÖ• <eod /> Ê†áÁ≠æ",
                 Icon = eodIcon,
             };
 
             AppBarButton addStyle = new()
             {
-                Label = "≤Â»Î≥£”√—˘ Ω",
+                Label = "ÊèíÂÖ•Â∏∏Áî®Ê†∑Âºè",
                 Icon = new FontIcon() { Glyph = "\uE943" },
                 Flyout = new MenuBarItemFlyout
                 {
@@ -103,21 +103,21 @@ public sealed partial class MarkdownEditPage : Page
                             Command = ViewModel.InsertAlignLeftCommand,
                             CommandParameter = MarkdownTextBox,
                             Icon = new SymbolIcon(Symbol.AlignLeft),
-                            Text = "æ”◊Û"
+                            Text = "Â±ÖÂ∑¶"
                         },
                         new MenuFlyoutItem()
                         {
                             Command = ViewModel.InsertAlignCenterCommand,
                             CommandParameter = MarkdownTextBox,
                             Icon = new SymbolIcon(Symbol.AlignCenter),
-                            Text = "æ”÷–"
+                            Text = "Â±Ö‰∏≠"
                         },
                         new MenuFlyoutItem()
                         {
                             Command = ViewModel.InsertAlignRightCommand,
                             CommandParameter = MarkdownTextBox,
                             Icon = new SymbolIcon(Symbol.AlignRight),
-                            Text = "æ””“"
+                            Text = "Â±ÖÂè≥"
                         },
                         new MenuFlyoutSeparator(),
                         new MenuFlyoutItem()
@@ -125,7 +125,7 @@ public sealed partial class MarkdownEditPage : Page
                             Command = ViewModel.InsertTextKaiCommand,
                             CommandParameter = MarkdownTextBox,
                             Icon = new FontIcon() { Glyph = "\uF17F" },
-                            Text = "ø¨ÃÂ◊÷ÃÂ"
+                            Text = "Ê•∑‰ΩìÂ≠ó‰Ωì"
                         },
                     }
                 }
