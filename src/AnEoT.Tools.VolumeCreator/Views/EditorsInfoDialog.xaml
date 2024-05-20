@@ -7,10 +7,8 @@
     xmlns:helpers="using:AnEoT.Tools.VolumeCreator.Helpers"
     xmlns:local="using:AnEoT.Tools.VolumeCreator.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="using:AnEoT.Tools.VolumeCreator.Models"
-    xmlns:views="using:AnEoT.Tools.VolumeCreator.Views"
     Title="添加文编信息"
-    d:DataContext="{d:DesignInstance Type=views:EditorsInfoDialog}"
+    d:DataContext="{d:DesignInstance Type=local:EditorsInfoDialog}"
     CloseButtonText="取消"
     PrimaryButtonClick="OnPrimaryButtonClicked"
     PrimaryButtonText="确定"
@@ -57,7 +55,7 @@
                 <Button Command="{x:Bind AddAdditionalPartCommand}" Content="添加" />
 
                 <controls:SettingsExpander.ItemTemplate>
-                    <DataTemplate x:DataType="views:AdditionPart">
+                    <DataTemplate x:DataType="local:AdditionPart">
                         <Grid Margin="5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />

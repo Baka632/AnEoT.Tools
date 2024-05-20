@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using AnEoT.Tools.VolumeCreator.Models;
 using AnEoT.Tools.VolumeCreator.Views;
@@ -142,6 +142,8 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     [RelayCommand]
     private async Task AddEditorsInfoToText(TextBox textBox)
     {
+        ArgumentNullException.ThrowIfNull(textBox);
+
         EditorsInfoDialog dialog = new()
         {
             XamlRoot = view.XamlRoot
@@ -170,6 +172,77 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(textBox);
         MarkdownString += $"{Environment.NewLine}{Environment.NewLine}{fakeAdsTag}";
         textBox.Select(MarkdownString.Length - fakeAdsTag.Length, fakeAdsTag.Length);
+    }
+
+    [RelayCommand]
+    private async Task InsertStyles(TextBox textBox)
+    {
+        ArgumentNullException.ThrowIfNull(textBox);
+
+        InsertStyleDialog dialog = new()
+        {
+            XamlRoot = view.XamlRoot
+        };
+
+        ContentDialogResult result = await dialog.ShowAsync();
+
+        if (result == ContentDialogResult.Primary && string.IsNullOrWhiteSpace(dialog.StyleString) != true)
+        {
+            int position = textBox.SelectionStart;
+            string style = dialog.StyleString;
+
+            MarkdownString = textBox.Text.Insert(position, style);
+            textBox.Select(position, style.Length);
+        }
+    }
+
+    [RelayCommand]
+    private void InsertAlignLeft(TextBox textBox)
+    {
+        ArgumentNullException.ThrowIfNull(textBox);
+
+        string style = GenerateCssClassList("aleft");
+        int position = textBox.SelectionStart;
+        MarkdownString = textBox.Text.Insert(position, style);
+        textBox.Select(position, style.Length);
+    }
+
+    [RelayCommand]
+    private void InsertAlignRight(TextBox textBox)
+    {
+        ArgumentNullException.ThrowIfNull(textBox);
+
+        string style = GenerateCssClassList("aright");
+        int position = textBox.SelectionStart;
+        MarkdownString = textBox.Text.Insert(position, style);
+        textBox.Select(position, style.Length);
+    }
+
+    [RelayCommand]
+    private void InsertAlignCenter(TextBox textBox)
+    {
+        ArgumentNullException.ThrowIfNull(textBox);
+
+        string style = GenerateCssClassList("centering");
+        int position = textBox.SelectionStart;
+        MarkdownString = textBox.Text.Insert(position, style);
+        textBox.Select(position, style.Length);
+    }
+
+    [RelayCommand]
+    private void InsertTextKai(TextBox textBox)
+    {
+        ArgumentNullException.ThrowIfNull(textBox);
+
+        string style = GenerateCssClassList("textkai");
+        int position = textBox.SelectionStart;
+        MarkdownString = textBox.Text.Insert(position, style);
+        textBox.Select(position, style.Length);
+    }
+
+    private static string GenerateCssClassList(string className)
+    {
+        return $"{{.{className}}}";
     }
 
     public void InsertImageToText(TextBox textBox, FileNode fileNode)

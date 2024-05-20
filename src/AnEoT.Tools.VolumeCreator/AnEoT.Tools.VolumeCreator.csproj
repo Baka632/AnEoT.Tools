@@ -35,6 +35,7 @@
     <None Remove="Views\ContentPage.xaml" />
     <None Remove="Views\EditorsInfoDialog.xaml" />
     <None Remove="Views\FrontMatterDialog.xaml" />
+    <None Remove="Views\InsertStyleDialog.xaml" />
     <None Remove="Views\MarkdownEditPage.xaml" />
     <None Remove="Views\MarkdownEditWindow.xaml" />
   </ItemGroup>
@@ -56,6 +57,7 @@
     <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.0.240109" />
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Markdown" Version="7.1.2" />
     <PackageReference Include="Markdig" Version="0.37.0" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240428000" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.3233" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
@@ -134,5 +136,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PRIResource Remove="AppPackages\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\InsertStyleDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 </Project>

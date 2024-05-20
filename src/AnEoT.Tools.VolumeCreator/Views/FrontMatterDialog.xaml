@@ -212,16 +212,20 @@
 
                 <controls:SettingsExpander.Items>
                     <controls:SettingsCard Header="图标字符串">
-                        <TextBox
+                        <AutoSuggestBox
                             MinWidth="200"
-                            IsSpellCheckEnabled="False"
-                            Text="{x:Bind IconString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            GotFocus="OnIconStringAutoSuggestBoxGotFocus"
+                            TextChanged="OnIconStringAutoSuggestBoxTextChanged" />
                     </controls:SettingsCard>
                     <controls:SettingsCard Header="序号">
-                        <TextBox
+                        <NumberBox
+                            x:Name="OrderNumberBox"
                             MinWidth="200"
-                            IsSpellCheckEnabled="False"
-                            Text="{x:Bind Order, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource Int32ToStringConverter}}" />
+                            LargeChange="2"
+                            SmallChange="1"
+                            SpinButtonPlacementMode="Inline"
+                            ValidationMode="InvalidInputOverwritten"
+                            Value="{x:Bind Order, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </controls:SettingsCard>
                 </controls:SettingsExpander.Items>
             </controls:SettingsExpander>
