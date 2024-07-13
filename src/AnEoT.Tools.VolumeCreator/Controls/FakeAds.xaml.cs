@@ -9,7 +9,7 @@ namespace AnEoT.Tools.VolumeCreator.Controls;
 [INotifyPropertyChanged]
 public sealed partial class FakeAds : UserControl
 {
-    private static readonly Uri AnEoTWebsiteUri = new("https://aneot.terrach.net/");
+    private static readonly Uri AnEoTWebsiteUri = new("https://aneot.arktca.com/");
     private static readonly Uri FakeAdImageUri = new("ms-appx:///Assets/fake-ads/");
 
     [ObservableProperty]
@@ -92,7 +92,7 @@ public sealed partial class FakeAds : UserControl
             }
             else
             {
-                AdTips = "此处可能...额，临时广告？";
+                AdTips = "此处可能展示...额，临时广告？";
                 AdAbout = "查看更多（但是点了也没有用）";
             }
 

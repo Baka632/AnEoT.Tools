@@ -26,6 +26,8 @@ partial class ContentPageViewModel
     [ObservableProperty]
     private bool convertToWebp = true;
     [ObservableProperty]
+    private bool isCoverSizeFixed = true;
+    [ObservableProperty]
     private bool isSavingVolume;
 
     [ObservableProperty]
@@ -43,8 +45,7 @@ partial class ContentPageViewModel
     [Required, NotifyDataErrorInfo]
     [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateWordFiles))]
     private ObservableCollection<MarkdownWrapper> wordFiles = [];
-    [ObservableProperty]
-    [Required]
+    [ObservableProperty, Required]
     private ObservableCollection<ImageListNode> imageFiles = [];
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowNotifyGenerateIndex))]

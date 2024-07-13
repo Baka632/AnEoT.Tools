@@ -2,6 +2,7 @@
 
 using AnEoT.Tools.VolumeCreator.Views;
 using Microsoft.Toolkit.Uwp.Notifications;
+using Windows.ApplicationModel;
 
 namespace AnEoT.Tools.VolumeCreator;
 
@@ -10,6 +11,11 @@ namespace AnEoT.Tools.VolumeCreator;
 /// </summary>
 public partial class App : Application
 {
+    /// <summary>
+    /// 获取应用程序版本
+    /// </summary>
+    public static string AppVersion => $"{Package.Current.Id.Version.Major}.{Package.Current.Id.Version.Minor}.{Package.Current.Id.Version.Build}.{Package.Current.Id.Version.Revision}";
+
     public Window Window { get; private set; }
 
     /// <summary>

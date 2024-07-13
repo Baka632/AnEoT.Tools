@@ -63,6 +63,12 @@ public sealed partial class MarkdownEditPage : Page
 
             deferral.Complete();
         }
+#if DEBUG
+        else
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+#endif
     }
 
     private void OnMarkdownTextBoxLoaded(object sender, RoutedEventArgs e)

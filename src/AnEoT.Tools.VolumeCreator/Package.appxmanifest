@@ -10,7 +10,7 @@
   <Identity
     Name="AnEoT.Tools.VolumeCreator"
     Publisher="CN=Baka632"
-    Version="1.0.1.0" />
+    Version="1.0.2.0" />
 
   <mp:PhoneIdentity PhoneProductId="e95ad583-2d1f-4c0a-a7e0-be47220136e1" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

@@ -21,6 +21,7 @@ using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
 using YamlDotNet.Core.Events;
 using AnEoT.Tools.Shared.Models;
+using SixLabors.ImageSharp.Processing;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -103,18 +104,16 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     {
         StorageFolder resourceFolder = await volumeFolder.CreateFolderAsync("res", CreationCollisionOption.ReplaceExisting);
 
-        if (ConvertToWebp && CoverFile!.ContentType != "image/webp")
-        {
-            using ImageSharpImage image = await ImageSharpImage.LoadAsync(CoverFile!.Path);
-            StorageFile target = await resourceFolder.CreateFileAsync("cover.webp");
+        StorageFile target = await resourceFolder.CreateFileAsync("cover.webp");
+        using ImageSharpImage image = await ImageSharpImage.LoadAsync(CoverFile!.Path);
 
-            using Stream targetStream = await target.OpenStreamForWriteAsync();
-            await Task.Run(() => image.SaveAsWebp(targetStream)); // 防止卡主线程，ImageSharp 库自带的异步方法有点问题
-        }
-        else
+        if (IsCoverSizeFixed)
         {
-            await CoverFile!.CopyAsync(resourceFolder, "cover.webp");
+            image.Mutate(context => context.Resize(768, 1080));
         }
+
+        using Stream targetStream = await target.OpenStreamForWriteAsync();
+        await Task.Run(() => image.SaveAsWebp(targetStream)); // 防止卡主线程，ImageSharp 库自带的异步方法有点问题
 
         await CopyContentRecursively(ImageFiles.Single(), resourceFolder);
     }
