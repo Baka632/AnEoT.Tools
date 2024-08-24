@@ -1,8 +1,12 @@
 ﻿using Windows.Storage;
 using System.Collections.ObjectModel;
+using System.Text.Json.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AnEoT.Tools.VolumeCreator.Models;
 
+[JsonDerivedType(typeof(FileNode), "file")]
+[JsonDerivedType(typeof(FolderNode), "folder")]
 public abstract class ImageListNode
 {
     public string DisplayName { get; set; } = string.Empty;
@@ -18,14 +22,20 @@ public abstract class ImageListNode
 
 public sealed class FileNode : ImageListNode
 {
-    public StorageFile File { get; }
+    public required StorageFile File { get; set; }
 
+    [SetsRequiredMembers]
     public FileNode(StorageFile file, ImageListNode? parent)
     {
         File = file;
         DisplayName = file.Name;
         Type = ImageListNodeType.File;
         Parent = parent;
+    }
+
+    public FileNode()
+    {
+        Type = ImageListNodeType.File;
     }
 }
 
@@ -36,6 +46,11 @@ public sealed class FolderNode : ImageListNode
         DisplayName = folderName;
         Type = ImageListNodeType.Folder;
         Parent = parent;
+    }
+
+    public FolderNode()
+    {
+        Type = ImageListNodeType.Folder;
     }
 }
 

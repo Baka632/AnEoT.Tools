@@ -10,7 +10,7 @@
   <Identity
     Name="AnEoT.Tools.VolumeCreator"
     Publisher="CN=Baka632"
-    Version="1.0.2.0" />
+    Version="1.1.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="e95ad583-2d1f-4c0a-a7e0-be47220136e1" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
@@ -39,9 +39,27 @@
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"  Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png">
+          <uap:ShowNameOnTiles>
+            <uap:ShowOn Tile="square150x150Logo"/>
+            <uap:ShowOn Tile="wide310x150Logo"/>
+            <uap:ShowOn Tile="square310x310Logo"/>
+          </uap:ShowNameOnTiles>
+        </uap:DefaultTile >
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="aneot-volume-project">
+            <uap:SupportedFileTypes>
+              <uap:FileType ContentType="application/json">.aneot-proj</uap:FileType>
+            </uap:SupportedFileTypes>
+            <uap:DisplayName>《回归线》网页版工程文件</uap:DisplayName>
+            <uap:EditFlags OpenIsSafe="true"/>
+            <uap:Logo>Assets\FileExtension.png</uap:Logo>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+      </Extensions>
     </Application>
   </Applications>
 

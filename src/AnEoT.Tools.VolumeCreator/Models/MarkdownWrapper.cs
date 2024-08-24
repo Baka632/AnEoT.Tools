@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using Windows.Storage;
 
 namespace AnEoT.Tools.VolumeCreator.Models;
 
 public sealed class MarkdownWrapper(StorageFile? file, string markdown, MarkdownWrapperType type = default, string outputTitle = "", PredefinedCategory? categoryInIndexPage = null) : INotifyPropertyChanged
 {
+    [JsonIgnore]
     public static readonly List<MarkdownWrapperType> AvailableTypes =
     [
         MarkdownWrapperType.Intro,
@@ -25,6 +27,7 @@ public sealed class MarkdownWrapper(StorageFile? file, string markdown, Markdown
 
     public PredefinedCategory? CategoryInIndexPage { get; set; } = categoryInIndexPage;
 
+    [JsonIgnore]
     public int TypeIndex
     {
         get => AvailableTypes.IndexOf(Type);

@@ -22,6 +22,7 @@ using YamlDotNet.Serialization;
 using YamlDotNet.Core.Events;
 using AnEoT.Tools.Shared.Models;
 using SixLabors.ImageSharp.Processing;
+using System.Text.Json;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -36,17 +37,17 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    private async Task SaveVolume()
+    private async Task ExportVolume()
     {
         ValidateAllProperties();
 
         if (HasErrors)
         {
             string message = string.Join(Environment.NewLine, GetErrors().Select(e => e.ErrorMessage));
-            await ShowDialogAsync("无法保存，存在错误", message);
+            await ShowDialogAsync("无法导出，存在错误", message);
             return;
         }
-
+        await SaveProject();
         nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
         FolderPicker picker = new();
 
@@ -69,18 +70,46 @@ public sealed partial class ContentPageViewModel : ObservableValidator
                 }
             }
 
-            IsSavingVolume = true;
+            IsExportingVolume = true;
             StorageFolder volumeFolder = await folder.CreateFolderAsync(VolumeFolderName, CreationCollisionOption.ReplaceExisting);
 
             await CreateResourcesFolder(volumeFolder);
             await SaveMarkdownContent(volumeFolder);
 
-            IsSavingVolume = false;
+            IsExportingVolume = false;
 
-            await ShowDialogAsync("保存成功",
-                                      $"内容已保存在 {volumeFolder.Path} 中。",
+            await ShowDialogAsync("导出成功",
+                                      $"内容已导出在 {volumeFolder.Path} 中。",
                                       closeText: "确定");
         }
+    }
+
+    [RelayCommand]
+    private async Task SaveProject()
+    {
+        Project project = new(
+            CoverFile?.Path, ConvertToWebp, IsCoverSizeFixed, VolumeFolderName, VolumeName, WordFiles, ImageFiles,
+            IndexMarkdown.FirstOrDefault());
+
+        nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
+
+        FileSavePicker picker = new();
+        InitializeWithWindow.Initialize(picker, hwnd);
+
+        picker.FileTypeChoices.Add("《回归线》网页版工程文件", [".aneot-proj"]);
+        picker.SuggestedFileName = VolumeName;
+        picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+        
+        StorageFile file = await picker.PickSaveFileAsync();
+
+        using Stream stream = await file.OpenStreamForWriteAsync();
+        stream.Seek(0, SeekOrigin.Begin);
+
+        await JsonSerializer.SerializeAsync(stream, project, CommonValues.DefaultJsonSerializerOption);
+
+        await ShowDialogAsync("保存成功",
+                                      $"工程文件已保存到 {file.Path}。",
+                                      closeText: "确定");
     }
 
     private async Task SaveMarkdownContent(StorageFolder volumeFolder)

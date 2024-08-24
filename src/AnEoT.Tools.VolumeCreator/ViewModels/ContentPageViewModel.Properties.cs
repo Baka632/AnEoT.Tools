@@ -28,7 +28,7 @@ partial class ContentPageViewModel
     [ObservableProperty]
     private bool isCoverSizeFixed = true;
     [ObservableProperty]
-    private bool isSavingVolume;
+    private bool isExportingVolume;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]

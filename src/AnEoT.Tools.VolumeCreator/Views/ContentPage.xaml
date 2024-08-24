@@ -108,15 +108,30 @@
             HorizontalAlignment="Left"
             DefaultLabelPosition="Right">
             <AppBarButton
+                AccessKey="E"
+                Command="{x:Bind ViewModel.ExportVolumeCommand}"
+                Label="导出期刊文件">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xEDE1;" />
+                </AppBarButton.Icon>
+                <AppBarButton.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="E" Modifiers="Control" />
+                </AppBarButton.KeyboardAccelerators>
+            </AppBarButton>
+
+            <AppBarSeparator />
+
+            <AppBarButton
                 x:Name="SaveAppBarButton"
                 AccessKey="S"
-                Command="{x:Bind ViewModel.SaveVolumeCommand}"
+                Command="{x:Bind ViewModel.SaveProjectCommand}"
                 Icon="Save"
-                Label="保存">
+                Label="保存工程">
                 <AppBarButton.KeyboardAccelerators>
                     <KeyboardAccelerator Key="S" Modifiers="Control" />
                 </AppBarButton.KeyboardAccelerators>
             </AppBarButton>
+
             <AppBarButton Label="关于">
                 <AppBarButton.Icon>
                     <FontIcon Glyph="&#xE946;" />
@@ -147,9 +162,9 @@
         </CommandBar>
 
         <TeachingTip
-            Title="正在保存..."
+            Title="正在导出..."
             IsLightDismissEnabled="False"
-            IsOpen="{x:Bind ViewModel.IsSavingVolume, Mode=OneWay}"
+            IsOpen="{x:Bind ViewModel.IsExportingVolume, Mode=OneWay}"
             PreferredPlacement="RightBottom"
             Subtitle="请不要关闭应用。">
             <TeachingTip.IconSource>
