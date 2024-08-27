@@ -2,6 +2,8 @@
 
 using AnEoT.Tools.VolumeCreator.Views;
 using Microsoft.Toolkit.Uwp.Notifications;
+using Microsoft.Windows.AppLifecycle;
+using WASDKAppInstance = Microsoft.Windows.AppLifecycle.AppInstance;
 using Windows.ApplicationModel;
 
 namespace AnEoT.Tools.VolumeCreator;
@@ -58,11 +60,25 @@ public partial class App : Application
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        Window = new MainWindow
+        AppActivationArguments activatedArgs = WASDKAppInstance.GetCurrent().GetActivatedEventArgs();
+
+        MainWindow mainWindow = new()
         {
             ExtendsContentIntoTitleBar = true,
             Title = "AnEoT Volume Creator",
         };
+        Window = mainWindow;
+
+        if (activatedArgs.Kind == ExtendedActivationKind.File)
+        {
+            var file = (Windows.ApplicationModel.Activation.FileActivatedEventArgs)activatedArgs.Data;
+            mainWindow.InitalizeWindow(file.Files);
+        }
+        else
+        {
+            mainWindow.InitalizeWindow();
+        }
+
         Window.Activate();
     }
 }

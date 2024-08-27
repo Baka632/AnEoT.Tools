@@ -107,4 +107,19 @@ public sealed partial class ContentPage : Page
             }
         }
     }
+
+    protected override async void OnNavigatedTo(NavigationEventArgs e)
+    {
+        await ParseParameter(e.Parameter);
+    }
+
+    public async Task ParseParameter(object? parameter)
+    {
+        if (parameter is IReadOnlyList<IStorageItem> files && files.Count > 0)
+        {
+            // 只要第一个
+            StorageFile? file = files[0] as StorageFile;
+            await ViewModel.LoadProject(file);
+        }
+    }
 }

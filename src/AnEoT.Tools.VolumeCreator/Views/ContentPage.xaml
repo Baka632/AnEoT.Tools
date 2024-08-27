@@ -122,6 +122,16 @@
             <AppBarSeparator />
 
             <AppBarButton
+                AccessKey="O"
+                Command="{x:Bind ViewModel.OpenProjectCommand}"
+                Icon="OpenFile"
+                Label="打开工程">
+                <AppBarButton.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="O" Modifiers="Control" />
+                </AppBarButton.KeyboardAccelerators>
+            </AppBarButton>
+
+            <AppBarButton
                 x:Name="SaveAppBarButton"
                 AccessKey="S"
                 Command="{x:Bind ViewModel.SaveProjectCommand}"
@@ -162,15 +172,12 @@
         </CommandBar>
 
         <TeachingTip
-            Title="正在导出..."
-            IsLightDismissEnabled="False"
-            IsOpen="{x:Bind ViewModel.IsExportingVolume, Mode=OneWay}"
-            PreferredPlacement="RightBottom"
-            Subtitle="请不要关闭应用。">
-            <TeachingTip.IconSource>
-                <SymbolIconSource Symbol="More" />
-            </TeachingTip.IconSource>
-        </TeachingTip>
+            Title="{x:Bind ViewModel.TeachingTipTitle, Mode=OneWay}"
+            IconSource="{x:Bind ViewModel.TeachingTipIconSource, Mode=OneWay}"
+            IsLightDismissEnabled="{x:Bind ViewModel.IsTeachingTipLightDismissEnabled, Mode=OneWay}"
+            IsOpen="{x:Bind ViewModel.IsShowTeachingTip, Mode=OneWay}"
+            PreferredPlacement="{x:Bind ViewModel.TeachingTipPreferredPlacement, Mode=OneWay}"
+            Subtitle="{x:Bind ViewModel.TeachingTipSubtitle, Mode=OneWay}" />
 
         <Grid Grid.Row="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
@@ -427,7 +434,7 @@
                         Description="根据上面的配置，自动生成目录页。"
                         Header="目录页"
                         IsExpanded="True"
-                        ItemsSource="{x:Bind ViewModel.IndexMarkdown}">
+                        ItemsSource="{x:Bind ViewModel.IndexMarkdown, Mode=OneWay}">
                         <controls:SettingsExpander.HeaderIcon>
                             <SymbolIcon Symbol="AllApps" />
                         </controls:SettingsExpander.HeaderIcon>

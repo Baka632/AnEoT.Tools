@@ -11,6 +11,7 @@ namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
 partial class ContentPageViewModel
 {
+    public StorageFile? ProjectFile { get; set; }
     public bool IsVolumeCoverNotExist => VolumeCover is null;
     public VerticalAlignment CoverImageVerticalAlignmentMode => VolumeCover is null ? VerticalAlignment.Stretch : VerticalAlignment.Top;
     public bool ShowNotifyAddWordFile => WordFiles.Count <= 0;
@@ -27,8 +28,19 @@ partial class ContentPageViewModel
     private bool convertToWebp = true;
     [ObservableProperty]
     private bool isCoverSizeFixed = true;
+
     [ObservableProperty]
-    private bool isExportingVolume;
+    private bool isShowTeachingTip;
+    [ObservableProperty]
+    private bool isTeachingTipLightDismissEnabled;
+    [ObservableProperty]
+    private TeachingTipPlacementMode teachingTipPreferredPlacement;
+    [ObservableProperty]
+    private string? teachingTipTitle;
+    [ObservableProperty]
+    private string? teachingTipSubtitle;
+    [ObservableProperty]
+    private IconSource? teachingTipIconSource;
 
     [ObservableProperty]
     [NotifyDataErrorInfo]

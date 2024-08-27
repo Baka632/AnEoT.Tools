@@ -47,7 +47,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             await ShowDialogAsync("无法导出，存在错误", message);
             return;
         }
-        await SaveProject();
+
         nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
         FolderPicker picker = new();
 
@@ -70,17 +70,77 @@ public sealed partial class ContentPageViewModel : ObservableValidator
                 }
             }
 
-            IsExportingVolume = true;
+            ShowTeachingTip("正在导出...", "请不要关闭应用。", false, TeachingTipPlacementMode.RightBottom,
+                            new SymbolIconSource() { Symbol = Symbol.More });
+
             StorageFolder volumeFolder = await folder.CreateFolderAsync(VolumeFolderName, CreationCollisionOption.ReplaceExisting);
 
             await CreateResourcesFolder(volumeFolder);
             await SaveMarkdownContent(volumeFolder);
 
-            IsExportingVolume = false;
+            IsShowTeachingTip = false;
 
             await ShowDialogAsync("导出成功",
                                       $"内容已导出在 {volumeFolder.Path} 中。",
                                       closeText: "确定");
+        }
+    }
+
+    [RelayCommand]
+    private async Task OpenProject()
+    {
+        nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
+
+        FileOpenPicker picker = new();
+        InitializeWithWindow.Initialize(picker, hwnd);
+
+        picker.FileTypeFilter.Add(".aneot-proj");
+        picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+
+        StorageFile file = await picker.PickSingleFileAsync();
+        await LoadProject(file);
+    }
+
+    public async Task LoadProject(StorageFile? file)
+    {
+        if (file is null)
+        {
+            return;
+        }
+
+        Stream stream = await file.OpenStreamForReadAsync();
+
+        try
+        {
+            Project? project = await JsonSerializer.DeserializeAsync<Project>(stream, CommonValues.DefaultJsonSerializerOption);
+
+            if (project is null)
+            {
+                ShowTeachingTip("无法打开工程文件", "文件可能无效或损坏。", false, TeachingTipPlacementMode.RightBottom,
+                            new FontIconSource() { Glyph = "\uEA39" });
+            }
+            else
+            {
+                VolumeName = project.VolumeName ?? string.Empty;
+                VolumeFolderName = project.VolumeFolderName ?? string.Empty;
+                CoverFile = Path.Exists(project.CoverImagePath)
+                    ? await StorageFile.GetFileFromPathAsync(project.CoverImagePath)
+                    : null;
+                await SetCoverByFile(CoverFile);
+
+                ConvertToWebp = project.ImageConvertToWebp;
+                IsCoverSizeFixed = project.IsCoverSizeFixed;
+                WordFiles = project.WordFiles;
+                ImageFiles = project.ImageFiles;
+                IndexMarkdown = [project.IndexMarkdown];
+
+                ProjectFile = file;
+            }
+        }
+        catch (JsonException)
+        {
+            ShowTeachingTip("无法打开工程文件", "文件可能无效或损坏。", false, TeachingTipPlacementMode.RightBottom,
+                            new FontIconSource() { Glyph = "\uEA39" });
         }
     }
 
@@ -91,25 +151,44 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             CoverFile?.Path, ConvertToWebp, IsCoverSizeFixed, VolumeFolderName, VolumeName, WordFiles, ImageFiles,
             IndexMarkdown.FirstOrDefault());
 
-        nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
+        StorageFile file;
+        if (ProjectFile is not null)
+        {
+            file = ProjectFile;
+            await SaveProjectCore(project, file);
+            ShowTeachingTip("工程保存成功", string.Empty, true, TeachingTipPlacementMode.RightBottom,
+                            new FontIconSource() { Glyph = "\uE73E" });
+        }
+        else
+        {
+            nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
 
-        FileSavePicker picker = new();
-        InitializeWithWindow.Initialize(picker, hwnd);
+            FileSavePicker picker = new();
+            InitializeWithWindow.Initialize(picker, hwnd);
 
-        picker.FileTypeChoices.Add("《回归线》网页版工程文件", [".aneot-proj"]);
-        picker.SuggestedFileName = VolumeName;
-        picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-        
-        StorageFile file = await picker.PickSaveFileAsync();
+            picker.FileTypeChoices.Add("《回归线》网页版工程文件", [".aneot-proj"]);
+            picker.SuggestedFileName = VolumeName;
+            picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
 
-        using Stream stream = await file.OpenStreamForWriteAsync();
-        stream.Seek(0, SeekOrigin.Begin);
+            file = await picker.PickSaveFileAsync();
 
-        await JsonSerializer.SerializeAsync(stream, project, CommonValues.DefaultJsonSerializerOption);
+            if (file is null)
+            {
+                return;
+            }
 
-        await ShowDialogAsync("保存成功",
+            await SaveProjectCore(project, file);
+            await ShowDialogAsync("保存成功",
                                       $"工程文件已保存到 {file.Path}。",
                                       closeText: "确定");
+        }
+    }
+
+    private static async Task SaveProjectCore(Project project, StorageFile file)
+    {
+        using Stream stream = await file.OpenStreamForWriteAsync();
+        stream.SetLength(0);
+        await JsonSerializer.SerializeAsync(stream, project, CommonValues.DefaultJsonSerializerOption);
     }
 
     private async Task SaveMarkdownContent(StorageFolder volumeFolder)
@@ -572,6 +651,26 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         };
 
         return await dialog.ShowAsync();
+    }
+
+    /// <summary>
+    /// 显示一个教学提示
+    /// </summary>
+    /// <param name="title">标题</param>
+    /// <param name="subtitle">副标题</param>
+    /// <param name="enableLightDismiss">是否启用单击关闭</param>
+    /// <param name="preferredPlacement">提示的位置</param>
+    private void ShowTeachingTip(string title, string subtitle, bool enableLightDismiss, TeachingTipPlacementMode preferredPlacement, IconSource icon)
+    {
+        IsShowTeachingTip = false;
+
+        TeachingTipTitle = title;
+        TeachingTipSubtitle = subtitle;
+        IsTeachingTipLightDismissEnabled = enableLightDismiss;
+        TeachingTipPreferredPlacement = preferredPlacement;
+        TeachingTipIconSource = icon;
+
+        IsShowTeachingTip = true;
     }
 
     [RequiresDynamicCode("此方法调用了不支持 IL 裁剪的 YamlDotNet.Serialization.DeserializerBuilder.DeserializerBuilder()")]
