@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using Windows.Storage;
 
 namespace AnEoT.Tools.VolumeCreator.Models;
 
-public sealed class MarkdownWrapper(StorageFile? file, string markdown, MarkdownWrapperType type = default, string outputTitle = "", PredefinedCategory? categoryInIndexPage = null) : INotifyPropertyChanged
+public sealed class MarkdownWrapper(string displayName, string markdown, MarkdownWrapperType type = default, string outputTitle = "", PredefinedCategory? categoryInIndexPage = null) : INotifyPropertyChanged
 {
     [JsonIgnore]
     public static readonly List<MarkdownWrapperType> AvailableTypes =
@@ -18,8 +17,6 @@ public sealed class MarkdownWrapper(StorageFile? file, string markdown, Markdown
         MarkdownWrapperType.Paintings,
         MarkdownWrapperType.Others,
     ];
-
-    public StorageFile? File { get; } = file;
 
     public string Markdown { get; set; } = markdown;
 
@@ -45,15 +42,18 @@ public sealed class MarkdownWrapper(StorageFile? file, string markdown, Markdown
         {
             outputTitle = value;
             OnPropertiesChanged();
-
-            if (File?.Name is null)
-            {
-                OnPropertiesChanged(nameof(DisplayName));
-            }
         }
     }
 
-    public string DisplayName => File?.Name ?? (string.IsNullOrWhiteSpace(outputTitle) ? "<自定义文件>" : outputTitle);
+    public string DisplayName
+    {
+        get => displayName;
+        set
+        {
+            displayName = value;
+            OnPropertiesChanged();
+        }
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

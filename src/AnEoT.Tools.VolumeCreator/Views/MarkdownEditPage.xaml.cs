@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using AnEoT.Tools.VolumeCreator.Helpers;
 using AnEoT.Tools.VolumeCreator.Models;
 using AnEoT.Tools.VolumeCreator.ViewModels;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Storage;

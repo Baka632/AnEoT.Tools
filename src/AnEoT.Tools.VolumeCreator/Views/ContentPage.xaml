@@ -306,8 +306,17 @@
                                     Command="{Binding ViewModel.ViewWordFileItemCommand}"
                                     CommandParameter="{x:Bind}"
                                     ContentAlignment="Vertical"
-                                    Header="{x:Bind DisplayName, Mode=OneWay}"
                                     IsClickEnabled="True">
+                                    <controls:SettingsCard.Header>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock VerticalAlignment="Center" Text="显示名称：" />
+                                            <TextBox
+                                                MinWidth="150"
+                                                VerticalAlignment="Center"
+                                                Text="{x:Bind DisplayName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        </StackPanel>
+                                    </controls:SettingsCard.Header>
+
                                     <ScrollViewer
                                         Padding="0,0,0,10"
                                         HorizontalAlignment="Stretch"

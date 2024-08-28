@@ -89,6 +89,8 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     [RelayCommand]
     private async Task OpenProject()
     {
+        // TODO: 之前打开的项目没保存怎么办？
+
         nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
 
         FileOpenPicker picker = new();
@@ -130,9 +132,22 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
                 ConvertToWebp = project.ImageConvertToWebp;
                 IsCoverSizeFixed = project.IsCoverSizeFixed;
+
+                WordFiles.CollectionChanged -= OnWordFilesCollectionChanged;
+                ImageFiles.CollectionChanged -= OnImagesFilesCollectionChanged;
+                IndexMarkdown.CollectionChanged -= OnIndexMarkdownCollectionChanged;
+
                 WordFiles = project.WordFiles;
                 ImageFiles = project.ImageFiles;
-                IndexMarkdown = [project.IndexMarkdown];
+                IndexMarkdown = project.IndexMarkdown is null ? [] : [project.IndexMarkdown];
+
+                OnPropertyChanged(nameof(ShowNotifyAddWordFile));
+                OnPropertyChanged(nameof(ShowNotifyAddImagesFile));
+                OnPropertyChanged(nameof(ShowNotifyGenerateIndex));
+
+                WordFiles.CollectionChanged += OnWordFilesCollectionChanged;
+                ImageFiles.CollectionChanged += OnImagesFilesCollectionChanged;
+                IndexMarkdown.CollectionChanged += OnIndexMarkdownCollectionChanged;
 
                 ProjectFile = file;
             }
@@ -341,30 +356,25 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     [RelayCommand]
     private void AddEmptyWordFileItem()
     {
-        MarkdownWrapper emptyMarkdownFile = new(null, string.Empty, MarkdownWrapperType.Others);
+        MarkdownWrapper emptyMarkdownFile = new("<自定义文件>", string.Empty, MarkdownWrapperType.Others);
         WordFiles.Add(emptyMarkdownFile);
     }
 
     [RelayCommand]
     private void AddPaintingWordFileItem()
     {
-        MarkdownWrapper paintingMarkdownFile = new(null, string.Empty, MarkdownWrapperType.Paintings);
+        MarkdownWrapper paintingMarkdownFile = new("<自定义文件>", string.Empty, MarkdownWrapperType.Paintings);
         WordFiles.Add(paintingMarkdownFile);
     }
 
     public async Task AddSingleWordFileItem(StorageFile file)
     {
-        if (WordFiles.Any(wrapper => wrapper?.File?.Path == file.Path))
-        {
-            return;
-        }
-
         MarkdownWrapper toMarkdownFile;
 
         try
         {
             string markdown = await Task.Run(() => WordToMarkdownService.GetMarkdown(file.Path));
-            toMarkdownFile = new(file, markdown);
+            toMarkdownFile = new(file.DisplayName, markdown);
             WordFiles.Add(toMarkdownFile);
         }
         catch (FileFormatException ex)
@@ -468,7 +478,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         builder.AppendLine("<FakeAds />");
 
         string markdown = builder.ToString();
-        MarkdownWrapper wrapper = new(null, markdown, MarkdownWrapperType.Others, "README");
+        MarkdownWrapper wrapper = new("<自定义文件>", markdown, MarkdownWrapperType.Others, "README");
 
         if (IndexMarkdown.Count == 1)
         {

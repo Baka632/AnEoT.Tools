@@ -16,8 +16,16 @@ public class StorageFileJsonConverter : JsonConverter<StorageFile?>
         }
         else
         {
-            StorageFile file = StorageFile.GetFileFromPathAsync(path).GetAwaiter().GetResult();
-            return file;
+            if (Path.Exists(path))
+            {
+                StorageFile file = StorageFile.GetFileFromPathAsync(path).GetAwaiter().GetResult();
+                return file;
+            }
+            else
+            {
+                // TODO: 如果文件不复存在怎么办？
+                return null;
+            }
         }
     }
 
