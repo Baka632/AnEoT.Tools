@@ -5,6 +5,7 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Windows.AppLifecycle;
 using WASDKAppInstance = Microsoft.Windows.AppLifecycle.AppInstance;
 using Windows.ApplicationModel;
+using Microsoft.UI.Dispatching;
 
 namespace AnEoT.Tools.VolumeCreator;
 
@@ -28,6 +29,11 @@ public partial class App : Application
     {
         this.InitializeComponent();
         UnhandledException += OnUnhandledException;
+    }
+
+    public void RunOnUIThread(DispatcherQueueHandler handler)
+    {
+        Window.DispatcherQueue.TryEnqueue(handler);
     }
 
     private void OnUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)

@@ -32,20 +32,36 @@
                         Grid.Column="1"
                         VerticalAlignment="Center"
                         Text="{x:Bind DisplayName}" />
-                    <Button
+                    <StackPanel
                         Grid.Column="2"
-                        Width="35"
-                        Height="35"
                         Margin="0,0,20,0"
-                        Padding="0"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
-                        helpers:AncestorSource.AncestorType="Page"
-                        Background="Transparent"
-                        Command="{Binding ViewModel.RemoveImageFileCommand}"
-                        CommandParameter="{x:Bind}">
-                        <SymbolIcon Symbol="Delete" />
-                    </Button>
+                        Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Height" Value="35" />
+                                <Setter Property="Width" Value="35" />
+                                <Setter Property="Padding" Value="0" />
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <Button
+                            Margin="0,0,5,0"
+                            helpers:AncestorSource.AncestorType="Page"
+                            Command="{Binding ViewModel.RemoveImageFileCommand}"
+                            CommandParameter="{x:Bind}">
+                            <SymbolIcon Symbol="Repair" />
+                        </Button>
+
+                        <Button
+                            helpers:AncestorSource.AncestorType="Page"
+                            Command="{Binding ViewModel.RemoveImageFileCommand}"
+                            CommandParameter="{x:Bind}">
+                            <SymbolIcon Symbol="Delete" />
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </TreeViewItem>
         </DataTemplate>
@@ -56,6 +72,7 @@
                 Background="Transparent"
                 DragOver="OnFolderNodeItemDragOver"
                 Drop="OnFolderNodeItemDrop"
+                IsExpanded="True"
                 ItemsSource="{x:Bind Children}">
                 <Grid>
                     <Grid.ColumnDefinitions>

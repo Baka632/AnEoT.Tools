@@ -48,6 +48,19 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             return;
         }
 
+        if (!CheckImageFilesPathAllExist(ImageFiles, out string? errorMessage))
+        {
+            ContentDialogResult result = await ShowDialogAsync("警告",
+                                                               $"以下文件不存在，无法导出它们。{Environment.NewLine}要继续吗？{Environment.NewLine}{Environment.NewLine}{errorMessage.TrimEnd()}",
+                                                               "继续操作",
+                                                               closeText: "取消操作");
+
+            if (result != ContentDialogResult.Primary)
+            {
+                return;
+            }
+        }
+
         nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
         FolderPicker picker = new();
 
@@ -633,6 +646,44 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         {
             return $"{wrapper.OutputTitle}.md";
         }
+    }
+
+    private static bool CheckImageFilesPathAllExist(IEnumerable<ImageListNode> nodes, [NotNullWhen(false)] out string? errorMessage)
+    {
+        bool isSuccess = true;
+        StringBuilder builder = new();
+
+        foreach (ImageListNode node in nodes)
+        {
+            if (node is FolderNode folderNode)
+            {
+                if (folderNode.Children.Count <= 0)
+                {
+                    continue;
+                }
+
+                bool success = CheckImageFilesPathAllExist(folderNode.Children, out string? msg);
+
+                if (!success)
+                {
+                    builder.AppendLine(msg);
+                    isSuccess = false;
+                }
+            }
+            else if (node is FileNode fileNode)
+            {
+                bool success = File.Exists(fileNode.FilePath);
+
+                if (!success)
+                {
+                    builder.AppendLine(fileNode.FilePath);
+                    isSuccess = false;
+                }
+            }
+        }
+
+        errorMessage = builder.ToString();
+        return isSuccess;
     }
 
     /// <summary>
