@@ -34,6 +34,8 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         ImageFiles.CollectionChanged += OnImagesFilesCollectionChanged;
         IndexMarkdown.CollectionChanged += OnIndexMarkdownCollectionChanged;
         InitializeImageFiles();
+
+        CommonValues.IsProjectSaved = true;
     }
 
     [RelayCommand]
@@ -70,6 +72,11 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
         if (folder != null)
         {
+            if (ProjectFile is not null)
+            {
+                await SaveProjectInternal(false);
+            }
+
             if (Directory.Exists(Path.Combine(folder.Path, VolumeFolderName)))
             {
                 ContentDialogResult result = await ShowDialogAsync("指定的文件夹内已经包含同名的期刊文件夹",
@@ -102,7 +109,17 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     [RelayCommand]
     private async Task OpenProject()
     {
-        // TODO: 之前打开的项目没保存怎么办？
+        if (!CommonValues.IsProjectSaved)
+        {
+            ContentDialogResult result = await ShowDialogAsync("尚未保存当前的工程",
+                                                               "要继续吗？未保存的更改将丢失。",
+                                                               "继续",
+                                                               closeText: "取消");
+            if (result != ContentDialogResult.Primary)
+            {
+                return;
+            }
+        }
 
         nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
 
@@ -198,6 +215,9 @@ public sealed partial class ContentPageViewModel : ObservableValidator
                 IndexMarkdown.CollectionChanged += OnIndexMarkdownCollectionChanged;
 
                 ProjectFile = file;
+
+                await Task.Delay(200);
+                CommonValues.IsProjectSaved = true;
             }
         }
         catch (JsonException)
@@ -210,6 +230,11 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     [RelayCommand]
     private async Task SaveProject()
     {
+        await SaveProjectInternal();
+    }
+
+    private async Task SaveProjectInternal(bool showSavingTip = true)
+    {
         Project project = new(
             CoverFile?.Path, ConvertToWebp, IsCoverSizeFixed, VolumeFolderName, VolumeName, WordFiles, ImageFiles,
             IndexMarkdown.FirstOrDefault());
@@ -219,8 +244,12 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         {
             file = ProjectFile;
             await SaveProjectCore(project, file);
-            ShowTeachingTip("工程保存成功", string.Empty, true, TeachingTipPlacementMode.RightBottom,
+
+            if (showSavingTip)
+            {
+                ShowTeachingTip("工程保存成功", string.Empty, true, TeachingTipPlacementMode.RightBottom,
                             new FontIconSource() { Glyph = "\uE73E" });
+            }
         }
         else
         {
@@ -245,13 +274,14 @@ public sealed partial class ContentPageViewModel : ObservableValidator
                                       $"工程文件已保存到 {file.Path}。",
                                       closeText: "确定");
         }
-    }
 
-    private static async Task SaveProjectCore(Project project, StorageFile file)
-    {
-        using Stream stream = await file.OpenStreamForWriteAsync();
-        stream.SetLength(0);
-        await JsonSerializer.SerializeAsync(stream, project, CommonValues.DefaultJsonSerializerOption);
+        static async Task SaveProjectCore(Project project, StorageFile file)
+        {
+            using Stream stream = await file.OpenStreamForWriteAsync();
+            stream.SetLength(0);
+            await JsonSerializer.SerializeAsync(stream, project, CommonValues.DefaultJsonSerializerOption);
+            CommonValues.IsProjectSaved = true;
+        }
     }
 
     private async Task SaveMarkdownContent(StorageFolder volumeFolder)
@@ -473,6 +503,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
                     node.Children.Add(new FileNode(file, node));
                 }
             }
+            CommonValues.IsProjectSaved = false;
         }
     }
 
@@ -480,6 +511,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     private static void RemoveImageFile(FileNode node)
     {
         node.Parent?.Children.Remove(node);
+        CommonValues.IsProjectSaved = false;
     }
 
     [RelayCommand]
@@ -502,6 +534,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         }
 
         node.FilePath = file.Path;
+        CommonValues.IsProjectSaved = true;
     }
 
     [RelayCommand]

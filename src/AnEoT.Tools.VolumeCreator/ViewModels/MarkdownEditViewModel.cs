@@ -39,6 +39,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
 
     partial void OnMarkdownStringChanged(string value)
     {
+        CommonValues.IsProjectSaved = false;
         MarkdownWrapper.Markdown = value;
     }
 

@@ -76,18 +76,68 @@ partial class ContentPageViewModel
         ImageFiles.Add(root);
     }
 
+    #region Save State Changer
+    partial void OnVolumeCoverChanged(BitmapImage? value)
+    {
+        CommonValues.IsProjectSaved = false;
+    }
+
+    partial void OnConvertToWebpChanged(bool value)
+    {
+        CommonValues.IsProjectSaved = false;
+    }
+
+    partial void OnIsCoverSizeFixedChanged(bool value)
+    {
+        CommonValues.IsProjectSaved = false;
+    }
+
+    partial void OnVolumeFolderNameChanged(string value)
+    {
+        CommonValues.IsProjectSaved = false;
+    }
+
+    partial void OnVolumeNameChanged(string value)
+    {
+        CommonValues.IsProjectSaved = false;
+    }
+
+    partial void OnCoverFileChanged(StorageFile? value)
+    {
+        CommonValues.IsProjectSaved = false;
+    }
+
+    partial void OnWordFilesChanged(ObservableCollection<MarkdownWrapper> value)
+    {
+        CommonValues.IsProjectSaved = false;
+    }
+
+    partial void OnImageFilesChanged(ObservableCollection<ImageListNode> value)
+    {
+        CommonValues.IsProjectSaved = false;
+    }
+
+    partial void OnIndexMarkdownChanged(ObservableCollection<MarkdownWrapper> value)
+    {
+        CommonValues.IsProjectSaved = false;
+    }
+    #endregion
+
     private void OnWordFilesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        CommonValues.IsProjectSaved = false;
         OnPropertyChanged(nameof(ShowNotifyAddWordFile));
     }
 
     private void OnImagesFilesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        CommonValues.IsProjectSaved = false;
         OnPropertyChanged(nameof(ShowNotifyAddImagesFile));
     }
     
     private void OnIndexMarkdownCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        CommonValues.IsProjectSaved = false;
         OnPropertyChanged(nameof(ShowNotifyGenerateIndex));
     }
 

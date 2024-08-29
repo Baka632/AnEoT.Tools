@@ -2,13 +2,14 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
-using AnEoT.Tools.VolumeCreator.Helpers.JsonConverters;
 using Markdig;
 
 namespace AnEoT.Tools.VolumeCreator;
 
 public class CommonValues
 {
+    public static bool IsProjectSaved { get; set; } = true;
+
     public static readonly MarkdownPipeline MarkdownPipeline = new MarkdownPipelineBuilder()
             .UseAdvancedExtensions()
             .UseListExtras()

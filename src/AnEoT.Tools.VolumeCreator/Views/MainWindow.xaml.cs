@@ -35,21 +35,24 @@ public sealed partial class MainWindow : WindowEx
 
     private async void OnClosing(object sender, AppWindowClosingEventArgs e)
     {
-        e.Cancel = true;
-
-        ContentDialog dialog = new()
+        if (!CommonValues.IsProjectSaved)
         {
-            Title = "要关闭应用吗？",
-            PrimaryButtonText = "关闭",
-            CloseButtonText = "取消",
-            XamlRoot = Content.XamlRoot
-        };
+            e.Cancel = true;
 
-        ContentDialogResult result = await dialog.ShowAsync();
+            ContentDialog dialog = new()
+            {
+                Title = "要关闭应用吗？工程文件还没有保存。",
+                PrimaryButtonText = "关闭",
+                CloseButtonText = "取消",
+                XamlRoot = Content.XamlRoot
+            };
 
-        if (result == ContentDialogResult.Primary)
-        {
-            Close();
+            ContentDialogResult result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                Close();
+            }
         }
     }
 

@@ -31,6 +31,7 @@ public sealed class MarkdownWrapper(string displayName, string markdown, Markdow
         set
         {
             Type = value + 1 > AvailableTypes.Count || value < 0 ? default : AvailableTypes[value];
+            CommonValues.IsProjectSaved = false;
             OnPropertiesChanged();
         }
     }
@@ -41,6 +42,7 @@ public sealed class MarkdownWrapper(string displayName, string markdown, Markdow
         set
         {
             outputTitle = value;
+            CommonValues.IsProjectSaved = false;
             OnPropertiesChanged();
         }
     }
@@ -51,6 +53,7 @@ public sealed class MarkdownWrapper(string displayName, string markdown, Markdow
         set
         {
             displayName = value;
+            CommonValues.IsProjectSaved = false;
             OnPropertiesChanged();
         }
     }
