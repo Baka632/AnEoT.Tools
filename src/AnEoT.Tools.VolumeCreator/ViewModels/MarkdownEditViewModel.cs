@@ -33,10 +33,8 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
         ImageFiles = imageFiles;
         MarkdownWrapper = wrapper;
 
-        if (coverImageFile is not null)
-        {
-            MarkdownImageUriToFileMapping["./res/cover.webp"] = coverImageFile.Path;
-        }
+        imageFiles.CollectionChanged += (s, e) => InitializeImageFileMapping();
+        InitializeImageFileMapping();
     }
 
     partial void OnMarkdownStringChanged(string value)
@@ -247,6 +245,36 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
 
     public void InsertImageToText(TextBox textBox, FileNode fileNode)
     {
+        string imageUri = ConstructImageUriByFileNode(fileNode);
+        string markdownImageMark = $"![]({imageUri})";
+
+        int position = textBox.SelectionStart;
+        string markToInsert = $"{Environment.NewLine}{Environment.NewLine}{Environment.NewLine}{markdownImageMark}{Environment.NewLine}";
+        MarkdownString = textBox.Text.Insert(position, markToInsert);
+        textBox.Select(position + markToInsert.Length, 0);
+    }
+
+    private void InitializeImageFileMapping()
+    {
+        MarkdownImageUriToFileMapping.Clear();
+
+        if (CoverImageFile is not null)
+        {
+            MarkdownImageUriToFileMapping["./res/cover.webp"] = CoverImageFile.Path;
+        }
+
+        foreach (ImageListNode node in ImageFiles)
+        {
+            foreach (FileNode fileNode in DescendantsFileNode(node))
+            {
+                string imageUri = ConstructImageUriByFileNode(fileNode);
+                MarkdownImageUriToFileMapping[imageUri] = fileNode.FilePath;
+            }
+        }
+    }
+
+    private static string ConstructImageUriByFileNode(FileNode fileNode)
+    {
         List<string> targetParts = new(3);
         ImageListNode? parentNode = fileNode;
         while (true)
@@ -268,15 +296,26 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
         targetParts.Reverse();
 
         string imageUri = $"./{string.Join('/', targetParts)}";
-        string markdownImageMark = $"![]({imageUri})";
+        return imageUri;
+    }
 
-        // TODO: 这里只会在插入图片时初始化，所以关闭窗口后再次进入时会导致无法显示图像。
-        MarkdownImageUriToFileMapping[imageUri] = fileNode.FilePath;
+    private static List<FileNode> DescendantsFileNode(ImageListNode node)
+    {
+        List<FileNode> fileNodes = new(10);
 
-        int position = textBox.SelectionStart;
-        string markToInsert = $"{Environment.NewLine}{Environment.NewLine}{Environment.NewLine}{markdownImageMark}{Environment.NewLine}";
-        MarkdownString = textBox.Text.Insert(position, markToInsert);
-        textBox.Select(position + markToInsert.Length, 0);
+        foreach (ImageListNode item in node.Children)
+        {
+            if (item is FileNode fileNode)
+            {
+                fileNodes.Add(fileNode);
+            }
+            else if (item is FolderNode folderNode)
+            {
+                fileNodes.AddRange(DescendantsFileNode(folderNode));
+            }
+        }
+
+        return fileNodes;
     }
 
     private static string GetYamlFrontMatterString(FrontMatter frontMatter)

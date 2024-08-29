@@ -14,8 +14,11 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <DataTemplate x:Key="FileNodeTemplate" x:DataType="models:ImageListNode">
-            <TreeViewItem ItemsSource="{x:Bind Children}">
+        <DataTemplate x:Key="FileNodeTemplate" x:DataType="models:FileNode">
+            <TreeViewItem
+                ItemsSource="{x:Bind Children}"
+                ToolTipService.ToolTip="{x:Bind FilePath, Mode=OneWay}"
+                Visibility="{x:Bind IsFileExist, Mode=OneWay}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
