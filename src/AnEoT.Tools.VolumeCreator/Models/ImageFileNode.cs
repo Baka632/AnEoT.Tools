@@ -22,13 +22,18 @@ public abstract class ImageListNode
 
 public sealed class FileNode : ImageListNode
 {
-    public required StorageFile File { get; set; }
+    public required string FilePath { get; set; }
 
     [SetsRequiredMembers]
-    public FileNode(StorageFile file, ImageListNode? parent)
+    public FileNode(StorageFile file, ImageListNode? parent) : this(file.Path, file.Name, parent)
     {
-        File = file;
-        DisplayName = file.Name;
+    }
+    
+    [SetsRequiredMembers]
+    public FileNode(string filePath, string displayName, ImageListNode? parent)
+    {
+        FilePath = filePath;
+        DisplayName = displayName;
         Type = ImageListNodeType.File;
         Parent = parent;
     }

@@ -259,13 +259,13 @@ public sealed partial class ContentPageViewModel : ObservableValidator
                         }
                     }
                 }
-                else if (item.Type == ImageListNodeType.File && item is FileNode fileNode)
+                else if (item.Type == ImageListNodeType.File && item is FileNode fileNode && File.Exists(fileNode.FilePath))
                 {
                     await SaveFileNode(fileNode, rootFolder);
                 }
             }
         }
-        else if (node.Type == ImageListNodeType.File && node is FileNode fileNode)
+        else if (node.Type == ImageListNodeType.File && node is FileNode fileNode && File.Exists(fileNode.FilePath))
         {
             await SaveFileNode(fileNode, rootFolder);
         }
@@ -278,9 +278,9 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
         async Task SaveFileNode(FileNode fileNode, StorageFolder rootFolder)
         {
-            if (ConvertToWebp && fileNode.File.ContentType != "image/webp")
+            if (ConvertToWebp && !Path.GetExtension(fileNode.FilePath).Equals(".webp", StringComparison.OrdinalIgnoreCase))
             {
-                using ImageSharpImage image = await ImageSharpImage.LoadAsync(fileNode.File.Path);
+                using ImageSharpImage image = await ImageSharpImage.LoadAsync(fileNode.FilePath);
                 StorageFile target = await rootFolder.CreateFileAsync(Path.ChangeExtension(fileNode.DisplayName, ".webp"));
 
                 using Stream targetStream = await target.OpenStreamForWriteAsync();
@@ -288,7 +288,8 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             }
             else
             {
-                await fileNode.File.CopyAsync(rootFolder);
+                StorageFile file = await StorageFile.GetFileFromPathAsync(fileNode.FilePath);
+                await file.CopyAsync(rootFolder);
             }
         }
     }
@@ -419,7 +420,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         {
             foreach (StorageFile file in files)
             {
-                if (!node.Children.Any(node => node is FileNode fileNode && fileNode.File.Path == file.Path))
+                if (!node.Children.Any(node => node is FileNode fileNode && fileNode.FilePath == file.Path))
                 {
                     node.Children.Add(new FileNode(file, node));
                 }

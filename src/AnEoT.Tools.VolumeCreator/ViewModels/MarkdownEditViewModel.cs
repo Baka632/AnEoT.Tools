@@ -16,7 +16,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     public MarkdownWrapper MarkdownWrapper { get; }
     public ObservableCollection<ImageListNode> ImageFiles { get; }
     public StorageFile? CoverImageFile { get; }
-    public Dictionary<string, StorageFile> MarkdownImageUriToFileMapping { get; } = new(10);
+    public Dictionary<string, string> MarkdownImageUriToFileMapping { get; } = new(10);
 
     private readonly MarkdownEditPage view;
 
@@ -35,7 +35,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
 
         if (coverImageFile is not null)
         {
-            MarkdownImageUriToFileMapping["./res/cover.webp"] = coverImageFile;
+            MarkdownImageUriToFileMapping["./res/cover.webp"] = coverImageFile.Path;
         }
     }
 
@@ -270,7 +270,8 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
         string imageUri = $"./{string.Join('/', targetParts)}";
         string markdownImageMark = $"![]({imageUri})";
 
-        MarkdownImageUriToFileMapping[imageUri] = fileNode.File;
+        // TODO: 这里只会在插入图片时初始化，所以关闭窗口后再次进入时会导致无法显示图像。
+        MarkdownImageUriToFileMapping[imageUri] = fileNode.FilePath;
 
         int position = textBox.SelectionStart;
         string markToInsert = $"{Environment.NewLine}{Environment.NewLine}{Environment.NewLine}{markdownImageMark}{Environment.NewLine}";

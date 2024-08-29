@@ -22,7 +22,6 @@ public class CommonValues
         Converters =
         {
             new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
-            new StorageFileJsonConverter()
         },
         ReferenceHandler = ReferenceHandler.Preserve,
         Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),

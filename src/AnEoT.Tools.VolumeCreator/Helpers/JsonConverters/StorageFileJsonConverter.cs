@@ -4,6 +4,7 @@ using Windows.Storage;
 
 namespace AnEoT.Tools.VolumeCreator.Helpers.JsonConverters;
 
+[Obsolete("不再使用。")]
 public class StorageFileJsonConverter : JsonConverter<StorageFile?>
 {
     public override StorageFile? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -16,14 +17,13 @@ public class StorageFileJsonConverter : JsonConverter<StorageFile?>
         }
         else
         {
-            if (Path.Exists(path))
+            if (File.Exists(path))
             {
                 StorageFile file = StorageFile.GetFileFromPathAsync(path).GetAwaiter().GetResult();
                 return file;
             }
             else
             {
-                // TODO: 如果文件不复存在怎么办？
                 return null;
             }
         }
@@ -31,6 +31,13 @@ public class StorageFileJsonConverter : JsonConverter<StorageFile?>
 
     public override void Write(Utf8JsonWriter writer, StorageFile? value, JsonSerializerOptions options)
     {
-        writer.WriteStringValue(value?.Path);
+        if (File.Exists(value?.Path))
+        {
+            writer.WriteStringValue(value.Path);
+        }
+        else
+        {
+            writer.WriteStringValue(string.Empty);
+        }
     }
 }

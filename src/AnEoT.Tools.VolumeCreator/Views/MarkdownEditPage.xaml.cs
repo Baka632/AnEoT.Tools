@@ -7,7 +7,6 @@ using AnEoT.Tools.VolumeCreator.ViewModels;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Storage;
-using Windows.Storage.Streams;
 
 namespace AnEoT.Tools.VolumeCreator.Views;
 
@@ -47,15 +46,12 @@ public sealed partial class MarkdownEditPage : Page
         }
     }
 
-    private async void OnMarkdownRenderTextBlockImageResolving(object sender, CommunityToolkit.WinUI.UI.Controls.ImageResolvingEventArgs e)
+    private void OnMarkdownRenderTextBlockImageResolving(object sender, CommunityToolkit.WinUI.UI.Controls.ImageResolvingEventArgs e)
     {
-        if (ViewModel.MarkdownImageUriToFileMapping.TryGetValue(e.Url, out StorageFile? file))
+        if (ViewModel.MarkdownImageUriToFileMapping.TryGetValue(e.Url, out string? file))
         {
             Deferral deferral = e.GetDeferral();
-            BitmapImage image = new();
-
-            IRandomAccessStreamWithContentType source = await file.OpenReadAsync();
-            await image.SetSourceAsync(source);
+            BitmapImage image = new(new Uri(file, UriKind.Absolute));
 
             e.Image = image;
             e.Handled = true;
