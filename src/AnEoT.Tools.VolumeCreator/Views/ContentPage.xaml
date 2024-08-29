@@ -351,6 +351,7 @@
                                             <TextBox
                                                 MinWidth="150"
                                                 VerticalAlignment="Center"
+                                                IsSpellCheckEnabled="False"
                                                 Text="{x:Bind DisplayName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                         </StackPanel>
                                     </controls:SettingsCard.Header>
@@ -379,6 +380,7 @@
                                             <TextBox
                                                 VerticalAlignment="Center"
                                                 Header="导出文件名（不设置此项将自动生成）"
+                                                IsSpellCheckEnabled="False"
                                                 PlaceholderText="不需要添加扩展名"
                                                 Text="{x:Bind OutputTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 

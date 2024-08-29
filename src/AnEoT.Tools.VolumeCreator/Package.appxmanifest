@@ -8,11 +8,11 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="AnEoT.Tools.VolumeCreator"
-    Publisher="CN=Baka632"
+    Name="Baka632.AnEoTVolumeCreator"
+    Publisher="CN=4D5AE839-7BCA-4089-9852-FAFCD5A737D1"
     Version="1.2.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="e95ad583-2d1f-4c0a-a7e0-be47220136e1" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="2f43e7bc-239a-4386-ba28-b7509fcd331a" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>AnEoT Volume Creator</DisplayName>
