@@ -54,8 +54,12 @@ public sealed class FileNode : ImageListNode
         {
             _filePath = value;
             OnPropertiesChanged();
+            OnPropertiesChanged(nameof(IsFileExist));
         }
     }
+
+    [JsonIgnore]
+    public bool IsFileExist { get => File.Exists(FilePath); }
 
     [SetsRequiredMembers]
     public FileNode(StorageFile file, ImageListNode? parent) : this(file.Path, file.Name, parent)
@@ -74,6 +78,11 @@ public sealed class FileNode : ImageListNode
     public FileNode()
     {
         Type = ImageListNodeType.File;
+    }
+
+    public void EnsurePathExist()
+    {
+        OnPropertiesChanged(nameof(IsFileExist));
     }
 }
 

@@ -136,12 +136,32 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             }
             else
             {
+                bool containsError = false;
+                StringBuilder stringBuilder = new();
+
                 VolumeName = project.VolumeName ?? string.Empty;
                 VolumeFolderName = project.VolumeFolderName ?? string.Empty;
-                CoverFile = Path.Exists(project.CoverImagePath)
-                    ? await StorageFile.GetFileFromPathAsync(project.CoverImagePath)
-                    : null;
-                await SetCoverByFile(CoverFile);
+                if (Path.Exists(project.CoverImagePath))
+                {
+                    CoverFile = await StorageFile.GetFileFromPathAsync(project.CoverImagePath);
+                    await SetCoverByFile(CoverFile);
+
+                    if (IsVolumeCoverError)
+                    {
+                        containsError = true;
+                        stringBuilder.AppendLine("【期刊封面】");
+                        stringBuilder.AppendLine($"文件 {project.CoverImagePath} 不是可解码的图像。");
+                        stringBuilder.AppendLine();
+                    }
+                }
+                else
+                {
+                    CoverFile = null;
+                    containsError = true;
+                    stringBuilder.AppendLine("【期刊封面】");
+                    stringBuilder.AppendLine($"找不到图像文件：{project.CoverImagePath}。");
+                    stringBuilder.AppendLine();
+                }
 
                 ConvertToWebp = project.ImageConvertToWebp;
                 IsCoverSizeFixed = project.IsCoverSizeFixed;
@@ -152,6 +172,21 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
                 WordFiles = project.WordFiles;
                 ImageFiles = project.ImageFiles;
+
+                if (!CheckImageFilesPathAllExist(ImageFiles, out string? msg))
+                {
+                    containsError = true;
+                    stringBuilder.AppendLine("【资源文件】");
+                    stringBuilder.AppendLine("找不到以下文件：");
+                    stringBuilder.AppendLine(msg.TrimEnd());
+                }
+
+                if (containsError)
+                {
+                    ShowTeachingTip("加载项目时出现以下问题", stringBuilder.ToString().TrimEnd(), false, TeachingTipPlacementMode.RightBottom,
+                            new FontIconSource() { Glyph = "\uE7BA" });
+                }
+
                 IndexMarkdown = project.IndexMarkdown is null ? [] : [project.IndexMarkdown];
 
                 OnPropertyChanged(nameof(ShowNotifyAddWordFile));
@@ -448,6 +483,28 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     }
 
     [RelayCommand]
+    private static async Task RepairImageFile(FileNode node)
+    {
+        nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
+
+        FileOpenPicker picker = new();
+
+        InitializeWithWindow.Initialize(picker, hwnd);
+
+        picker.FileTypeFilter.Add(".jpg");
+        picker.FileTypeFilter.Add(".png");
+        picker.FileTypeFilter.Add(".webp");
+
+        StorageFile? file = await picker.PickSingleFileAsync();
+        if (file is null)
+        {
+            return;
+        }
+
+        node.FilePath = file.Path;
+    }
+
+    [RelayCommand]
     private void WordFileItemGoUp(MarkdownWrapper wrapper)
     {
         int currentItemIndex = WordFiles.IndexOf(wrapper);
@@ -672,9 +729,9 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             }
             else if (node is FileNode fileNode)
             {
-                bool success = File.Exists(fileNode.FilePath);
+                fileNode.EnsurePathExist();
 
-                if (!success)
+                if (!fileNode.IsFileExist)
                 {
                     builder.AppendLine(fileNode.FilePath);
                     isSuccess = false;

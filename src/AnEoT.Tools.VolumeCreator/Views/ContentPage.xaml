@@ -14,8 +14,8 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <DataTemplate x:Key="FileNodeTemplate" x:DataType="models:ImageListNode">
-            <TreeViewItem ItemsSource="{x:Bind Children}">
+        <DataTemplate x:Key="FileNodeTemplate" x:DataType="models:FileNode">
+            <TreeViewItem ItemsSource="{x:Bind Children}" ToolTipService.ToolTip="{x:Bind FilePath, Mode=OneWay}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -27,11 +27,28 @@
                         Grid.Column="0"
                         Margin="0,0,5,0"
                         VerticalAlignment="Center"
-                        Symbol="Document" />
+                        Symbol="Document"
+                        Visibility="{x:Bind IsFileExist, Mode=OneWay}" />
+                    <FontIcon
+                        Grid.Column="0"
+                        Margin="0,0,5,0"
+                        VerticalAlignment="Center"
+                        Glyph="&#xE7BA;"
+                        Visibility="{x:Bind IsFileExist, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True, Mode=OneWay}" />
+
                     <TextBlock
                         Grid.Column="1"
                         VerticalAlignment="Center"
-                        Text="{x:Bind DisplayName}" />
+                        Text="{x:Bind DisplayName}"
+                        Visibility="{x:Bind IsFileExist, Mode=OneWay}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Visibility="{x:Bind IsFileExist, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True, Mode=OneWay}">
+                        <Run FontStyle="Italic" Text="{x:Bind DisplayName}" />
+                        <Run FontStyle="Normal" Text="（未找到）" />
+                    </TextBlock>
+
                     <StackPanel
                         Grid.Column="2"
                         Margin="0,0,20,0"
@@ -39,7 +56,7 @@
                         VerticalAlignment="Center"
                         Orientation="Horizontal">
                         <StackPanel.Resources>
-                            <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                            <Style BasedOn="{StaticResource DefaultButtonStyle}" TargetType="Button">
                                 <Setter Property="Background" Value="Transparent" />
                                 <Setter Property="Height" Value="35" />
                                 <Setter Property="Width" Value="35" />
@@ -50,15 +67,18 @@
                         <Button
                             Margin="0,0,5,0"
                             helpers:AncestorSource.AncestorType="Page"
-                            Command="{Binding ViewModel.RemoveImageFileCommand}"
-                            CommandParameter="{x:Bind}">
+                            Command="{Binding ViewModel.RepairImageFileCommand}"
+                            CommandParameter="{x:Bind}"
+                            ToolTipService.ToolTip="修复"
+                            Visibility="{x:Bind IsFileExist, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True, Mode=OneWay}">
                             <SymbolIcon Symbol="Repair" />
                         </Button>
 
                         <Button
                             helpers:AncestorSource.AncestorType="Page"
                             Command="{Binding ViewModel.RemoveImageFileCommand}"
-                            CommandParameter="{x:Bind}">
+                            CommandParameter="{x:Bind}"
+                            ToolTipService.ToolTip="移除">
                             <SymbolIcon Symbol="Delete" />
                         </Button>
                     </StackPanel>
@@ -101,7 +121,8 @@
                         helpers:AncestorSource.AncestorType="Page"
                         Background="Transparent"
                         Command="{Binding ViewModel.AddImageFileCommand}"
-                        CommandParameter="{x:Bind}">
+                        CommandParameter="{x:Bind}"
+                        ToolTipService.ToolTip="添加文件">
                         <SymbolIcon Symbol="Add" />
                     </Button>
                 </Grid>
