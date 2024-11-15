@@ -10,11 +10,11 @@ public sealed class Project
     }
 
     [SetsRequiredMembers]
-    public Project(string? coverImagePath,
+    public Project(string coverImagePath,
                         bool imageConvertToWebp,
                         bool isCoverSizeFixed,
-                        string? volumeFolderName,
-                        string? volumeName,
+                        string volumeFolderName,
+                        string volumeName,
                         ObservableCollection<MarkdownWrapper> wordFiles,
                         ObservableCollection<ImageListNode> imageFiles,
                         MarkdownWrapper? indexMarkdown)
@@ -32,7 +32,7 @@ public sealed class Project
     /// <summary>
     /// 期刊封面图像路径
     /// </summary>
-    public required string? CoverImagePath { get; set; }
+    public required string CoverImagePath { get; set; }
     
     /// <summary>
     /// 指示图像是否转换为 WEBP 图像的值
@@ -47,12 +47,12 @@ public sealed class Project
     /// <summary>
     /// 期刊文件夹名称
     /// </summary>
-    public required string? VolumeFolderName { get; set; }
+    public required string VolumeFolderName { get; set; }
 
     /// <summary>
     /// 期刊名称
     /// </summary>
-    public required string? VolumeName { get; set; }
+    public required string VolumeName { get; set; }
 
     /// <summary>
     /// DOCX 文件列表
@@ -68,4 +68,21 @@ public sealed class Project
     /// 目录页
     /// </summary>
     public required MarkdownWrapper? IndexMarkdown { get; set; }
+
+    public static Project CreateEmpty()
+    {
+        Project project = new()
+        {
+            VolumeName = string.Empty,
+            VolumeFolderName = string.Empty,
+            CoverImagePath = string.Empty,
+            ImageConvertToWebp = true,
+            IsCoverSizeFixed = true,
+            WordFiles = [],
+            ImageFiles = [],
+            IndexMarkdown = null
+        };
+
+        return project;
+    }
 }

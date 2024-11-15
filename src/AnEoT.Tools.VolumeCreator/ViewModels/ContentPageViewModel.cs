@@ -236,7 +236,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     private async Task SaveProjectInternal(bool showSavingTip = true)
     {
         Project project = new(
-            CoverFile?.Path, ConvertToWebp, IsCoverSizeFixed, VolumeFolderName, VolumeName, WordFiles, ImageFiles,
+            CoverFile?.Path ?? string.Empty, ConvertToWebp, IsCoverSizeFixed, VolumeFolderName, VolumeName, WordFiles, ImageFiles,
             IndexMarkdown.FirstOrDefault());
 
         StorageFile file;
@@ -277,6 +277,17 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
         static async Task SaveProjectCore(Project project, StorageFile file)
         {
+            using ProjectPackage projectPackage = await ProjectPackage.LoadOrCreateAsync(Path.ChangeExtension(file.Path, ".zip"));
+            projectPackage.Info = new(project.VolumeName, project.VolumeFolderName, project.IsCoverSizeFixed, project.ImageConvertToWebp, null);
+            projectPackage.IndexMarkdown = project.IndexMarkdown;
+            projectPackage.Articles = project.WordFiles;
+            projectPackage.Assets = project.ImageFiles;
+            if (!string.IsNullOrWhiteSpace(project?.CoverImagePath))
+            {
+                await projectPackage.SetCoverFile(project.CoverImagePath);
+            }
+            await projectPackage.SaveAsync();
+
             using Stream stream = await file.OpenStreamForWriteAsync();
             stream.SetLength(0);
             await JsonSerializer.SerializeAsync(stream, project, CommonValues.DefaultJsonSerializerOption);
@@ -393,12 +404,32 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     {
         if (file != null)
         {
-            IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
+            using IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
             try
             {
                 BitmapImage bitmapImage = new();
                 await bitmapImage.SetSourceAsync(stream);
                 CoverFile = file;
+
+                VolumeCover = bitmapImage;
+                IsVolumeCoverError = false;
+            }
+            catch (COMException ex) when (ex.ErrorCode == -2003292336)
+            {
+                IsVolumeCoverError = true;
+            }
+        }
+    }
+
+    internal async Task SetCoverByStream(Stream? dotnetStream)
+    {
+        if (dotnetStream != null)
+        {
+            using IRandomAccessStream stream = dotnetStream.AsRandomAccessStream();
+            try
+            {
+                BitmapImage bitmapImage = new();
+                await bitmapImage.SetSourceAsync(stream);
 
                 VolumeCover = bitmapImage;
                 IsVolumeCoverError = false;
@@ -770,6 +801,12 @@ public sealed partial class ContentPageViewModel : ObservableValidator
                     isSuccess = false;
                 }
             }
+#if DEBUG
+            else
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+#endif
         }
 
         errorMessage = builder.ToString();

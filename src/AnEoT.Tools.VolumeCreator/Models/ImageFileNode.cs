@@ -58,20 +58,31 @@ public sealed class FileNode : ImageListNode
         }
     }
 
+    /// <summary>
+    /// 确定文件路径（<see cref="FilePath"/>）是否为相对路径。
+    /// </summary>
+    public bool IsRelativePath { get; set; }
+
+    /// <summary>
+    /// 确定 <see cref="FilePath"/> 指向的路径是否存在。
+    /// </summary>
+    /// <remarks>
+    /// 如果 <see cref="IsRelativePath"/> 为 <see langword="true"/>，则此属性始终返回 <see langword="true"/>。
+    /// </remarks>
     [JsonIgnore]
-    public bool IsFileExist { get => File.Exists(FilePath); }
+    public bool IsFileExist { get => IsRelativePath || File.Exists(FilePath); }
 
     [SetsRequiredMembers]
-    public FileNode(StorageFile file, ImageListNode? parent) : this(file.Path, file.Name, parent)
+    public FileNode(StorageFile file, ImageListNode? parent) : this(file.Path, false, file.Name, parent)
     {
     }
     
     [SetsRequiredMembers]
-    public FileNode(string filePath, string displayName, ImageListNode? parent)
+    public FileNode(string filePath, bool isRelativePath, string displayName, ImageListNode? parent) : this()
     {
         FilePath = filePath;
+        IsRelativePath = isRelativePath;
         DisplayName = displayName;
-        Type = ImageListNodeType.File;
         Parent = parent;
     }
 
