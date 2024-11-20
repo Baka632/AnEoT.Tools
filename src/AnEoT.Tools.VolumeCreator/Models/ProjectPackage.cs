@@ -82,7 +82,7 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
     /// <summary>
     /// 资源列表。
     /// </summary>
-    public IEnumerable<ImageListNode> Assets { get; set; } = [];
+    public IEnumerable<AssetNode> Assets { get; set; } = [];
 
     /// <summary>
     /// 目录页 Markdown。
@@ -162,7 +162,7 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
             await InitializePackageFor<IEnumerable<MarkdownWrapper>>(package, ArticlesFileName,
                                                         articles => package.Articles = articles ?? [],
                                                         $"无法加载工程文件中的文章列表。");
-            await InitializePackageFor<IEnumerable<ImageListNode>>(package, AssetsFileName,
+            await InitializePackageFor<IEnumerable<AssetNode>>(package, AssetsFileName,
                                                         nodes => package.Assets = nodes ?? [],
                                                         $"无法加载工程文件中的资源列表。");
 
@@ -299,7 +299,7 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
         }
     }
 
-    private async Task SavePackageForAssets(IEnumerable<ImageListNode> nodes)
+    private async Task SavePackageForAssets(IEnumerable<AssetNode> nodes)
     {
         await SaveAssets(nodes);
         await SavePackageFor(AssetsFileName, nodes);
@@ -316,9 +316,9 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
             }
         }
 
-        static IEnumerable<T> Descendants<T>(IEnumerable<ImageListNode> nodes)
+        static IEnumerable<T> Descendants<T>(IEnumerable<AssetNode> nodes)
         {
-            foreach (ImageListNode node in nodes)
+            foreach (AssetNode node in nodes)
             {
                 if (node is T target)
                 {
@@ -348,9 +348,9 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
         }
     }
 
-    private async Task SaveAssets(IEnumerable<ImageListNode> nodes)
+    private async Task SaveAssets(IEnumerable<AssetNode> nodes)
     {
-        foreach (ImageListNode node in nodes)
+        foreach (AssetNode node in nodes)
         {
             if (node is FolderNode folderNode)
             {
@@ -384,7 +384,7 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
         }
     }
 
-    private static string GetNodePath(ImageListNode node)
+    private static string GetNodePath(AssetNode node)
     {
         if (node.Parent is null)
         {

@@ -2,14 +2,14 @@
 
 namespace AnEoT.Tools.VolumeCreator.Helpers;
 
-public sealed class ImageNodeDataTemplateSelector : DataTemplateSelector
+public sealed class AssetNodeDataTemplateSelector : DataTemplateSelector
 {
     public DataTemplate? FileTemplate { get; set; }
     public DataTemplate? FolderTemplate { get; set; }
 
     protected override DataTemplate SelectTemplateCore(object item)
     {
-        ImageListNode model = (ImageListNode)item;
+        AssetNode model = (AssetNode)item;
 
         return model.Type switch
         {

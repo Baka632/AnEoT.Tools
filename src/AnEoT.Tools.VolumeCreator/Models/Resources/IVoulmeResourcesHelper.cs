@@ -14,7 +14,7 @@ public interface IVoulmeResourcesHelper
 
     Task<Stream?> GetAssetsAsync(FileNode fileNode);
 
-    Task ExportAssetsAsync(IEnumerable<ImageListNode> files, StorageFolder outputFolder);
+    Task ExportAssetsAsync(IEnumerable<AssetNode> files, StorageFolder outputFolder);
 
-    bool ValidateAssets(IEnumerable<ImageListNode> files, [NotNullWhen(false)] out string? errorMessage);
+    bool ValidateAssets(IEnumerable<AssetNode> files, [NotNullWhen(false)] out string? errorMessage);
 }

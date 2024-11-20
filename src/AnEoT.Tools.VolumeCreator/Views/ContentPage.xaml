@@ -67,7 +67,7 @@
                         <Button
                             Margin="0,0,5,0"
                             helpers:AncestorSource.AncestorType="Page"
-                            Command="{Binding ViewModel.RepairImageFileCommand}"
+                            Command="{Binding ViewModel.RepairAssetCommand}"
                             CommandParameter="{x:Bind}"
                             ToolTipService.ToolTip="修复"
                             Visibility="{x:Bind IsFileExist, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True, Mode=OneWay}">
@@ -76,7 +76,7 @@
 
                         <Button
                             helpers:AncestorSource.AncestorType="Page"
-                            Command="{Binding ViewModel.RemoveImageFileCommand}"
+                            Command="{Binding ViewModel.RemoveAssetCommand}"
                             CommandParameter="{x:Bind}"
                             ToolTipService.ToolTip="移除">
                             <SymbolIcon Symbol="Delete" />
@@ -86,7 +86,7 @@
             </TreeViewItem>
         </DataTemplate>
 
-        <DataTemplate x:Key="FolderNodeTemplate" x:DataType="models:ImageListNode">
+        <DataTemplate x:Key="FolderNodeTemplate" x:DataType="models:AssetNode">
             <TreeViewItem
                 AllowDrop="True"
                 Background="Transparent"
@@ -120,7 +120,7 @@
                         VerticalAlignment="Center"
                         helpers:AncestorSource.AncestorType="Page"
                         Background="Transparent"
-                        Command="{Binding ViewModel.AddImageFileCommand}"
+                        Command="{Binding ViewModel.AddAssetCommand}"
                         CommandParameter="{x:Bind}"
                         ToolTipService.ToolTip="添加文件">
                         <SymbolIcon Symbol="Add" />
@@ -129,7 +129,7 @@
             </TreeViewItem>
         </DataTemplate>
 
-        <helpers:ImageNodeDataTemplateSelector
+        <helpers:AssetNodeDataTemplateSelector
             x:Key="NodeTemplateSelector"
             FileTemplate="{StaticResource FileNodeTemplate}"
             FolderTemplate="{StaticResource FolderNodeTemplate}" />
@@ -303,8 +303,8 @@
                     <controls:SettingsExpander
                         AllowDrop="True"
                         Description="添加期刊的文章。"
-                        DragOver="OnWordFileListDragOver"
-                        Drop="OnWordFileListDrop"
+                        DragOver="OnArticlesListDragOver"
+                        Drop="OnArticlesListDrop"
                         Header="文章列表"
                         IsExpanded="True"
                         ItemsSource="{x:Bind ViewModel.Articles, Mode=OneWay}">
@@ -313,8 +313,8 @@
                         </controls:SettingsExpander.HeaderIcon>
 
                         <StackPanel Orientation="Horizontal" Spacing="5">
-                            <Button Command="{x:Bind ViewModel.AddEmptyWordFileItemCommand}" Content="添加自定义文件" />
-                            <Button Command="{x:Bind ViewModel.AddWordFileItemCommand}" Content="添加 DOCX 文件" />
+                            <Button Command="{x:Bind ViewModel.AddEmptyArticleCommand}" Content="创建自定义文章" />
+                            <Button Command="{x:Bind ViewModel.ImportWordFileItemCommand}" Content="从 DOCX 文件导入" />
                         </StackPanel>
 
                         <controls:SettingsExpander.ItemsHeader>
@@ -348,7 +348,7 @@
                                 <controls:SettingsCard
                                     HorizontalContentAlignment="Stretch"
                                     helpers:AncestorSource.AncestorType="Page"
-                                    Command="{Binding ViewModel.ViewWordFileItemCommand}"
+                                    Command="{Binding ViewModel.ViewArticleCommand}"
                                     CommandParameter="{x:Bind}"
                                     ContentAlignment="Vertical"
                                     IsClickEnabled="True">
@@ -403,7 +403,7 @@
                                                 <Button.Flyout>
                                                     <MenuFlyout>
                                                         <MenuFlyoutItem
-                                                            Command="{Binding ViewModel.WordFileItemGoUpCommand}"
+                                                            Command="{Binding ViewModel.ArticleGoUpCommand}"
                                                             CommandParameter="{x:Bind}"
                                                             Text="上移">
                                                             <MenuFlyoutItem.Icon>
@@ -411,7 +411,7 @@
                                                             </MenuFlyoutItem.Icon>
                                                         </MenuFlyoutItem>
                                                         <MenuFlyoutItem
-                                                            Command="{Binding ViewModel.WordFileItemGoDownCommand}"
+                                                            Command="{Binding ViewModel.ArticleGoDownCommand}"
                                                             CommandParameter="{x:Bind}"
                                                             Text="下移">
                                                             <MenuFlyoutItem.Icon>
@@ -422,7 +422,7 @@
                                                         <MenuFlyoutSeparator />
 
                                                         <MenuFlyoutItem
-                                                            Command="{Binding ViewModel.RemoveWordFileItemCommand}"
+                                                            Command="{Binding ViewModel.RemoveArticleCommand}"
                                                             CommandParameter="{x:Bind}"
                                                             Text="移除">
                                                             <MenuFlyoutItem.Icon>
@@ -520,7 +520,7 @@
                             <DataTemplate x:DataType="models:MarkdownWrapper">
                                 <controls:SettingsCard
                                     helpers:AncestorSource.AncestorType="Page"
-                                    Command="{Binding ViewModel.ViewWordFileItemCommand}"
+                                    Command="{Binding ViewModel.ViewArticleCommand}"
                                     CommandParameter="{x:Bind}"
                                     Header="查看目录页"
                                     IsClickEnabled="True" />

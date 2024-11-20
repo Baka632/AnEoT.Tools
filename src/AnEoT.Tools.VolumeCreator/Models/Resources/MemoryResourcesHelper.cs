@@ -39,9 +39,9 @@ internal sealed class MemoryResourcesHelper : IVoulmeResourcesHelper
         coverFile = file;
     }
 
-    public async Task ExportAssetsAsync(IEnumerable<ImageListNode> files, StorageFolder outputFolder)
+    public async Task ExportAssetsAsync(IEnumerable<AssetNode> files, StorageFolder outputFolder)
     {
-        foreach (ImageListNode node in files)
+        foreach (AssetNode node in files)
         {
             await CopyContentRecursively(node, outputFolder);
         }
@@ -58,18 +58,18 @@ internal sealed class MemoryResourcesHelper : IVoulmeResourcesHelper
         return await file.OpenStreamForReadAsync();
     }
 
-    public bool ValidateAssets(IEnumerable<ImageListNode> files, [NotNullWhen(false)] out string? errorMessage)
+    public bool ValidateAssets(IEnumerable<AssetNode> files, [NotNullWhen(false)] out string? errorMessage)
     {
         bool success = CheckImageFilesPathAllExist(files, out string? msg);
         errorMessage = msg;
         return success;
     }
 
-    private async Task CopyContentRecursively(ImageListNode node, StorageFolder rootFolder)
+    private async Task CopyContentRecursively(AssetNode node, StorageFolder rootFolder)
     {
         if (node.Type == ImageListNodeType.Folder)
         {
-            foreach (ImageListNode item in node.Children)
+            foreach (AssetNode item in node.Children)
             {
                 if (item.Type == ImageListNodeType.Folder)
                 {
@@ -77,7 +77,7 @@ internal sealed class MemoryResourcesHelper : IVoulmeResourcesHelper
                     {
                         StorageFolder folder = await rootFolder.CreateFolderAsync(item.DisplayName, CreationCollisionOption.OpenIfExists);
 
-                        foreach (ImageListNode subItem in item.Children)
+                        foreach (AssetNode subItem in item.Children)
                         {
                             await CopyContentRecursively(subItem, folder);
                         }
@@ -133,12 +133,12 @@ internal sealed class MemoryResourcesHelper : IVoulmeResourcesHelper
         return helper;
     }
 
-    private static bool CheckImageFilesPathAllExist(IEnumerable<ImageListNode> nodes, [NotNullWhen(false)] out string? errorMessage)
+    private static bool CheckImageFilesPathAllExist(IEnumerable<AssetNode> nodes, [NotNullWhen(false)] out string? errorMessage)
     {
         bool isSuccess = true;
         StringBuilder builder = new();
 
-        foreach (ImageListNode node in nodes)
+        foreach (AssetNode node in nodes)
         {
             if (node is FolderNode folderNode)
             {

@@ -31,19 +31,19 @@ internal sealed class ProjectPackageResourcesHelper(ProjectPackage projectPackag
         await ProjectPackage.SetCoverFileAsync(coverPath);
     }
 
-    public async Task ExportAssetsAsync(IEnumerable<ImageListNode> files, StorageFolder outputFolder)
+    public async Task ExportAssetsAsync(IEnumerable<AssetNode> files, StorageFolder outputFolder)
     {
-        foreach (ImageListNode node in files)
+        foreach (AssetNode node in files)
         {
             await ExportAssetsCore(node, outputFolder);
         }
     }
 
-    private async Task ExportAssetsCore(ImageListNode node, StorageFolder outputFolder)
+    private async Task ExportAssetsCore(AssetNode node, StorageFolder outputFolder)
     {
         if (node.Type == ImageListNodeType.Folder)
         {
-            foreach (ImageListNode item in node.Children)
+            foreach (AssetNode item in node.Children)
             {
                 if (item.Type == ImageListNodeType.Folder)
                 {
@@ -51,7 +51,7 @@ internal sealed class ProjectPackageResourcesHelper(ProjectPackage projectPackag
                     {
                         StorageFolder folder = await outputFolder.CreateFolderAsync(item.DisplayName, CreationCollisionOption.OpenIfExists);
 
-                        foreach (ImageListNode subItem in item.Children)
+                        foreach (AssetNode subItem in item.Children)
                         {
                             await ExportAssetsCore(subItem, folder);
                         }
@@ -126,7 +126,7 @@ internal sealed class ProjectPackageResourcesHelper(ProjectPackage projectPackag
         }
     }
 
-    public bool ValidateAssets(IEnumerable<ImageListNode> files, [NotNullWhen(false)] out string? errorMessage)
+    public bool ValidateAssets(IEnumerable<AssetNode> files, [NotNullWhen(false)] out string? errorMessage)
     {
         bool success = ValidateAssetsCore(files, out string? msg);
         errorMessage = msg;
@@ -150,12 +150,12 @@ internal sealed class ProjectPackageResourcesHelper(ProjectPackage projectPackag
         }
     }
 
-    private bool ValidateAssetsCore(IEnumerable<ImageListNode> assets, [NotNullWhen(false)] out string? errorMessage)
+    private bool ValidateAssetsCore(IEnumerable<AssetNode> assets, [NotNullWhen(false)] out string? errorMessage)
     {
         bool isSuccess = true;
         StringBuilder builder = new();
 
-        foreach (ImageListNode node in assets)
+        foreach (AssetNode node in assets)
         {
             if (node is FolderNode folderNode)
             {

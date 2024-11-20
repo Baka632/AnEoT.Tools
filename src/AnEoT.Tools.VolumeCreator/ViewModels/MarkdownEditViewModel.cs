@@ -14,7 +14,7 @@ namespace AnEoT.Tools.VolumeCreator.ViewModels;
 public sealed partial class MarkdownEditViewModel : ObservableObject
 {
     public MarkdownWrapper MarkdownWrapper { get; }
-    public ObservableCollection<ImageListNode> ImageFiles { get; }
+    public ObservableCollection<AssetNode> Assets { get; }
     public IVoulmeResourcesHelper ResourcesHelper { get; }
     public Dictionary<string, FileNode> MarkdownImageUriToFileMapping { get; } = new(10);
 
@@ -25,15 +25,15 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     [ObservableProperty]
     private string articleQuote = string.Empty;
 
-    public MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage viewPage, ObservableCollection<ImageListNode> imageFiles, IVoulmeResourcesHelper resourcesHelper)
+    public MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage viewPage, ObservableCollection<AssetNode> assets, IVoulmeResourcesHelper resourcesHelper)
     {
         markdownString = wrapper.Markdown;
         view = viewPage;
         ResourcesHelper = resourcesHelper;
-        ImageFiles = imageFiles;
+        Assets = assets;
         MarkdownWrapper = wrapper;
 
-        imageFiles.CollectionChanged += (s, e) => InitializeImageFileMapping();
+        assets.CollectionChanged += (s, e) => InitializeImageFileMapping();
         InitializeImageFileMapping();
     }
 
@@ -259,7 +259,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     {
         MarkdownImageUriToFileMapping.Clear();
 
-        foreach (ImageListNode node in ImageFiles)
+        foreach (AssetNode node in Assets)
         {
             foreach (FileNode fileNode in DescendantsFileNode(node))
             {
@@ -272,7 +272,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     private static string ConstructImageUriByFileNode(FileNode fileNode)
     {
         List<string> targetParts = new(3);
-        ImageListNode? parentNode = fileNode;
+        AssetNode? parentNode = fileNode;
         while (true)
         {
             if (parentNode is null)
@@ -295,11 +295,11 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
         return imageUri;
     }
 
-    private static List<FileNode> DescendantsFileNode(ImageListNode node)
+    private static List<FileNode> DescendantsFileNode(AssetNode node)
     {
         List<FileNode> fileNodes = new(10);
 
-        foreach (ImageListNode item in node.Children)
+        foreach (AssetNode item in node.Children)
         {
             if (item is FileNode fileNode)
             {

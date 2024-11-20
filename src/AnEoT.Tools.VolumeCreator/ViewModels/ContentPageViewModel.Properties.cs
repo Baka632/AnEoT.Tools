@@ -67,7 +67,7 @@ partial class ContentPageViewModel
     private ObservableCollection<MarkdownWrapper> articles = [];
     [ObservableProperty, Required, NotifyDataErrorInfo]
     [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateAssets))]
-    private ObservableCollection<ImageListNode> assets = [];
+    private ObservableCollection<AssetNode> assets = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowNotifyGenerateIndex))]
@@ -118,7 +118,7 @@ partial class ContentPageViewModel
         CommonValues.IsProjectSaved = false;
     }
 
-    partial void OnAssetsChanged(ObservableCollection<ImageListNode> value)
+    partial void OnAssetsChanged(ObservableCollection<AssetNode> value)
     {
         CommonValues.IsProjectSaved = false;
     }
@@ -218,7 +218,7 @@ partial class ContentPageViewModel
         }
     }
 
-    public static ValidationResult ValidateAssets(ObservableCollection<ImageListNode> nodes)
+    public static ValidationResult ValidateAssets(ObservableCollection<AssetNode> nodes)
     {
         bool isSuccess = ResourcesHelperForValidation.ValidateAssets(nodes, out string? message);
         if (isSuccess)

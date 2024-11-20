@@ -17,7 +17,7 @@ public sealed class CompatibilityProject
                         string volumeFolderName,
                         string volumeName,
                         ObservableCollection<MarkdownWrapper> wordFiles,
-                        ObservableCollection<ImageListNode> imageFiles,
+                        ObservableCollection<AssetNode> imageFiles,
                         MarkdownWrapper? indexMarkdown)
     {
         CoverImagePath = coverImagePath;
@@ -63,7 +63,7 @@ public sealed class CompatibilityProject
     /// <summary>
     /// 图像文件列表
     /// </summary>
-    public required ObservableCollection<ImageListNode> ImageFiles { get; set; }
+    public required ObservableCollection<AssetNode> ImageFiles { get; set; }
 
     /// <summary>
     /// 目录页

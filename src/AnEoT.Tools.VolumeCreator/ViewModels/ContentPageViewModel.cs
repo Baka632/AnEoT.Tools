@@ -97,7 +97,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             StorageFolder volumeFolder = await folder.CreateFolderAsync(VolumeFolderName, CreationCollisionOption.ReplaceExisting);
 
             await ExportAssets(volumeFolder);
-            await ExportMarkdownContent(volumeFolder);
+            await ExportArticles(volumeFolder);
 
             IsShowTeachingTip = false;
 
@@ -151,6 +151,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
             (VolumeName, VolumeFolderName, IsCoverSizeFixed, ConvertToWebp, _) = resHelper.ProjectPackage.Info;
             Stream? coverStream = await resHelper.GetCoverAsync();
+            VolumeCover = null;
             if (coverStream != null)
             {
                 await SetCoverByStream(coverStream);
@@ -345,7 +346,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         projectPackage.Assets = Assets;
     }
 
-    private async Task ExportMarkdownContent(StorageFolder volumeFolder)
+    private async Task ExportArticles(StorageFolder volumeFolder)
     {
         foreach (KeyValuePair<MarkdownWrapper, string> pair in GetOutputFileNameDictionary())
         {
@@ -418,7 +419,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         }
     }
 
-    internal async Task SetCoverByStream(Stream? dotnetStream)
+    private async Task SetCoverByStream(Stream? dotnetStream)
     {
         if (dotnetStream != null)
         {
@@ -439,7 +440,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    private async Task AddWordFileItem()
+    private async Task ImportWordFileItem()
     {
         nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
 
@@ -455,26 +456,27 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         {
             foreach (StorageFile file in files)
             {
-                await AddSingleWordFileItem(file);
+                await ImportSingleWordFileItem(file);
             }
         }
     }
 
     [RelayCommand]
-    private void AddEmptyWordFileItem()
+    private void AddEmptyArticle()
     {
-        MarkdownWrapper emptyMarkdownFile = new("<自定义文件>", string.Empty, MarkdownWrapperType.Others);
+        MarkdownWrapper emptyMarkdownFile = new("<自定义文章>", string.Empty, MarkdownWrapperType.Others);
         Articles.Add(emptyMarkdownFile);
     }
 
     [RelayCommand]
-    private void AddPaintingWordFileItem()
+    private void AddPaintingArticle()
     {
+        // TODO: 会有吗？
         MarkdownWrapper paintingMarkdownFile = new("<自定义文件>", string.Empty, MarkdownWrapperType.Paintings);
         Articles.Add(paintingMarkdownFile);
     }
 
-    public async Task AddSingleWordFileItem(StorageFile file)
+    public async Task ImportSingleWordFileItem(StorageFile file)
     {
         MarkdownWrapper toMarkdownFile;
 
@@ -491,13 +493,13 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    private void RemoveWordFileItem(MarkdownWrapper target)
+    private void RemoveArticle(MarkdownWrapper target)
     {
         Articles.Remove(target);
     }
     
     [RelayCommand]
-    private void ViewWordFileItem(MarkdownWrapper wrapper)
+    private void ViewArticle(MarkdownWrapper wrapper)
     {
         MarkdownEditWindow window = new()
         {
@@ -508,7 +510,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    private static async Task AddImageFile(FolderNode node)
+    private static async Task AddAsset(FolderNode node)
     {
         nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
 
@@ -536,14 +538,14 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    private static void RemoveImageFile(FileNode node)
+    private static void RemoveAsset(FileNode node)
     {
         node.Parent?.Children.Remove(node);
         CommonValues.IsProjectSaved = false;
     }
 
     [RelayCommand]
-    private static async Task RepairImageFile(FileNode node)
+    private static async Task RepairAsset(FileNode node)
     {
         nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
 
@@ -566,7 +568,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    private void WordFileItemGoUp(MarkdownWrapper wrapper)
+    private void ArticleGoUp(MarkdownWrapper wrapper)
     {
         int currentItemIndex = Articles.IndexOf(wrapper);
         int upperIndex = currentItemIndex - 1;
@@ -579,7 +581,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    private void WordFileItemGoDown(MarkdownWrapper wrapper)
+    private void ArticleGoDown(MarkdownWrapper wrapper)
     {
         int currentItemIndex = Articles.IndexOf(wrapper);
         int downIndex = currentItemIndex + 1;

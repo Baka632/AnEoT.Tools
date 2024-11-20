@@ -50,12 +50,12 @@ public sealed partial class ContentPage : Page
         ViewModel.IsVolumeCoverError = true;
     }
 
-    private void OnWordFileListDragOver(object sender, DragEventArgs e)
+    private void OnArticlesListDragOver(object sender, DragEventArgs e)
     {
         if (e.DataView.Contains(StandardDataFormats.StorageItems))
         {
             e.AcceptedOperation = DataPackageOperation.Link;
-            e.DragUIOverride.Caption = "添加 DOCX 文件";
+            e.DragUIOverride.Caption = "导入 DOCX 文件";
         }
         else
         {
@@ -63,7 +63,7 @@ public sealed partial class ContentPage : Page
         }
     }
 
-    private async void OnWordFileListDrop(object sender, DragEventArgs e)
+    private async void OnArticlesListDrop(object sender, DragEventArgs e)
     {
         if (e.DataView.Contains(StandardDataFormats.StorageItems))
         {
@@ -71,7 +71,7 @@ public sealed partial class ContentPage : Page
             foreach (StorageFile file in items.Where(item => item.IsOfType(StorageItemTypes.File))
                                               .Select(item => (StorageFile)item))
             {
-                await ViewModel.AddSingleWordFileItem(file);
+                await ViewModel.ImportSingleWordFileItem(file);
             }
         }
     }

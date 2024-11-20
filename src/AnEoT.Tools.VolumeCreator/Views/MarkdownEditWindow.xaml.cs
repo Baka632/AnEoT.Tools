@@ -12,7 +12,7 @@ namespace AnEoT.Tools.VolumeCreator.Views;
 /// </summary>
 public sealed partial class MarkdownEditWindow : WindowEx
 {
-    public (MarkdownWrapper? Markdown, ObservableCollection<ImageListNode> ImageFiles, IVoulmeResourcesHelper ResourceHelper) Model { get; set; }
+    public (MarkdownWrapper? Markdown, ObservableCollection<AssetNode> Assets, IVoulmeResourcesHelper ResourceHelper) Model { get; set; }
 
     public MarkdownEditWindow()
     {

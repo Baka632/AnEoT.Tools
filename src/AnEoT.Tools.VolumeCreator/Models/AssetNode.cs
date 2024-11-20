@@ -9,7 +9,7 @@ namespace AnEoT.Tools.VolumeCreator.Models;
 
 [JsonDerivedType(typeof(FileNode), "file")]
 [JsonDerivedType(typeof(FolderNode), "folder")]
-public abstract class ImageListNode : INotifyPropertyChanged
+public abstract class AssetNode : INotifyPropertyChanged
 {
     private string _displayName = string.Empty;
 
@@ -25,9 +25,9 @@ public abstract class ImageListNode : INotifyPropertyChanged
         }
     }
 
-    public ObservableCollection<ImageListNode> Children { get; set; } = [];
+    public ObservableCollection<AssetNode> Children { get; set; } = [];
 
-    public ImageListNode? Parent { get; set; } = null;
+    public AssetNode? Parent { get; set; } = null;
 
     public ImageListNodeType Type { get; set; }
 
@@ -43,7 +43,7 @@ public abstract class ImageListNode : INotifyPropertyChanged
     }
 }
 
-public sealed class FileNode : ImageListNode
+public sealed class FileNode : AssetNode
 {
     private string _filePath = string.Empty;
 
@@ -73,12 +73,12 @@ public sealed class FileNode : ImageListNode
     public bool IsFileExist { get => IsRelativePath || File.Exists(FilePath); }
 
     [SetsRequiredMembers]
-    public FileNode(StorageFile file, ImageListNode? parent) : this(file.Path, false, file.Name, parent)
+    public FileNode(StorageFile file, AssetNode? parent) : this(file.Path, false, file.Name, parent)
     {
     }
     
     [SetsRequiredMembers]
-    public FileNode(string filePath, bool isRelativePath, string displayName, ImageListNode? parent) : this()
+    public FileNode(string filePath, bool isRelativePath, string displayName, AssetNode? parent) : this()
     {
         FilePath = filePath;
         IsRelativePath = isRelativePath;
@@ -97,9 +97,9 @@ public sealed class FileNode : ImageListNode
     }
 }
 
-public sealed class FolderNode : ImageListNode
+public sealed class FolderNode : AssetNode
 {
-    public FolderNode(string folderName, ImageListNode? parent)
+    public FolderNode(string folderName, AssetNode? parent)
     {
         DisplayName = folderName;
         Type = ImageListNodeType.Folder;

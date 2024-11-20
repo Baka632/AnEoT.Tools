@@ -25,7 +25,7 @@ public sealed partial class MarkdownEditPage : Page
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        if (e.Parameter is ValueTuple<MarkdownWrapper, ObservableCollection<ImageListNode>, IVoulmeResourcesHelper> tuple)
+        if (e.Parameter is ValueTuple<MarkdownWrapper, ObservableCollection<AssetNode>, IVoulmeResourcesHelper> tuple)
         {
             ViewModel = new MarkdownEditViewModel(tuple.Item1, this, tuple.Item2, tuple.Item3);
         }
