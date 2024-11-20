@@ -220,14 +220,13 @@ partial class ContentPageViewModel
 
     public static ValidationResult ValidateAssets(ObservableCollection<AssetNode> nodes)
     {
-        bool isSuccess = ResourcesHelperForValidation.ValidateAssets(nodes, out string? message);
-        if (isSuccess)
+        if (ResourcesHelperForValidation.ValidateAssets(nodes, out string? message))
         {
             return ValidationResult.Success!;
         }
         else
         {
-            return new ValidationResult($"【资源文件】以下文件不存在\n{message}");
+            return new ValidationResult($"【资源文件】以下文件不存在\n{message.Trim()}");
         }
     }
 

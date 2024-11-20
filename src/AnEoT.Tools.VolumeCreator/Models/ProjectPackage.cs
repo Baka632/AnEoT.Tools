@@ -58,15 +58,7 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
             stream.Seek(0, SeekOrigin.Begin);
         }
 
-        try
-        {
-            zipArchive = new ZipArchive(stream, ZipArchiveMode.Update);
-        }
-        catch
-        {
-            stream.Dispose();
-            throw;
-        }
+        zipArchive = new ZipArchive(stream, ZipArchiveMode.Update);
     }
 
     /// <summary>
@@ -149,9 +141,10 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
     /// <exception cref="InvalidDataException">项目包的格式无效。</exception>
     public static async Task<ProjectPackage> LoadAsync(string path)
     {
+        ProjectPackage? package = null;
         try
         {
-            ProjectPackage package = new(path);
+            package = new(path);
             await InitializePackageFor<ProjectInfo>(package, ProjectInfoFileName, info => package.Info = info,
                                                     $"无法加载工程文件中的项目信息（{ProjectInfoFileName}）。",
                                                     true,
@@ -170,6 +163,7 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
         }
         catch (Exception ex)
         {
+            package?.zipArchive?.Dispose();
             throw new InvalidDataException("工程文件无效，请查阅内部异常以获取更多信息。", ex);
         }
     }
