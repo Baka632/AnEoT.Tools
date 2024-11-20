@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace AnEoT.Tools.VolumeCreator.Models;
 
+[Obsolete("请使用 ProjectPackage。")]
 public sealed class Project
 {
     public Project()

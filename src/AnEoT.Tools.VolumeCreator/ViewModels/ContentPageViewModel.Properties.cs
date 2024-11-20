@@ -5,18 +5,29 @@ using AnEoT.Tools.VolumeCreator.Models;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Globalization;
-using Windows.Storage;
+using AnEoT.Tools.VolumeCreator.Models.Resources;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
 partial class ContentPageViewModel
 {
-    public StorageFile? ProjectFile { get; set; }
     public bool IsVolumeCoverNotExist => VolumeCover is null;
     public VerticalAlignment CoverImageVerticalAlignmentMode => VolumeCover is null ? VerticalAlignment.Stretch : VerticalAlignment.Top;
     public bool ShowNotifyAddWordFile => WordFiles.Count <= 0;
     public bool ShowNotifyAddImagesFile => ImageFiles.Count <= 0;
     public bool ShowNotifyGenerateIndex => IndexMarkdown.Count <= 0;
+    [Required]
+    [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateResourcesHelper))]
+    public IVoulmeResourcesHelper ResourcesHelper
+    {
+        get => resourcesHelper;
+        set
+        {
+            resourcesHelper = value;
+            ResourcesHelperForValidation = value;
+        }
+    }
+    public static IVoulmeResourcesHelper ResourcesHelperForValidation { get; set; } = new MemoryResourcesHelper();
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsVolumeCoverNotExist))]
@@ -24,10 +35,6 @@ partial class ContentPageViewModel
     private BitmapImage? _volumeCover;
     [ObservableProperty]
     private bool _isVolumeCoverError;
-    [ObservableProperty]
-    private bool convertToWebp = true;
-    [ObservableProperty]
-    private bool isCoverSizeFixed = true;
 
     [ObservableProperty]
     private bool isShowTeachingTip;
@@ -50,20 +57,24 @@ partial class ContentPageViewModel
     [NotifyDataErrorInfo]
     [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateVolumeDisplayName))]
     private string _volumeName = string.Empty;
-    [ObservableProperty, NotifyDataErrorInfo]
-    [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateCoverFile))]
-    private StorageFile? _coverFile;
+    [ObservableProperty]
+    private bool convertToWebp = true;
+    [ObservableProperty]
+    private bool isCoverSizeFixed = true;
     [ObservableProperty]
     [Required, NotifyDataErrorInfo]
     [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateWordFiles))]
     private ObservableCollection<MarkdownWrapper> wordFiles = [];
-    [ObservableProperty, Required]
+    [ObservableProperty, Required, NotifyDataErrorInfo]
+    [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateImageFiles))]
     private ObservableCollection<ImageListNode> imageFiles = [];
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowNotifyGenerateIndex))]
     [NotifyDataErrorInfo]
     [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateIndexMarkdown))]
     private ObservableCollection<MarkdownWrapper> indexMarkdown = [];
+    private IVoulmeResourcesHelper resourcesHelper = new MemoryResourcesHelper();
 
     private void InitializeImageFiles()
     {
@@ -102,11 +113,6 @@ partial class ContentPageViewModel
         CommonValues.IsProjectSaved = false;
     }
 
-    partial void OnCoverFileChanged(StorageFile? value)
-    {
-        CommonValues.IsProjectSaved = false;
-    }
-
     partial void OnWordFilesChanged(ObservableCollection<MarkdownWrapper> value)
     {
         CommonValues.IsProjectSaved = false;
@@ -139,6 +145,18 @@ partial class ContentPageViewModel
     {
         CommonValues.IsProjectSaved = false;
         OnPropertyChanged(nameof(ShowNotifyGenerateIndex));
+    }
+
+    public static ValidationResult ValidateResourcesHelper(IVoulmeResourcesHelper helper)
+    {
+        if (!helper.HasCover)
+        {
+            return new ValidationResult("【期刊封面图片】没有添加封面图片，无法进行操作。");
+        }
+        else
+        {
+            return ValidationResult.Success!;
+        }
     }
 
     public static ValidationResult ValidateVolumeDisplayName(string volumeName)
@@ -199,19 +217,20 @@ partial class ContentPageViewModel
                 || (wrapper.Type != MarkdownWrapperType.Others && !string.IsNullOrWhiteSpace(wrapper.OutputTitle));
         }
     }
-    
-    public static ValidationResult ValidateCoverFile(StorageFile file)
+
+    public static ValidationResult ValidateImageFiles(ObservableCollection<ImageListNode> nodes)
     {
-        if (file is null)
-        {
-            return new ValidationResult("【期刊封面图片】没有添加封面图片，无法进行操作。");
-        }
-        else
+        bool isSuccess = ResourcesHelperForValidation.ValidateAssets(nodes, out string? message);
+        if (isSuccess)
         {
             return ValidationResult.Success!;
         }
+        else
+        {
+            return new ValidationResult($"【资源文件】以下文件不存在\n{message}");
+        }
     }
-    
+
     public static ValidationResult ValidateIndexMarkdown(ObservableCollection<MarkdownWrapper> wrapper)
     {
 #if DEBUG

@@ -7,7 +7,7 @@ using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization;
 using System.Text;
 using System.Collections.ObjectModel;
-using Windows.Storage;
+using AnEoT.Tools.VolumeCreator.Models.Resources;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -15,8 +15,8 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
 {
     public MarkdownWrapper MarkdownWrapper { get; }
     public ObservableCollection<ImageListNode> ImageFiles { get; }
-    public StorageFile? CoverImageFile { get; }
-    public Dictionary<string, string> MarkdownImageUriToFileMapping { get; } = new(10);
+    public IVoulmeResourcesHelper ResourcesHelper { get; }
+    public Dictionary<string, FileNode> MarkdownImageUriToFileMapping { get; } = new(10);
 
     private readonly MarkdownEditPage view;
 
@@ -25,11 +25,11 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     [ObservableProperty]
     private string articleQuote = string.Empty;
 
-    public MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage viewPage, ObservableCollection<ImageListNode> imageFiles, StorageFile? coverImageFile)
+    public MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage viewPage, ObservableCollection<ImageListNode> imageFiles, IVoulmeResourcesHelper resourcesHelper)
     {
         markdownString = wrapper.Markdown;
         view = viewPage;
-        CoverImageFile = coverImageFile;
+        ResourcesHelper = resourcesHelper;
         ImageFiles = imageFiles;
         MarkdownWrapper = wrapper;
 
@@ -259,17 +259,12 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     {
         MarkdownImageUriToFileMapping.Clear();
 
-        if (CoverImageFile is not null)
-        {
-            MarkdownImageUriToFileMapping["./res/cover.webp"] = CoverImageFile.Path;
-        }
-
         foreach (ImageListNode node in ImageFiles)
         {
             foreach (FileNode fileNode in DescendantsFileNode(node))
             {
                 string imageUri = ConstructImageUriByFileNode(fileNode);
-                MarkdownImageUriToFileMapping[imageUri] = fileNode.FilePath;
+                MarkdownImageUriToFileMapping[imageUri] = fileNode;
             }
         }
     }

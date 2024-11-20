@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Text.Json;
 
 namespace AnEoT.Tools.VolumeCreator.Models;
@@ -84,6 +82,23 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
     public MarkdownWrapper? IndexMarkdown { get; set; }
 
     /// <summary>
+    /// 确定项目包内是否包括封面图像。
+    /// </summary>
+    public bool HasCoverImage
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(Info.CoverImageName))
+            {
+                return false;
+            }
+
+            ZipArchiveEntry? coverEntry = zipArchive.GetEntry(Info.CoverImageName);
+            return coverEntry is not null;
+        }
+    }
+
+    /// <summary>
     /// 加载指定的项目包。若路径指向的文件不存在或无效，则创建一个新的项目包。
     /// </summary>
     /// <param name="path">项目包文件路径。</param>
@@ -155,7 +170,7 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
     /// 获取封面图像流。
     /// </summary>
     /// <returns>表示封面图像流的 <see cref="Stream"/>，若包内没有封面图像，则返回 <see langword="null"/>。</returns>
-    public async Task<Stream?> GetCoverFile()
+    public async Task<Stream?> GetCoverFileAsync()
     {
         if (string.IsNullOrWhiteSpace(Info.CoverImageName))
         {
@@ -181,7 +196,7 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
     /// 设置封面图像。
     /// </summary>
     /// <param name="coverImagePath">封面图像的文件路径。</param>
-    public async Task SetCoverFile(string coverImagePath)
+    public async Task SetCoverFileAsync(string coverImagePath)
     {
         using FileStream coverStream = File.OpenRead(coverImagePath);
         coverStream.Seek(0, SeekOrigin.Begin);
@@ -199,20 +214,31 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// 移除封面图像。
+    /// </summary>
+    public void RemoveCoverFile()
+    {
+        if (!string.IsNullOrWhiteSpace(Info.CoverImageName))
+        {
+            ZipArchiveEntry? coverEntry = zipArchive.GetEntry(Info.CoverImageName);
+            coverEntry?.Delete();
+        }
+    }
+
+    /// <summary>
     /// 获取项目包中的资源流。
     /// </summary>
     /// <param name="fileNode">用于获取资源流的 <see cref="FileNode"/>。</param>
     /// <returns>表示资源流的 <see cref="Stream"/>，若为 <see langword="null"/> 则表示未找到指定的资源。</returns>
     /// <exception cref="ArgumentException"><paramref name="fileNode"/> 的文件路径不为相对路径。</exception>
-    public async Task<Stream?> GetAsset(FileNode fileNode)
+    public async Task<Stream?> GetAssetAsync(FileNode fileNode)
     {
         if (!fileNode.IsRelativePath)
         {
             throw new ArgumentException($"只有文件路径为相对路径的 {nameof(FileNode)} 才能用于获取项目包内的资源文件。");
         }
 
-        string fileName = GetNodePath(fileNode);
-        if (TryGetEntryStream(fileName, out Stream? entryStream))
+        if (TryGetEntryStream(fileNode.FilePath, out Stream? entryStream))
         {
             using (entryStream)
             {
@@ -227,6 +253,23 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
         {
             return null;
         }
+    }
+
+    /// <summary>
+    /// 确定项目包内是否包含 <see cref="FileNode"/> 所表示的资源。
+    /// </summary>
+    /// <param name="fileNode">指定的 <see cref="FileNode"/>。</param>
+    /// <returns>指示资源是否存在的值。</returns>
+    /// <exception cref="ArgumentException"><paramref name="fileNode"/> 的文件路径不为相对路径。</exception>
+    public bool ContainsAsset(FileNode fileNode)
+    {
+        if (!fileNode.IsRelativePath)
+        {
+            throw new ArgumentException($"只有文件路径为相对路径的 {nameof(FileNode)} 才能用于获取项目包内的资源文件。");
+        }
+
+        ZipArchiveEntry? entry = zipArchive.GetEntry(fileNode.FilePath);
+        return entry is not null;
     }
 
     /// <summary>
