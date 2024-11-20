@@ -103,7 +103,7 @@ public sealed partial class ContentPage : Page
             foreach (StorageFile file in items.Where(item => item.IsOfType(StorageItemTypes.File))
                                               .Select(item => (StorageFile)item))
             {
-                ViewModel.ImageFiles.Add(new FileNode(file, node));
+                ViewModel.Assets.Add(new FileNode(file, node));
             }
         }
     }

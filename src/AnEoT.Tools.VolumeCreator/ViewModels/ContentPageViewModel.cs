@@ -31,10 +31,10 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 {
     public ContentPageViewModel()
     {
-        WordFiles.CollectionChanged += OnWordFilesCollectionChanged;
-        ImageFiles.CollectionChanged += OnImagesFilesCollectionChanged;
+        Articles.CollectionChanged += OnWordFilesCollectionChanged;
+        Assets.CollectionChanged += OnImagesFilesCollectionChanged;
         IndexMarkdown.CollectionChanged += OnIndexMarkdownCollectionChanged;
-        InitializeImageFiles();
+        InitializeAssets();
 
         CommonValues.IsProjectSaved = true;
     }
@@ -51,7 +51,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             return;
         }
 
-        if (!ResourcesHelper.ValidateAssets(ImageFiles, out string? errorMessage))
+        if (!ResourcesHelper.ValidateAssets(Assets, out string? errorMessage))
         {
             ContentDialogResult result = await ShowDialogAsync("警告",
                                                                $"以下文件不存在，无法导出它们。{Environment.NewLine}要继续吗？{Environment.NewLine}{Environment.NewLine}{errorMessage.TrimEnd()}",
@@ -165,15 +165,15 @@ public sealed partial class ContentPageViewModel : ObservableValidator
                 }
             }
 
-            WordFiles.CollectionChanged -= OnWordFilesCollectionChanged;
-            ImageFiles.CollectionChanged -= OnImagesFilesCollectionChanged;
+            Articles.CollectionChanged -= OnWordFilesCollectionChanged;
+            Assets.CollectionChanged -= OnImagesFilesCollectionChanged;
             IndexMarkdown.CollectionChanged -= OnIndexMarkdownCollectionChanged;
 
-            WordFiles = new(resHelper.ProjectPackage.Articles);
-            ImageFiles = new(resHelper.ProjectPackage.Assets);
+            Articles = new(resHelper.ProjectPackage.Articles);
+            Assets = new(resHelper.ProjectPackage.Assets);
             IndexMarkdown = resHelper.ProjectPackage.IndexMarkdown is null ? [] : [resHelper.ProjectPackage.IndexMarkdown];
 
-            if (!resHelper.ValidateAssets(ImageFiles, out string? msg))
+            if (!resHelper.ValidateAssets(Assets, out string? msg))
             {
                 containsError = true;
                 stringBuilder.AppendLine("【资源文件】");
@@ -187,12 +187,12 @@ public sealed partial class ContentPageViewModel : ObservableValidator
                         new FontIconSource() { Glyph = "\uE7BA" });
             }
 
-            OnPropertyChanged(nameof(ShowNotifyAddWordFile));
-            OnPropertyChanged(nameof(ShowNotifyAddImagesFile));
+            OnPropertyChanged(nameof(ShowNotifyAddArticles));
+            OnPropertyChanged(nameof(ShowNotifyAddAssets));
             OnPropertyChanged(nameof(ShowNotifyGenerateIndex));
 
-            WordFiles.CollectionChanged += OnWordFilesCollectionChanged;
-            ImageFiles.CollectionChanged += OnImagesFilesCollectionChanged;
+            Articles.CollectionChanged += OnWordFilesCollectionChanged;
+            Assets.CollectionChanged += OnImagesFilesCollectionChanged;
             IndexMarkdown.CollectionChanged += OnIndexMarkdownCollectionChanged;
 
             if (ResourcesHelper is ProjectPackageResourcesHelper oldPkgHelper)
@@ -341,8 +341,8 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             ImageConvertToWebp = this.ConvertToWebp,
         };
         projectPackage.IndexMarkdown = IndexMarkdown.FirstOrDefault();
-        projectPackage.Articles = WordFiles;
-        projectPackage.Assets = ImageFiles;
+        projectPackage.Articles = Articles;
+        projectPackage.Assets = Assets;
     }
 
     private async Task ExportMarkdownContent(StorageFolder volumeFolder)
@@ -365,7 +365,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     private async Task ExportAssets(StorageFolder volumeFolder)
     {
         StorageFolder resourceFolder = await volumeFolder.CreateFolderAsync("res", CreationCollisionOption.ReplaceExisting);
-        await ResourcesHelper.ExportAssetsAsync(ImageFiles, resourceFolder);
+        await ResourcesHelper.ExportAssetsAsync(Assets, resourceFolder);
 
         StorageFile target = await resourceFolder.CreateFileAsync("cover.webp");
         Stream? coverImageStream = await ResourcesHelper.GetCoverAsync();
@@ -464,14 +464,14 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     private void AddEmptyWordFileItem()
     {
         MarkdownWrapper emptyMarkdownFile = new("<自定义文件>", string.Empty, MarkdownWrapperType.Others);
-        WordFiles.Add(emptyMarkdownFile);
+        Articles.Add(emptyMarkdownFile);
     }
 
     [RelayCommand]
     private void AddPaintingWordFileItem()
     {
         MarkdownWrapper paintingMarkdownFile = new("<自定义文件>", string.Empty, MarkdownWrapperType.Paintings);
-        WordFiles.Add(paintingMarkdownFile);
+        Articles.Add(paintingMarkdownFile);
     }
 
     public async Task AddSingleWordFileItem(StorageFile file)
@@ -482,7 +482,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         {
             string markdown = await Task.Run(() => WordToMarkdownService.GetMarkdown(file.Path));
             toMarkdownFile = new(file.DisplayName, markdown);
-            WordFiles.Add(toMarkdownFile);
+            Articles.Add(toMarkdownFile);
         }
         catch (FileFormatException ex)
         {
@@ -493,7 +493,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     [RelayCommand]
     private void RemoveWordFileItem(MarkdownWrapper target)
     {
-        WordFiles.Remove(target);
+        Articles.Remove(target);
     }
     
     [RelayCommand]
@@ -501,7 +501,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     {
         MarkdownEditWindow window = new()
         {
-            Model = (wrapper, ImageFiles, ResourcesHelper),
+            Model = (wrapper, Assets, ResourcesHelper),
             Title = $"{wrapper.DisplayName} - Markdown 编辑窗口"
         };
         window.Activate();
@@ -568,27 +568,27 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     [RelayCommand]
     private void WordFileItemGoUp(MarkdownWrapper wrapper)
     {
-        int currentItemIndex = WordFiles.IndexOf(wrapper);
+        int currentItemIndex = Articles.IndexOf(wrapper);
         int upperIndex = currentItemIndex - 1;
 
         if (currentItemIndex == -1 || upperIndex < 0)
         {
             return;
         }
-        WordFiles.Move(currentItemIndex, upperIndex);
+        Articles.Move(currentItemIndex, upperIndex);
     }
 
     [RelayCommand]
     private void WordFileItemGoDown(MarkdownWrapper wrapper)
     {
-        int currentItemIndex = WordFiles.IndexOf(wrapper);
+        int currentItemIndex = Articles.IndexOf(wrapper);
         int downIndex = currentItemIndex + 1;
 
-        if (currentItemIndex == -1 || downIndex + 1 > WordFiles.Count)
+        if (currentItemIndex == -1 || downIndex + 1 > Articles.Count)
         {
             return;
         }
-        WordFiles.Move(currentItemIndex, downIndex);
+        Articles.Move(currentItemIndex, downIndex);
     }
 
     [RelayCommand]
@@ -626,12 +626,12 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     {
         Dictionary<MarkdownWrapper, string> outputFileNameMapping = GetOutputFileNameDictionary();
 
-        if (WordFiles.Any(wrapper => wrapper.Type == MarkdownWrapperType.Intro))
+        if (Articles.Any(wrapper => wrapper.Type == MarkdownWrapperType.Intro))
         {
             builder.AppendLine("- [**卷首语**](intro.html)");
         }
 
-        IEnumerable<IGrouping<PredefinedCategory, MarkdownWrapper>> articleGroups = WordFiles
+        IEnumerable<IGrouping<PredefinedCategory, MarkdownWrapper>> articleGroups = Articles
             .Where(wrapper => wrapper.CategoryInIndexPage.HasValue)
             .GroupBy(wrapper => wrapper.CategoryInIndexPage!.Value);
         foreach (IGrouping<PredefinedCategory, MarkdownWrapper> articleGroup in articleGroups)
@@ -646,27 +646,27 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             }
         }
 
-        if (WordFiles.Any(wrapper => wrapper.Type == MarkdownWrapperType.Interview))
+        if (Articles.Any(wrapper => wrapper.Type == MarkdownWrapperType.Interview))
         {
             builder.AppendLine("- **创作者访谈**");
-            foreach (MarkdownWrapper item in WordFiles.Where(wrapper => wrapper.Type == MarkdownWrapperType.Interview))
+            foreach (MarkdownWrapper item in Articles.Where(wrapper => wrapper.Type == MarkdownWrapperType.Interview))
             {
                 string title = GetTitleInMarkdown(item.Markdown) ?? item.DisplayName;
                 builder.AppendLine($"  - [{title}](interview.html)");
             }
         }
 
-        if (WordFiles.Any(wrapper => wrapper.Type == MarkdownWrapperType.OperatorSecret))
+        if (Articles.Any(wrapper => wrapper.Type == MarkdownWrapperType.OperatorSecret))
         {
             builder.AppendLine("- **干员秘闻**");
-            foreach (MarkdownWrapper item in WordFiles.Where(wrapper => wrapper.Type == MarkdownWrapperType.OperatorSecret))
+            foreach (MarkdownWrapper item in Articles.Where(wrapper => wrapper.Type == MarkdownWrapperType.OperatorSecret))
             {
                 string title = GetTitleInMarkdown(item.Markdown) ?? item.DisplayName;
                 builder.AppendLine($"  - [{title}](ope_sec.html)");
             }
         }
 
-        foreach (MarkdownWrapper item in WordFiles.Where(item => item.Type == MarkdownWrapperType.Others))
+        foreach (MarkdownWrapper item in Articles.Where(item => item.Type == MarkdownWrapperType.Others))
         {
             builder.AppendLine($"- **{item.OutputTitle}**");
         }
@@ -696,12 +696,12 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
     private Dictionary<MarkdownWrapper, string> GetOutputFileNameDictionary()
     {
-        Dictionary<MarkdownWrapper, string> pairs = new(WordFiles.Count);
+        Dictionary<MarkdownWrapper, string> pairs = new(Articles.Count);
 
         int articleIndex = 1;
         int comicIndex = 1;
 
-        foreach (MarkdownWrapper wrapper in WordFiles)
+        foreach (MarkdownWrapper wrapper in Articles)
         {
             string saveFileName = string.Empty;
 

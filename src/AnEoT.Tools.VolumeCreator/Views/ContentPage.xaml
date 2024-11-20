@@ -302,38 +302,45 @@
 
                     <controls:SettingsExpander
                         AllowDrop="True"
-                        Description="添加要转换为 Markdown 文件的 DOCX 文件。"
+                        Description="添加期刊的文章。"
                         DragOver="OnWordFileListDragOver"
                         Drop="OnWordFileListDrop"
-                        Header="DOCX 文件列表"
+                        Header="文章列表"
                         IsExpanded="True"
-                        ItemsSource="{x:Bind ViewModel.WordFiles, Mode=OneWay}">
+                        ItemsSource="{x:Bind ViewModel.Articles, Mode=OneWay}">
                         <controls:SettingsExpander.HeaderIcon>
                             <FontIcon Glyph="&#xE8FD;" />
                         </controls:SettingsExpander.HeaderIcon>
 
                         <StackPanel Orientation="Horizontal" Spacing="5">
                             <Button Command="{x:Bind ViewModel.AddEmptyWordFileItemCommand}" Content="添加自定义文件" />
-                            <Button Command="{x:Bind ViewModel.AddWordFileItemCommand}" Content="添加文件" />
+                            <Button Command="{x:Bind ViewModel.AddWordFileItemCommand}" Content="添加 DOCX 文件" />
                         </StackPanel>
 
                         <controls:SettingsExpander.ItemsHeader>
-                            <Grid>
+                            <StackPanel>
                                 <InfoBar
                                     Title="请添加一些文件。"
                                     BorderThickness="0"
                                     CornerRadius="0"
                                     IsClosable="False"
-                                    IsOpen="{x:Bind ViewModel.ShowNotifyAddWordFile, Mode=OneWay}"
+                                    IsOpen="{x:Bind ViewModel.ShowNotifyAddArticles, Mode=OneWay}"
                                     Severity="Informational" />
                                 <InfoBar
                                     Title="请记得更改每个项目的文章类型。"
                                     BorderThickness="0"
                                     CornerRadius="0"
                                     IsClosable="False"
-                                    IsOpen="{x:Bind ViewModel.ShowNotifyAddWordFile, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
+                                    IsOpen="{x:Bind ViewModel.ShowNotifyAddArticles, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
                                     Severity="Warning" />
-                            </Grid>
+                                <InfoBar
+                                    Title="请注意，此程序不能处理 DOC 文件，请手动将这些文件转换为 DOCX 格式。"
+                                    BorderThickness="0"
+                                    CornerRadius="0"
+                                    IsClosable="True"
+                                    IsOpen="True"
+                                    Severity="Warning" />
+                            </StackPanel>
                         </controls:SettingsExpander.ItemsHeader>
 
                         <controls:SettingsExpander.ItemTemplate>
@@ -434,8 +441,8 @@
 
                     <controls:SettingsExpander
                         AllowDrop="True"
-                        Description="添加期刊中使用的图像文件。"
-                        Header="图像文件列表"
+                        Description="添加期刊中使用的资源文件。"
+                        Header="资源列表"
                         IsExpanded="True">
                         <controls:SettingsExpander.HeaderIcon>
                             <SymbolIcon Symbol="Pictures" />
@@ -447,7 +454,7 @@
                                 BorderThickness="0"
                                 CornerRadius="0"
                                 IsClosable="False"
-                                IsOpen="{x:Bind ViewModel.ShowNotifyAddImagesFile, Mode=OneWay}"
+                                IsOpen="{x:Bind ViewModel.ShowNotifyAddAssets, Mode=OneWay}"
                                 Severity="Informational" />
                         </controls:SettingsExpander.ItemsHeader>
 
@@ -473,7 +480,7 @@
                                     CanDragItems="True"
                                     CanReorderItems="True"
                                     ItemTemplateSelector="{StaticResource NodeTemplateSelector}"
-                                    ItemsSource="{x:Bind ViewModel.ImageFiles, Mode=OneWay}"
+                                    ItemsSource="{x:Bind ViewModel.Assets, Mode=OneWay}"
                                     SelectionMode="None" />
                             </controls:SettingsCard>
                         </controls:SettingsExpander.Items>

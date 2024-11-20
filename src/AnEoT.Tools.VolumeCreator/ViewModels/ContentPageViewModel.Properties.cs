@@ -13,8 +13,8 @@ partial class ContentPageViewModel
 {
     public bool IsVolumeCoverNotExist => VolumeCover is null;
     public VerticalAlignment CoverImageVerticalAlignmentMode => VolumeCover is null ? VerticalAlignment.Stretch : VerticalAlignment.Top;
-    public bool ShowNotifyAddWordFile => WordFiles.Count <= 0;
-    public bool ShowNotifyAddImagesFile => ImageFiles.Count <= 0;
+    public bool ShowNotifyAddArticles => Articles.Count <= 0;
+    public bool ShowNotifyAddAssets => Assets.Count <= 0;
     public bool ShowNotifyGenerateIndex => IndexMarkdown.Count <= 0;
     [Required]
     [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateResourcesHelper))]
@@ -63,11 +63,11 @@ partial class ContentPageViewModel
     private bool isCoverSizeFixed = true;
     [ObservableProperty]
     [Required, NotifyDataErrorInfo]
-    [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateWordFiles))]
-    private ObservableCollection<MarkdownWrapper> wordFiles = [];
+    [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateArticles))]
+    private ObservableCollection<MarkdownWrapper> articles = [];
     [ObservableProperty, Required, NotifyDataErrorInfo]
-    [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateImageFiles))]
-    private ObservableCollection<ImageListNode> imageFiles = [];
+    [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateAssets))]
+    private ObservableCollection<ImageListNode> assets = [];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowNotifyGenerateIndex))]
@@ -76,7 +76,7 @@ partial class ContentPageViewModel
     private ObservableCollection<MarkdownWrapper> indexMarkdown = [];
     private IVoulmeResourcesHelper resourcesHelper = new MemoryResourcesHelper();
 
-    private void InitializeImageFiles()
+    private void InitializeAssets()
     {
         FolderNode root = new("res", null);
         root.Children.Add(new FolderNode("comic", root));
@@ -84,7 +84,7 @@ partial class ContentPageViewModel
         root.Children.Add(new FolderNode("ope_sec", root));
         root.Children.Add(new FolderNode("interview", root));
 
-        ImageFiles.Add(root);
+        Assets.Add(root);
     }
 
     #region Save State Changer
@@ -113,12 +113,12 @@ partial class ContentPageViewModel
         CommonValues.IsProjectSaved = false;
     }
 
-    partial void OnWordFilesChanged(ObservableCollection<MarkdownWrapper> value)
+    partial void OnArticlesChanged(ObservableCollection<MarkdownWrapper> value)
     {
         CommonValues.IsProjectSaved = false;
     }
 
-    partial void OnImageFilesChanged(ObservableCollection<ImageListNode> value)
+    partial void OnAssetsChanged(ObservableCollection<ImageListNode> value)
     {
         CommonValues.IsProjectSaved = false;
     }
@@ -127,25 +127,25 @@ partial class ContentPageViewModel
     {
         CommonValues.IsProjectSaved = false;
     }
-    #endregion
 
     private void OnWordFilesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         CommonValues.IsProjectSaved = false;
-        OnPropertyChanged(nameof(ShowNotifyAddWordFile));
+        OnPropertyChanged(nameof(ShowNotifyAddArticles));
     }
 
     private void OnImagesFilesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         CommonValues.IsProjectSaved = false;
-        OnPropertyChanged(nameof(ShowNotifyAddImagesFile));
+        OnPropertyChanged(nameof(ShowNotifyAddAssets));
     }
-    
+
     private void OnIndexMarkdownCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         CommonValues.IsProjectSaved = false;
         OnPropertyChanged(nameof(ShowNotifyGenerateIndex));
     }
+    #endregion
 
     public static ValidationResult ValidateResourcesHelper(IVoulmeResourcesHelper helper)
     {
@@ -187,13 +187,13 @@ partial class ContentPageViewModel
         }
     }
 
-    public static ValidationResult ValidateWordFiles(ObservableCollection<MarkdownWrapper> files)
+    public static ValidationResult ValidateArticles(ObservableCollection<MarkdownWrapper> files)
     {
         if (files.Count > 0)
         {
             if (files.Any(wrapper => wrapper.Type == MarkdownWrapperType.Others && string.IsNullOrWhiteSpace(wrapper.OutputTitle)))
             {
-                return new ValidationResult("【DOCX 文件列表】列表中的自定义项应当填写导出文件名。");
+                return new ValidationResult("【文章列表】列表中的自定义项应当填写导出文件名。");
             }
 
             IEnumerable<MarkdownWrapper> fileWithOutputNames = files.Where(IsWrapperHasOutputTitle);
@@ -201,14 +201,14 @@ partial class ContentPageViewModel
 
             if (fileWithOutputNames.SequenceEqual(distincedSequence) != true)
             {
-                return new ValidationResult("【DOCX 文件列表】存在导出文件名重复的项。");
+                return new ValidationResult("【文章列表】存在导出文件名重复的项。");
             }
 
             return ValidationResult.Success!;
         }
         else
         {
-            return new ValidationResult("【DOCX 文件列表】没有导入任何文件，无法进行操作。");
+            return new ValidationResult("【文章列表】没有导入任何文件，无法进行操作。");
         }
 
         static bool IsWrapperHasOutputTitle(MarkdownWrapper wrapper)
@@ -218,7 +218,7 @@ partial class ContentPageViewModel
         }
     }
 
-    public static ValidationResult ValidateImageFiles(ObservableCollection<ImageListNode> nodes)
+    public static ValidationResult ValidateAssets(ObservableCollection<ImageListNode> nodes)
     {
         bool isSuccess = ResourcesHelperForValidation.ValidateAssets(nodes, out string? message);
         if (isSuccess)
