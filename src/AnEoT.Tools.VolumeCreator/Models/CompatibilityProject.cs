@@ -3,15 +3,15 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace AnEoT.Tools.VolumeCreator.Models;
 
-[Obsolete("请使用 ProjectPackage。")]
-public sealed class Project
+[Obsolete($"除非是为了兼容性用途，否则请使用 {nameof(ProjectPackage)} 类。")]
+public sealed class CompatibilityProject
 {
-    public Project()
+    public CompatibilityProject()
     {
     }
 
     [SetsRequiredMembers]
-    public Project(string coverImagePath,
+    public CompatibilityProject(string coverImagePath,
                         bool imageConvertToWebp,
                         bool isCoverSizeFixed,
                         string volumeFolderName,
@@ -70,9 +70,9 @@ public sealed class Project
     /// </summary>
     public required MarkdownWrapper? IndexMarkdown { get; set; }
 
-    public static Project CreateEmpty()
+    public static CompatibilityProject CreateEmpty()
     {
-        Project project = new()
+        CompatibilityProject project = new()
         {
             VolumeName = string.Empty,
             VolumeFolderName = string.Empty,

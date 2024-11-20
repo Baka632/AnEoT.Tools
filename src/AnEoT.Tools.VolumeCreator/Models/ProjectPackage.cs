@@ -58,7 +58,15 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
             stream.Seek(0, SeekOrigin.Begin);
         }
 
-        zipArchive = new ZipArchive(stream, ZipArchiveMode.Update);
+        try
+        {
+            zipArchive = new ZipArchive(stream, ZipArchiveMode.Update);
+        }
+        catch
+        {
+            stream.Dispose();
+            throw;
+        }
     }
 
     /// <summary>
@@ -355,7 +363,7 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
             }
             else if (node is FileNode fileNode)
             {
-                if (!fileNode.IsRelativePath)
+                if (!fileNode.IsRelativePath && fileNode.IsFileExist)
                 {
                     using FileStream fileStream = File.OpenRead(fileNode.FilePath);
                     fileStream.Seek(0, SeekOrigin.Begin);

@@ -23,6 +23,7 @@ using YamlDotNet.Core.Events;
 using AnEoT.Tools.Shared.Models;
 using SixLabors.ImageSharp.Processing;
 using AnEoT.Tools.VolumeCreator.Models.Resources;
+using System.Text.Json;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -212,6 +213,54 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             }
             else
             {
+                try
+                {
+                    Stream stream = await file.OpenStreamForReadAsync();
+#pragma warning disable CS0618 // 类型或成员已过时——这是为了兼容性用途。
+                    CompatibilityProject? project;
+                    using (stream)
+                    {
+                        project = await JsonSerializer.DeserializeAsync<CompatibilityProject>(stream, CommonValues.DefaultJsonSerializerOption);
+                    }
+#pragma warning restore CS0618
+
+                    if (project != null)
+                    {
+                        ContentDialogResult result = await ShowDialogAsync("此项目文件使用的是不再受支持的旧格式",
+                                                                           "应用只能读取新格式的项目文件。\n不过我们可以尝试将此文件转换为新格式，要转换吗？",
+                                                                           "转换", closeText: "不转换");
+
+                        if (result == ContentDialogResult.Primary)
+                        {
+                            try
+                            {
+                                ProjectPackage projectPackage = ProjectPackage.Create(file.Path);
+                                projectPackage.Info = new ProjectInfo(project.VolumeName, project.VolumeFolderName, project.IsCoverSizeFixed, project.ImageConvertToWebp, null);
+                                projectPackage.Articles = project.WordFiles;
+                                projectPackage.Assets = project.ImageFiles;
+                                projectPackage.IndexMarkdown = project.IndexMarkdown;
+
+                                if (File.Exists(project.CoverImagePath))
+                                {
+                                    await projectPackage.SetCoverFileAsync(project.CoverImagePath);
+                                }
+                                await projectPackage.DisposeAsync();
+                            }
+                            catch (Exception convertEx)
+                            {
+                                await ShowDialogAsync("转换过程中出现了异常", convertEx.Message, closeText: "关闭");
+                                return;
+                            }
+
+                            await LoadProject(file);
+                        }
+
+                        return;
+                    }
+                }
+                catch (JsonException)
+                {
+                }
                 message = "文件可能无效或损坏。";
             }
 
