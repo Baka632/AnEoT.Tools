@@ -10,10 +10,11 @@ namespace AnEoT.Tools.VolumeCreator.Views;
 /// </summary>
 public sealed partial class ContentPage : Page
 {
-    public ContentPageViewModel ViewModel { get; } = new ContentPageViewModel();
+    public ContentPageViewModel ViewModel { get; }
 
     public ContentPage()
     {
+        ViewModel = new ContentPageViewModel(this);
         this.InitializeComponent();
     }
 
@@ -121,5 +122,35 @@ public sealed partial class ContentPage : Page
             StorageFile? file = files[0] as StorageFile;
             await ViewModel.LoadProject(file);
         }
+    }
+
+    private void OnAddNewAssetMenuFlyoutItemClick(object sender, RoutedEventArgs e)
+    {
+        FolderNode folderNode = (FolderNode)((MenuFlyoutItem)sender).DataContext;
+        ViewModel.AddAssetCommand.Execute(folderNode);
+    }
+
+    private void OnRepairAssetButtonClick(object sender, RoutedEventArgs e)
+    {
+        FileNode fileNode = (FileNode)((Button)sender).DataContext;
+        ViewModel.RepairAssetCommand.Execute(fileNode);
+    }
+
+    private void OnRemoveAssetButtonClick(object sender, RoutedEventArgs e)
+    {
+        FileNode fileNode = (FileNode)((Button)sender).DataContext;
+        ViewModel.RemoveAssetCommand.Execute(fileNode);
+    }
+
+    private void OnAddNewAssetFolderMenuFlyoutItemClick(object sender, RoutedEventArgs e)
+    {
+        FolderNode folderNode = (FolderNode)((MenuFlyoutItem)sender).DataContext;
+        ViewModel.AddAssetFolderCommand.Execute(folderNode);
+    }
+
+    private void OnRemoveAssetFolderButtonClick(object sender, RoutedEventArgs e)
+    {
+        FolderNode folderNode = (FolderNode)((Button)sender).DataContext;
+        ViewModel.RemoveAssetFolderCommand.Execute(folderNode);
     }
 }

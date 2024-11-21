@@ -29,6 +29,8 @@ partial class ContentPageViewModel
     }
     public static IVoulmeResourcesHelper ResourcesHelperForValidation { get; set; } = new MemoryResourcesHelper();
 
+    private IVoulmeResourcesHelper resourcesHelper = new MemoryResourcesHelper();
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsVolumeCoverNotExist))]
     [NotifyPropertyChangedFor(nameof(CoverImageVerticalAlignmentMode))]
@@ -68,13 +70,11 @@ partial class ContentPageViewModel
     [ObservableProperty, Required, NotifyDataErrorInfo]
     [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateAssets))]
     private ObservableCollection<AssetNode> assets = [];
-
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowNotifyGenerateIndex))]
     [NotifyDataErrorInfo]
     [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateIndexMarkdown))]
     private ObservableCollection<MarkdownWrapper> indexMarkdown = [];
-    private IVoulmeResourcesHelper resourcesHelper = new MemoryResourcesHelper();
 
     private void InitializeAssets()
     {

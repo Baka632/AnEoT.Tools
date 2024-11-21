@@ -24,12 +24,15 @@ using AnEoT.Tools.Shared.Models;
 using SixLabors.ImageSharp.Processing;
 using AnEoT.Tools.VolumeCreator.Models.Resources;
 using System.Text.Json;
+using System.Collections.ObjectModel;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
 public sealed partial class ContentPageViewModel : ObservableValidator
 {
-    public ContentPageViewModel()
+    public ContentPage View { get; }
+
+    public ContentPageViewModel(ContentPage view)
     {
         Articles.CollectionChanged += OnWordFilesCollectionChanged;
         Assets.CollectionChanged += OnImagesFilesCollectionChanged;
@@ -37,6 +40,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         InitializeAssets();
 
         CommonValues.IsProjectSaved = true;
+        View = view;
     }
 
     [RelayCommand]
@@ -497,7 +501,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     {
         Articles.Remove(target);
     }
-    
+
     [RelayCommand]
     private void ViewArticle(MarkdownWrapper wrapper)
     {
@@ -510,7 +514,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    private static async Task AddAsset(FolderNode node)
+    private async Task AddAsset(FolderNode? parentNode)
     {
         nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
 
@@ -526,21 +530,30 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
         if (files is not null)
         {
+            ObservableCollection<AssetNode> target = parentNode is null ? Assets : parentNode.Children;
+
             foreach (StorageFile file in files)
             {
-                if (!node.Children.Any(node => node is FileNode fileNode && fileNode.FilePath == file.Path))
+                if (!target.Any(node => node is FileNode fileNode && fileNode.FilePath == file.Path))
                 {
-                    node.Children.Add(new FileNode(file, node));
+                    target.Add(new FileNode(file, parentNode));
+                    CommonValues.IsProjectSaved = false;
                 }
             }
-            CommonValues.IsProjectSaved = false;
         }
     }
 
     [RelayCommand]
-    private static void RemoveAsset(FileNode node)
+    private void RemoveAsset(FileNode node)
     {
-        node.Parent?.Children.Remove(node);
+        if (node.Parent is null)
+        {
+            Assets.Remove(node);
+        }
+        else
+        {
+            node.Parent?.Children.Remove(node);
+        }
         CommonValues.IsProjectSaved = false;
     }
 
@@ -564,7 +577,43 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         }
 
         node.FilePath = file.Path;
-        CommonValues.IsProjectSaved = true;
+        CommonValues.IsProjectSaved = false;
+    }
+
+    [RelayCommand]
+    private async Task AddAssetFolder(FolderNode? parentNode)
+    {
+        NewAssetFolderDialog dialog = new()
+        {
+            XamlRoot = View.XamlRoot
+        };
+
+        ContentDialogResult result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+        {
+            ObservableCollection<AssetNode> target = parentNode is null ? Assets : parentNode.Children;
+
+            string folderName = dialog.NewFolderName;
+            if (!target.Any(node => node.DisplayName == folderName))
+            {
+                target.Add(new FolderNode(folderName, parentNode));
+                CommonValues.IsProjectSaved = false;
+            }
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveAssetFolder(FolderNode node)
+    {
+        if (node.Parent is null)
+        {
+            Assets.Remove(node);
+        }
+        else
+        {
+            node.Parent?.Children.Remove(node);
+        }
+        CommonValues.IsProjectSaved = false;
     }
 
     [RelayCommand]

@@ -66,18 +66,16 @@
 
                         <Button
                             Margin="0,0,5,0"
-                            helpers:AncestorSource.AncestorType="Page"
-                            Command="{Binding ViewModel.RepairAssetCommand}"
-                            CommandParameter="{x:Bind}"
+                            Click="OnRepairAssetButtonClick"
+                            DataContext="{x:Bind}"
                             ToolTipService.ToolTip="修复"
                             Visibility="{x:Bind IsFileExist, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True, Mode=OneWay}">
                             <SymbolIcon Symbol="Repair" />
                         </Button>
 
                         <Button
-                            helpers:AncestorSource.AncestorType="Page"
-                            Command="{Binding ViewModel.RemoveAssetCommand}"
-                            CommandParameter="{x:Bind}"
+                            Click="OnRemoveAssetButtonClick"
+                            DataContext="{x:Bind}"
                             ToolTipService.ToolTip="移除">
                             <SymbolIcon Symbol="Delete" />
                         </Button>
@@ -110,21 +108,57 @@
                         Grid.Column="1"
                         VerticalAlignment="Center"
                         Text="{x:Bind DisplayName}" />
-                    <Button
+
+                    <StackPanel
                         Grid.Column="2"
-                        Width="35"
-                        Height="35"
-                        Margin="0,0,10,0"
-                        Padding="0"
+                        Margin="0,0,20,0"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
-                        helpers:AncestorSource.AncestorType="Page"
-                        Background="Transparent"
-                        Command="{Binding ViewModel.AddAssetCommand}"
-                        CommandParameter="{x:Bind}"
-                        ToolTipService.ToolTip="添加文件">
-                        <SymbolIcon Symbol="Add" />
-                    </Button>
+                        Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style BasedOn="{StaticResource DefaultButtonStyle}" TargetType="Button">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Height" Value="35" />
+                                <Setter Property="Width" Value="35" />
+                                <Setter Property="Padding" Value="0" />
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <Button Margin="0,0,5,0" ToolTipService.ToolTip="添加...">
+                            <SymbolIcon Symbol="Add" />
+
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem
+                                        Click="OnAddNewAssetMenuFlyoutItemClick"
+                                        DataContext="{x:Bind}"
+                                        Icon="Document"
+                                        Text="文件" />
+                                    <MenuFlyoutItem
+                                        Click="OnAddNewAssetFolderMenuFlyoutItemClick"
+                                        DataContext="{x:Bind}"
+                                        Icon="Folder"
+                                        Text="文件夹" />
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+
+                        <Button ToolTipService.ToolTip="删除文件夹">
+                            <SymbolIcon Symbol="Delete" />
+
+                            <Button.Flyout>
+                                <Flyout>
+                                    <StackPanel>
+                                        <TextBlock Margin="0,0,0,10" Text="此文件夹的所有内容都将被删除，确定吗？" />
+                                        <Button
+                                            Click="OnRemoveAssetFolderButtonClick"
+                                            Content="确定"
+                                            DataContext="{x:Bind}" />
+                                    </StackPanel>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </TreeViewItem>
         </DataTemplate>
@@ -472,16 +506,55 @@
                                     IsThreeState="False" />
                             </controls:SettingsCard>
 
-                            <controls:SettingsCard
-                                HorizontalContentAlignment="Stretch"
-                                ContentAlignment="Vertical"
-                                Header="文件列表">
-                                <TreeView
-                                    CanDragItems="True"
-                                    CanReorderItems="True"
-                                    ItemTemplateSelector="{StaticResource NodeTemplateSelector}"
-                                    ItemsSource="{x:Bind ViewModel.Assets, Mode=OneWay}"
-                                    SelectionMode="None" />
+                            <controls:SettingsCard HorizontalContentAlignment="Stretch" ContentAlignment="Vertical">
+                                <StackPanel HorizontalAlignment="Stretch">
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock
+                                            Grid.Column="0"
+                                            VerticalAlignment="Center"
+                                            Text="文件列表" />
+
+                                        <Button
+                                            Grid.Column="1"
+                                            Width="35"
+                                            Height="35"
+                                            Margin="10,0,0,0"
+                                            Padding="0"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Background="Transparent"
+                                            ToolTipService.ToolTip="添加...">
+                                            <SymbolIcon Symbol="Add" />
+
+                                            <Button.Flyout>
+                                                <MenuFlyout>
+                                                    <MenuFlyoutItem
+                                                        Click="OnAddNewAssetMenuFlyoutItemClick"
+                                                        DataContext="{x:Null}"
+                                                        Icon="Document"
+                                                        Text="文件" />
+                                                    <MenuFlyoutItem
+                                                        Click="OnAddNewAssetFolderMenuFlyoutItemClick"
+                                                        DataContext="{x:Null}"
+                                                        Icon="Folder"
+                                                        Text="文件夹" />
+                                                </MenuFlyout>
+                                            </Button.Flyout>
+                                        </Button>
+                                    </Grid>
+
+                                    <TreeView
+                                        CanDragItems="False"
+                                        CanReorderItems="False"
+                                        ItemTemplateSelector="{StaticResource NodeTemplateSelector}"
+                                        ItemsSource="{x:Bind ViewModel.Assets, Mode=OneWay}"
+                                        SelectionMode="None" />
+                                </StackPanel>
                             </controls:SettingsCard>
                         </controls:SettingsExpander.Items>
                     </controls:SettingsExpander>
