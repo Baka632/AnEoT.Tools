@@ -39,6 +39,7 @@
     <None Remove="Views\InsertStyleDialog.xaml" />
     <None Remove="Views\MarkdownEditPage.xaml" />
     <None Remove="Views\MarkdownEditWindow.xaml" />
+    <None Remove="Views\NewAssetFolderDialog.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -63,6 +64,7 @@
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.8" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Private.Uri" Version="4.3.2" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
     <PackageReference Include="WinUIEx" Version="2.3.4" />
     <Manifest Include="$(ApplicationManifest)" />
@@ -137,6 +139,11 @@
   </PropertyGroup>
   <ItemGroup>
     <PRIResource Remove="AppPackages\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\NewAssetFolderDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\InsertStyleDialog.xaml">

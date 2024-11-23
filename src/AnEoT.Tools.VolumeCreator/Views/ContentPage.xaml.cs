@@ -10,10 +10,11 @@ namespace AnEoT.Tools.VolumeCreator.Views;
 /// </summary>
 public sealed partial class ContentPage : Page
 {
-    public ContentPageViewModel ViewModel { get; } = new ContentPageViewModel();
+    public ContentPageViewModel ViewModel { get; }
 
     public ContentPage()
     {
+        ViewModel = new ContentPageViewModel(this);
         this.InitializeComponent();
     }
 
@@ -50,12 +51,12 @@ public sealed partial class ContentPage : Page
         ViewModel.IsVolumeCoverError = true;
     }
 
-    private void OnWordFileListDragOver(object sender, DragEventArgs e)
+    private void OnArticlesListDragOver(object sender, DragEventArgs e)
     {
         if (e.DataView.Contains(StandardDataFormats.StorageItems))
         {
             e.AcceptedOperation = DataPackageOperation.Link;
-            e.DragUIOverride.Caption = "添加 DOCX 文件";
+            e.DragUIOverride.Caption = "导入 DOCX 文件";
         }
         else
         {
@@ -63,7 +64,7 @@ public sealed partial class ContentPage : Page
         }
     }
 
-    private async void OnWordFileListDrop(object sender, DragEventArgs e)
+    private async void OnArticlesListDrop(object sender, DragEventArgs e)
     {
         if (e.DataView.Contains(StandardDataFormats.StorageItems))
         {
@@ -71,7 +72,7 @@ public sealed partial class ContentPage : Page
             foreach (StorageFile file in items.Where(item => item.IsOfType(StorageItemTypes.File))
                                               .Select(item => (StorageFile)item))
             {
-                await ViewModel.AddSingleWordFileItem(file);
+                await ViewModel.ImportSingleWordFileItem(file);
             }
         }
     }
@@ -103,7 +104,7 @@ public sealed partial class ContentPage : Page
             foreach (StorageFile file in items.Where(item => item.IsOfType(StorageItemTypes.File))
                                               .Select(item => (StorageFile)item))
             {
-                ViewModel.ImageFiles.Add(new FileNode(file, node));
+                ViewModel.Assets.Add(new FileNode(file, node));
             }
         }
     }
@@ -121,5 +122,35 @@ public sealed partial class ContentPage : Page
             StorageFile? file = files[0] as StorageFile;
             await ViewModel.LoadProject(file);
         }
+    }
+
+    private void OnAddNewAssetMenuFlyoutItemClick(object sender, RoutedEventArgs e)
+    {
+        FolderNode folderNode = (FolderNode)((MenuFlyoutItem)sender).DataContext;
+        ViewModel.AddAssetCommand.Execute(folderNode);
+    }
+
+    private void OnRepairAssetButtonClick(object sender, RoutedEventArgs e)
+    {
+        FileNode fileNode = (FileNode)((Button)sender).DataContext;
+        ViewModel.RepairAssetCommand.Execute(fileNode);
+    }
+
+    private void OnRemoveAssetButtonClick(object sender, RoutedEventArgs e)
+    {
+        FileNode fileNode = (FileNode)((Button)sender).DataContext;
+        ViewModel.RemoveAssetCommand.Execute(fileNode);
+    }
+
+    private void OnAddNewAssetFolderMenuFlyoutItemClick(object sender, RoutedEventArgs e)
+    {
+        FolderNode folderNode = (FolderNode)((MenuFlyoutItem)sender).DataContext;
+        ViewModel.AddAssetFolderCommand.Execute(folderNode);
+    }
+
+    private void OnRemoveAssetFolderButtonClick(object sender, RoutedEventArgs e)
+    {
+        FolderNode folderNode = (FolderNode)((Button)sender).DataContext;
+        ViewModel.RemoveAssetFolderCommand.Execute(folderNode);
     }
 }

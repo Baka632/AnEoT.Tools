@@ -1,0 +1,24 @@
+<ContentDialog
+    x:Class="AnEoT.Tools.VolumeCreator.Views.NewAssetFolderDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:AnEoT.Tools.VolumeCreator.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="添加资源文件夹"
+    CloseButtonText="取消"
+    PrimaryButtonClick="OnPrimaryButtonClicked"
+    PrimaryButtonText="确定"
+    Style="{StaticResource DefaultContentDialogStyle}"
+    mc:Ignorable="d">
+
+    <StackPanel>
+        <TextBox Header="文件夹名称" Text="{x:Bind NewFolderName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <InfoBar
+            Title="文件夹名称为空。"
+            Margin="0,10,0,0"
+            IsClosable="False"
+            IsOpen="{x:Bind ShowEmptyFolderNameWarning, Mode=OneWay}"
+            Severity="Error" />
+    </StackPanel>
+</ContentDialog>

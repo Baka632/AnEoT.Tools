@@ -66,18 +66,16 @@
 
                         <Button
                             Margin="0,0,5,0"
-                            helpers:AncestorSource.AncestorType="Page"
-                            Command="{Binding ViewModel.RepairImageFileCommand}"
-                            CommandParameter="{x:Bind}"
+                            Click="OnRepairAssetButtonClick"
+                            DataContext="{x:Bind}"
                             ToolTipService.ToolTip="修复"
                             Visibility="{x:Bind IsFileExist, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True, Mode=OneWay}">
                             <SymbolIcon Symbol="Repair" />
                         </Button>
 
                         <Button
-                            helpers:AncestorSource.AncestorType="Page"
-                            Command="{Binding ViewModel.RemoveImageFileCommand}"
-                            CommandParameter="{x:Bind}"
+                            Click="OnRemoveAssetButtonClick"
+                            DataContext="{x:Bind}"
                             ToolTipService.ToolTip="移除">
                             <SymbolIcon Symbol="Delete" />
                         </Button>
@@ -86,7 +84,7 @@
             </TreeViewItem>
         </DataTemplate>
 
-        <DataTemplate x:Key="FolderNodeTemplate" x:DataType="models:ImageListNode">
+        <DataTemplate x:Key="FolderNodeTemplate" x:DataType="models:AssetNode">
             <TreeViewItem
                 AllowDrop="True"
                 Background="Transparent"
@@ -110,26 +108,62 @@
                         Grid.Column="1"
                         VerticalAlignment="Center"
                         Text="{x:Bind DisplayName}" />
-                    <Button
+
+                    <StackPanel
                         Grid.Column="2"
-                        Width="35"
-                        Height="35"
-                        Margin="0,0,10,0"
-                        Padding="0"
+                        Margin="0,0,20,0"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Center"
-                        helpers:AncestorSource.AncestorType="Page"
-                        Background="Transparent"
-                        Command="{Binding ViewModel.AddImageFileCommand}"
-                        CommandParameter="{x:Bind}"
-                        ToolTipService.ToolTip="添加文件">
-                        <SymbolIcon Symbol="Add" />
-                    </Button>
+                        Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style BasedOn="{StaticResource DefaultButtonStyle}" TargetType="Button">
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Height" Value="35" />
+                                <Setter Property="Width" Value="35" />
+                                <Setter Property="Padding" Value="0" />
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <Button Margin="0,0,5,0" ToolTipService.ToolTip="添加...">
+                            <SymbolIcon Symbol="Add" />
+
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem
+                                        Click="OnAddNewAssetMenuFlyoutItemClick"
+                                        DataContext="{x:Bind}"
+                                        Icon="Document"
+                                        Text="文件" />
+                                    <MenuFlyoutItem
+                                        Click="OnAddNewAssetFolderMenuFlyoutItemClick"
+                                        DataContext="{x:Bind}"
+                                        Icon="Folder"
+                                        Text="文件夹" />
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+
+                        <Button ToolTipService.ToolTip="删除文件夹">
+                            <SymbolIcon Symbol="Delete" />
+
+                            <Button.Flyout>
+                                <Flyout>
+                                    <StackPanel>
+                                        <TextBlock Margin="0,0,0,10" Text="此文件夹的所有内容都将被删除，确定吗？" />
+                                        <Button
+                                            Click="OnRemoveAssetFolderButtonClick"
+                                            Content="确定"
+                                            DataContext="{x:Bind}" />
+                                    </StackPanel>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </TreeViewItem>
         </DataTemplate>
 
-        <helpers:ImageNodeDataTemplateSelector
+        <helpers:AssetNodeDataTemplateSelector
             x:Key="NodeTemplateSelector"
             FileTemplate="{StaticResource FileNodeTemplate}"
             FolderTemplate="{StaticResource FolderNodeTemplate}" />
@@ -302,38 +336,45 @@
 
                     <controls:SettingsExpander
                         AllowDrop="True"
-                        Description="添加要转换为 Markdown 文件的 DOCX 文件。"
-                        DragOver="OnWordFileListDragOver"
-                        Drop="OnWordFileListDrop"
-                        Header="DOCX 文件列表"
+                        Description="添加期刊的文章。"
+                        DragOver="OnArticlesListDragOver"
+                        Drop="OnArticlesListDrop"
+                        Header="文章列表"
                         IsExpanded="True"
-                        ItemsSource="{x:Bind ViewModel.WordFiles, Mode=OneWay}">
+                        ItemsSource="{x:Bind ViewModel.Articles, Mode=OneWay}">
                         <controls:SettingsExpander.HeaderIcon>
                             <FontIcon Glyph="&#xE8FD;" />
                         </controls:SettingsExpander.HeaderIcon>
 
                         <StackPanel Orientation="Horizontal" Spacing="5">
-                            <Button Command="{x:Bind ViewModel.AddEmptyWordFileItemCommand}" Content="添加自定义文件" />
-                            <Button Command="{x:Bind ViewModel.AddWordFileItemCommand}" Content="添加文件" />
+                            <Button Command="{x:Bind ViewModel.AddEmptyArticleCommand}" Content="创建自定义文章" />
+                            <Button Command="{x:Bind ViewModel.ImportWordFileItemCommand}" Content="从 DOCX 文件导入" />
                         </StackPanel>
 
                         <controls:SettingsExpander.ItemsHeader>
-                            <Grid>
+                            <StackPanel>
                                 <InfoBar
                                     Title="请添加一些文件。"
                                     BorderThickness="0"
                                     CornerRadius="0"
                                     IsClosable="False"
-                                    IsOpen="{x:Bind ViewModel.ShowNotifyAddWordFile, Mode=OneWay}"
+                                    IsOpen="{x:Bind ViewModel.ShowNotifyAddArticles, Mode=OneWay}"
                                     Severity="Informational" />
                                 <InfoBar
                                     Title="请记得更改每个项目的文章类型。"
                                     BorderThickness="0"
                                     CornerRadius="0"
                                     IsClosable="False"
-                                    IsOpen="{x:Bind ViewModel.ShowNotifyAddWordFile, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
+                                    IsOpen="{x:Bind ViewModel.ShowNotifyAddArticles, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
                                     Severity="Warning" />
-                            </Grid>
+                                <InfoBar
+                                    Title="请注意，此程序不能处理 DOC 文件，请手动将这些文件转换为 DOCX 格式。"
+                                    BorderThickness="0"
+                                    CornerRadius="0"
+                                    IsClosable="True"
+                                    IsOpen="True"
+                                    Severity="Warning" />
+                            </StackPanel>
                         </controls:SettingsExpander.ItemsHeader>
 
                         <controls:SettingsExpander.ItemTemplate>
@@ -341,7 +382,7 @@
                                 <controls:SettingsCard
                                     HorizontalContentAlignment="Stretch"
                                     helpers:AncestorSource.AncestorType="Page"
-                                    Command="{Binding ViewModel.ViewWordFileItemCommand}"
+                                    Command="{Binding ViewModel.ViewArticleCommand}"
                                     CommandParameter="{x:Bind}"
                                     ContentAlignment="Vertical"
                                     IsClickEnabled="True">
@@ -396,7 +437,7 @@
                                                 <Button.Flyout>
                                                     <MenuFlyout>
                                                         <MenuFlyoutItem
-                                                            Command="{Binding ViewModel.WordFileItemGoUpCommand}"
+                                                            Command="{Binding ViewModel.ArticleGoUpCommand}"
                                                             CommandParameter="{x:Bind}"
                                                             Text="上移">
                                                             <MenuFlyoutItem.Icon>
@@ -404,7 +445,7 @@
                                                             </MenuFlyoutItem.Icon>
                                                         </MenuFlyoutItem>
                                                         <MenuFlyoutItem
-                                                            Command="{Binding ViewModel.WordFileItemGoDownCommand}"
+                                                            Command="{Binding ViewModel.ArticleGoDownCommand}"
                                                             CommandParameter="{x:Bind}"
                                                             Text="下移">
                                                             <MenuFlyoutItem.Icon>
@@ -415,7 +456,7 @@
                                                         <MenuFlyoutSeparator />
 
                                                         <MenuFlyoutItem
-                                                            Command="{Binding ViewModel.RemoveWordFileItemCommand}"
+                                                            Command="{Binding ViewModel.RemoveArticleCommand}"
                                                             CommandParameter="{x:Bind}"
                                                             Text="移除">
                                                             <MenuFlyoutItem.Icon>
@@ -434,8 +475,8 @@
 
                     <controls:SettingsExpander
                         AllowDrop="True"
-                        Description="添加期刊中使用的图像文件。"
-                        Header="图像文件列表"
+                        Description="添加期刊中使用的资源文件。"
+                        Header="资源列表"
                         IsExpanded="True">
                         <controls:SettingsExpander.HeaderIcon>
                             <SymbolIcon Symbol="Pictures" />
@@ -447,7 +488,7 @@
                                 BorderThickness="0"
                                 CornerRadius="0"
                                 IsClosable="False"
-                                IsOpen="{x:Bind ViewModel.ShowNotifyAddImagesFile, Mode=OneWay}"
+                                IsOpen="{x:Bind ViewModel.ShowNotifyAddAssets, Mode=OneWay}"
                                 Severity="Informational" />
                         </controls:SettingsExpander.ItemsHeader>
 
@@ -465,16 +506,55 @@
                                     IsThreeState="False" />
                             </controls:SettingsCard>
 
-                            <controls:SettingsCard
-                                HorizontalContentAlignment="Stretch"
-                                ContentAlignment="Vertical"
-                                Header="文件列表">
-                                <TreeView
-                                    CanDragItems="True"
-                                    CanReorderItems="True"
-                                    ItemTemplateSelector="{StaticResource NodeTemplateSelector}"
-                                    ItemsSource="{x:Bind ViewModel.ImageFiles, Mode=OneWay}"
-                                    SelectionMode="None" />
+                            <controls:SettingsCard HorizontalContentAlignment="Stretch" ContentAlignment="Vertical">
+                                <StackPanel HorizontalAlignment="Stretch">
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock
+                                            Grid.Column="0"
+                                            VerticalAlignment="Center"
+                                            Text="文件列表" />
+
+                                        <Button
+                                            Grid.Column="1"
+                                            Width="35"
+                                            Height="35"
+                                            Margin="10,0,0,0"
+                                            Padding="0"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Background="Transparent"
+                                            ToolTipService.ToolTip="添加...">
+                                            <SymbolIcon Symbol="Add" />
+
+                                            <Button.Flyout>
+                                                <MenuFlyout>
+                                                    <MenuFlyoutItem
+                                                        Click="OnAddNewAssetMenuFlyoutItemClick"
+                                                        DataContext="{x:Null}"
+                                                        Icon="Document"
+                                                        Text="文件" />
+                                                    <MenuFlyoutItem
+                                                        Click="OnAddNewAssetFolderMenuFlyoutItemClick"
+                                                        DataContext="{x:Null}"
+                                                        Icon="Folder"
+                                                        Text="文件夹" />
+                                                </MenuFlyout>
+                                            </Button.Flyout>
+                                        </Button>
+                                    </Grid>
+
+                                    <TreeView
+                                        CanDragItems="False"
+                                        CanReorderItems="False"
+                                        ItemTemplateSelector="{StaticResource NodeTemplateSelector}"
+                                        ItemsSource="{x:Bind ViewModel.Assets, Mode=OneWay}"
+                                        SelectionMode="None" />
+                                </StackPanel>
                             </controls:SettingsCard>
                         </controls:SettingsExpander.Items>
                     </controls:SettingsExpander>
@@ -513,7 +593,7 @@
                             <DataTemplate x:DataType="models:MarkdownWrapper">
                                 <controls:SettingsCard
                                     helpers:AncestorSource.AncestorType="Page"
-                                    Command="{Binding ViewModel.ViewWordFileItemCommand}"
+                                    Command="{Binding ViewModel.ViewArticleCommand}"
                                     CommandParameter="{x:Bind}"
                                     Header="查看目录页"
                                     IsClickEnabled="True" />

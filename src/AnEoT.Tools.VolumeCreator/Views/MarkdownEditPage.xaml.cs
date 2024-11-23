@@ -3,10 +3,10 @@
 using System.Collections.ObjectModel;
 using AnEoT.Tools.VolumeCreator.Helpers;
 using AnEoT.Tools.VolumeCreator.Models;
+using AnEoT.Tools.VolumeCreator.Models.Resources;
 using AnEoT.Tools.VolumeCreator.ViewModels;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Windows.Storage;
 
 namespace AnEoT.Tools.VolumeCreator.Views;
 
@@ -25,7 +25,7 @@ public sealed partial class MarkdownEditPage : Page
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        if (e.Parameter is ValueTuple<MarkdownWrapper, ObservableCollection<ImageListNode>, StorageFile?> tuple)
+        if (e.Parameter is ValueTuple<MarkdownWrapper, ObservableCollection<AssetNode>, IVoulmeResourcesHelper> tuple)
         {
             ViewModel = new MarkdownEditViewModel(tuple.Item1, this, tuple.Item2, tuple.Item3);
         }
@@ -46,24 +46,37 @@ public sealed partial class MarkdownEditPage : Page
         }
     }
 
-    private void OnMarkdownRenderTextBlockImageResolving(object sender, CommunityToolkit.WinUI.UI.Controls.ImageResolvingEventArgs e)
+    private async void OnMarkdownRenderTextBlockImageResolving(object sender, CommunityToolkit.WinUI.UI.Controls.ImageResolvingEventArgs e)
     {
-        if (ViewModel.MarkdownImageUriToFileMapping.TryGetValue(e.Url, out string? file))
+        Deferral deferral = e.GetDeferral();
+        Stream? stream;
+
+        if (e.Url == "./res/cover.webp")
         {
-            Deferral deferral = e.GetDeferral();
-            BitmapImage image = new(new Uri(file, UriKind.Absolute));
-
-            e.Image = image;
-            e.Handled = true;
-
-            deferral.Complete();
+            stream = await ViewModel.ResourcesHelper.GetCoverAsync();
         }
-#if DEBUG
+        else if (ViewModel.MarkdownImageUriToFileMapping.TryGetValue(e.Url, out FileNode? file))
+        {
+            stream = await ViewModel.ResourcesHelper.GetAssetsAsync(file);
+        }
         else
         {
-            System.Diagnostics.Debugger.Break();
+            stream = null;
         }
-#endif
+
+        if (stream is not null)
+        {
+            using (stream)
+            {
+                BitmapImage image = new();
+                await image.SetSourceAsync(stream.AsRandomAccessStream());
+
+                e.Image = image;
+                e.Handled = true;
+            }
+        }
+
+        deferral.Complete();
     }
 
     private void OnMarkdownTextBoxLoaded(object sender, RoutedEventArgs e)

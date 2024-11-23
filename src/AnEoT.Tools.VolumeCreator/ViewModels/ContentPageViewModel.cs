@@ -22,20 +22,25 @@ using YamlDotNet.Serialization;
 using YamlDotNet.Core.Events;
 using AnEoT.Tools.Shared.Models;
 using SixLabors.ImageSharp.Processing;
+using AnEoT.Tools.VolumeCreator.Models.Resources;
 using System.Text.Json;
+using System.Collections.ObjectModel;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
 public sealed partial class ContentPageViewModel : ObservableValidator
 {
-    public ContentPageViewModel()
+    public ContentPage View { get; }
+
+    public ContentPageViewModel(ContentPage view)
     {
-        WordFiles.CollectionChanged += OnWordFilesCollectionChanged;
-        ImageFiles.CollectionChanged += OnImagesFilesCollectionChanged;
+        Articles.CollectionChanged += OnWordFilesCollectionChanged;
+        Assets.CollectionChanged += OnImagesFilesCollectionChanged;
         IndexMarkdown.CollectionChanged += OnIndexMarkdownCollectionChanged;
-        InitializeImageFiles();
+        InitializeAssets();
 
         CommonValues.IsProjectSaved = true;
+        View = view;
     }
 
     [RelayCommand]
@@ -50,7 +55,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             return;
         }
 
-        if (!CheckImageFilesPathAllExist(ImageFiles, out string? errorMessage))
+        if (!ResourcesHelper.ValidateAssets(Assets, out string? errorMessage))
         {
             ContentDialogResult result = await ShowDialogAsync("警告",
                                                                $"以下文件不存在，无法导出它们。{Environment.NewLine}要继续吗？{Environment.NewLine}{Environment.NewLine}{errorMessage.TrimEnd()}",
@@ -72,7 +77,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
         if (folder != null)
         {
-            if (ProjectFile is not null)
+            if (ResourcesHelper is ProjectPackageResourcesHelper pkgHelper)
             {
                 await SaveProjectInternal(false);
             }
@@ -95,8 +100,8 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
             StorageFolder volumeFolder = await folder.CreateFolderAsync(VolumeFolderName, CreationCollisionOption.ReplaceExisting);
 
-            await CreateResourcesFolder(volumeFolder);
-            await SaveMarkdownContent(volumeFolder);
+            await ExportAssets(volumeFolder);
+            await ExportArticles(volumeFolder);
 
             IsShowTeachingTip = false;
 
@@ -140,89 +145,131 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             return;
         }
 
-        Stream stream = await file.OpenStreamForReadAsync();
-
         try
         {
-            Project? project = await JsonSerializer.DeserializeAsync<Project>(stream, CommonValues.DefaultJsonSerializerOption);
+            ProjectPackage projectPackage = await ProjectPackage.LoadAsync(file.Path);
+            ProjectPackageResourcesHelper resHelper = new(projectPackage);
 
-            if (project is null)
+            bool containsError = false;
+            StringBuilder stringBuilder = new();
+
+            (VolumeName, VolumeFolderName, IsCoverSizeFixed, ConvertToWebp, _) = resHelper.ProjectPackage.Info;
+            Stream? coverStream = await resHelper.GetCoverAsync();
+            VolumeCover = null;
+            if (coverStream != null)
             {
-                ShowTeachingTip("无法打开工程文件", "文件可能无效或损坏。", false, TeachingTipPlacementMode.RightBottom,
-                            new FontIconSource() { Glyph = "\uEA39" });
+                await SetCoverByStream(coverStream);
+
+                if (IsVolumeCoverError)
+                {
+                    resHelper.ProjectPackage.RemoveCoverFile();
+                    containsError = true;
+                    stringBuilder.AppendLine("【期刊封面】");
+                    stringBuilder.AppendLine($"项目文件内的期刊封面不是可解码的图像。");
+                    stringBuilder.AppendLine();
+                }
+            }
+
+            Articles.CollectionChanged -= OnWordFilesCollectionChanged;
+            Assets.CollectionChanged -= OnImagesFilesCollectionChanged;
+            IndexMarkdown.CollectionChanged -= OnIndexMarkdownCollectionChanged;
+
+            Articles = new(resHelper.ProjectPackage.Articles);
+            Assets = new(resHelper.ProjectPackage.Assets);
+            IndexMarkdown = resHelper.ProjectPackage.IndexMarkdown is null ? [] : [resHelper.ProjectPackage.IndexMarkdown];
+
+            if (!resHelper.ValidateAssets(Assets, out string? msg))
+            {
+                containsError = true;
+                stringBuilder.AppendLine("【资源文件】");
+                stringBuilder.AppendLine("找不到以下文件：");
+                stringBuilder.AppendLine(msg.TrimEnd());
+            }
+
+            if (containsError)
+            {
+                ShowTeachingTip("加载项目时出现以下问题", stringBuilder.ToString().TrimEnd(), false, TeachingTipPlacementMode.RightBottom,
+                        new FontIconSource() { Glyph = "\uE7BA" });
+            }
+
+            OnPropertyChanged(nameof(ShowNotifyAddArticles));
+            OnPropertyChanged(nameof(ShowNotifyAddAssets));
+            OnPropertyChanged(nameof(ShowNotifyGenerateIndex));
+
+            Articles.CollectionChanged += OnWordFilesCollectionChanged;
+            Assets.CollectionChanged += OnImagesFilesCollectionChanged;
+            IndexMarkdown.CollectionChanged += OnIndexMarkdownCollectionChanged;
+
+            if (ResourcesHelper is ProjectPackageResourcesHelper oldPkgHelper)
+            {
+                await oldPkgHelper.DisposeAsync();
+            }
+            ResourcesHelper = resHelper;
+
+            await Task.Delay(200);
+            CommonValues.IsProjectSaved = true;
+        }
+        catch (InvalidDataException ex)
+        {
+            string message;
+            if (ex.InnerException?.HResult == -2147024864)
+            {
+                message = "文件正在被其他进程使用。";
             }
             else
             {
-                bool containsError = false;
-                StringBuilder stringBuilder = new();
-
-                VolumeName = project.VolumeName ?? string.Empty;
-                VolumeFolderName = project.VolumeFolderName ?? string.Empty;
-                if (Path.Exists(project.CoverImagePath))
+                try
                 {
-                    CoverFile = await StorageFile.GetFileFromPathAsync(project.CoverImagePath);
-                    await SetCoverByFile(CoverFile);
-
-                    if (IsVolumeCoverError)
+                    Stream stream = await file.OpenStreamForReadAsync();
+#pragma warning disable CS0618 // 类型或成员已过时——这是为了兼容性用途。
+                    CompatibilityProject? project;
+                    using (stream)
                     {
-                        containsError = true;
-                        stringBuilder.AppendLine("【期刊封面】");
-                        stringBuilder.AppendLine($"文件 {project.CoverImagePath} 不是可解码的图像。");
-                        stringBuilder.AppendLine();
+                        project = await JsonSerializer.DeserializeAsync<CompatibilityProject>(stream, CommonValues.DefaultJsonSerializerOption);
+                    }
+#pragma warning restore CS0618
+
+                    if (project != null)
+                    {
+                        ContentDialogResult result = await ShowDialogAsync("此项目文件使用的是不再受支持的旧格式",
+                                                                           "应用只能读取新格式的项目文件。\n不过我们可以尝试将此文件转换为新格式，要转换吗？",
+                                                                           "转换", closeText: "不转换");
+
+                        if (result == ContentDialogResult.Primary)
+                        {
+                            try
+                            {
+                                ProjectPackage projectPackage = ProjectPackage.Create(file.Path);
+                                projectPackage.Info = new ProjectInfo(project.VolumeName, project.VolumeFolderName, project.IsCoverSizeFixed, project.ImageConvertToWebp, null);
+                                projectPackage.Articles = project.WordFiles;
+                                projectPackage.Assets = project.ImageFiles;
+                                projectPackage.IndexMarkdown = project.IndexMarkdown;
+
+                                if (File.Exists(project.CoverImagePath))
+                                {
+                                    await projectPackage.SetCoverFileAsync(project.CoverImagePath);
+                                }
+                                await projectPackage.DisposeAsync();
+                            }
+                            catch (Exception convertEx)
+                            {
+                                await ShowDialogAsync("转换过程中出现了异常", convertEx.Message, closeText: "关闭");
+                                return;
+                            }
+
+                            await LoadProject(file);
+                        }
+
+                        return;
                     }
                 }
-                else
+                catch (JsonException)
                 {
-                    CoverFile = null;
-                    containsError = true;
-                    stringBuilder.AppendLine("【期刊封面】");
-                    stringBuilder.AppendLine($"找不到图像文件：{project.CoverImagePath}。");
-                    stringBuilder.AppendLine();
                 }
-
-                ConvertToWebp = project.ImageConvertToWebp;
-                IsCoverSizeFixed = project.IsCoverSizeFixed;
-
-                WordFiles.CollectionChanged -= OnWordFilesCollectionChanged;
-                ImageFiles.CollectionChanged -= OnImagesFilesCollectionChanged;
-                IndexMarkdown.CollectionChanged -= OnIndexMarkdownCollectionChanged;
-
-                WordFiles = project.WordFiles;
-                ImageFiles = project.ImageFiles;
-
-                if (!CheckImageFilesPathAllExist(ImageFiles, out string? msg))
-                {
-                    containsError = true;
-                    stringBuilder.AppendLine("【资源文件】");
-                    stringBuilder.AppendLine("找不到以下文件：");
-                    stringBuilder.AppendLine(msg.TrimEnd());
-                }
-
-                if (containsError)
-                {
-                    ShowTeachingTip("加载项目时出现以下问题", stringBuilder.ToString().TrimEnd(), false, TeachingTipPlacementMode.RightBottom,
-                            new FontIconSource() { Glyph = "\uE7BA" });
-                }
-
-                IndexMarkdown = project.IndexMarkdown is null ? [] : [project.IndexMarkdown];
-
-                OnPropertyChanged(nameof(ShowNotifyAddWordFile));
-                OnPropertyChanged(nameof(ShowNotifyAddImagesFile));
-                OnPropertyChanged(nameof(ShowNotifyGenerateIndex));
-
-                WordFiles.CollectionChanged += OnWordFilesCollectionChanged;
-                ImageFiles.CollectionChanged += OnImagesFilesCollectionChanged;
-                IndexMarkdown.CollectionChanged += OnIndexMarkdownCollectionChanged;
-
-                ProjectFile = file;
-
-                await Task.Delay(200);
-                CommonValues.IsProjectSaved = true;
+                message = "文件可能无效或损坏。";
             }
-        }
-        catch (JsonException)
-        {
-            ShowTeachingTip("无法打开工程文件", "文件可能无效或损坏。", false, TeachingTipPlacementMode.RightBottom,
+
+            ShowTeachingTip("无法打开工程文件", message, false, TeachingTipPlacementMode.RightBottom,
                             new FontIconSource() { Glyph = "\uEA39" });
         }
     }
@@ -235,15 +282,9 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
     private async Task SaveProjectInternal(bool showSavingTip = true)
     {
-        Project project = new(
-            CoverFile?.Path, ConvertToWebp, IsCoverSizeFixed, VolumeFolderName, VolumeName, WordFiles, ImageFiles,
-            IndexMarkdown.FirstOrDefault());
-
-        StorageFile file;
-        if (ProjectFile is not null)
+        if (ResourcesHelper is ProjectPackageResourcesHelper pkgHelper)
         {
-            file = ProjectFile;
-            await SaveProjectCore(project, file);
+            await SaveProjectCore(pkgHelper.ProjectPackage);
 
             if (showSavingTip)
             {
@@ -251,7 +292,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
                             new FontIconSource() { Glyph = "\uE73E" });
             }
         }
-        else
+        else if (ResourcesHelper is MemoryResourcesHelper memoryHelper)
         {
             nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
 
@@ -262,29 +303,54 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             picker.SuggestedFileName = VolumeName;
             picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
 
-            file = await picker.PickSaveFileAsync();
+            StorageFile file = await picker.PickSaveFileAsync();
 
             if (file is null)
             {
                 return;
             }
 
-            await SaveProjectCore(project, file);
+            ProjectPackage projectPackage = ProjectPackage.Create(file.Path);
+            InitializeProjectPackage(projectPackage);
+            pkgHelper = await memoryHelper.ToProjectBasedResourcesHelperAsync(projectPackage);
+            ResourcesHelper = pkgHelper;
+
+            await SaveProjectCore(projectPackage);
             await ShowDialogAsync("保存成功",
                                       $"工程文件已保存到 {file.Path}。",
                                       closeText: "确定");
         }
-
-        static async Task SaveProjectCore(Project project, StorageFile file)
+#if DEBUG
+        else
         {
-            using Stream stream = await file.OpenStreamForWriteAsync();
-            stream.SetLength(0);
-            await JsonSerializer.SerializeAsync(stream, project, CommonValues.DefaultJsonSerializerOption);
+            System.Diagnostics.Debugger.Break();
+        }
+#endif
+
+        async Task SaveProjectCore(ProjectPackage projectPackage)
+        {
+            InitializeProjectPackage(projectPackage);
+            // 封面图像不在这里设置
+            await projectPackage.SaveAsync();
             CommonValues.IsProjectSaved = true;
         }
     }
 
-    private async Task SaveMarkdownContent(StorageFolder volumeFolder)
+    private void InitializeProjectPackage(ProjectPackage projectPackage)
+    {
+        projectPackage.Info = projectPackage.Info with
+        {
+            VolumeName = this.VolumeName,
+            VolumeFolderName = this.VolumeFolderName,
+            IsCoverSizeFixed = this.IsCoverSizeFixed,
+            ImageConvertToWebp = this.ConvertToWebp,
+        };
+        projectPackage.IndexMarkdown = IndexMarkdown.FirstOrDefault();
+        projectPackage.Articles = Articles;
+        projectPackage.Assets = Assets;
+    }
+
+    private async Task ExportArticles(StorageFolder volumeFolder)
     {
         foreach (KeyValuePair<MarkdownWrapper, string> pair in GetOutputFileNameDictionary())
         {
@@ -301,12 +367,14 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         }
     }
 
-    private async Task CreateResourcesFolder(StorageFolder volumeFolder)
+    private async Task ExportAssets(StorageFolder volumeFolder)
     {
         StorageFolder resourceFolder = await volumeFolder.CreateFolderAsync("res", CreationCollisionOption.ReplaceExisting);
+        await ResourcesHelper.ExportAssetsAsync(Assets, resourceFolder);
 
         StorageFile target = await resourceFolder.CreateFileAsync("cover.webp");
-        using ImageSharpImage image = await ImageSharpImage.LoadAsync(CoverFile!.Path);
+        Stream? coverImageStream = await ResourcesHelper.GetCoverAsync();
+        using ImageSharpImage image = await ImageSharpImage.LoadAsync(coverImageStream!);
 
         if (IsCoverSizeFixed)
         {
@@ -315,61 +383,6 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
         using Stream targetStream = await target.OpenStreamForWriteAsync();
         await Task.Run(() => image.SaveAsWebp(targetStream)); // 防止卡主线程，ImageSharp 库自带的异步方法有点问题
-
-        await CopyContentRecursively(ImageFiles.Single(), resourceFolder);
-    }
-
-    private async Task CopyContentRecursively(ImageListNode node, StorageFolder rootFolder)
-    {
-        if (node.Type == ImageListNodeType.Folder)
-        {
-            foreach (ImageListNode item in node.Children)
-            {
-                if (item.Type == ImageListNodeType.Folder)
-                {
-                    if (item.Children.Count > 0)
-                    {
-                        StorageFolder folder = await rootFolder.CreateFolderAsync(item.DisplayName, CreationCollisionOption.OpenIfExists);
-
-                        foreach (ImageListNode subItem in item.Children)
-                        {
-                            await CopyContentRecursively(subItem, folder);
-                        }
-                    }
-                }
-                else if (item.Type == ImageListNodeType.File && item is FileNode fileNode && File.Exists(fileNode.FilePath))
-                {
-                    await SaveFileNode(fileNode, rootFolder);
-                }
-            }
-        }
-        else if (node.Type == ImageListNodeType.File && node is FileNode fileNode && File.Exists(fileNode.FilePath))
-        {
-            await SaveFileNode(fileNode, rootFolder);
-        }
-#if DEBUG
-        else
-        {
-            System.Diagnostics.Debugger.Break();
-        }
-#endif
-
-        async Task SaveFileNode(FileNode fileNode, StorageFolder rootFolder)
-        {
-            if (ConvertToWebp && !Path.GetExtension(fileNode.FilePath).Equals(".webp", StringComparison.OrdinalIgnoreCase))
-            {
-                using ImageSharpImage image = await ImageSharpImage.LoadAsync(fileNode.FilePath);
-                StorageFile target = await rootFolder.CreateFileAsync(Path.ChangeExtension(fileNode.DisplayName, ".webp"));
-
-                using Stream targetStream = await target.OpenStreamForWriteAsync();
-                await Task.Run(() => image.SaveAsWebp(targetStream)); // 防止卡主线程，ImageSharp 库自带的异步方法有点问题
-            }
-            else
-            {
-                StorageFile file = await StorageFile.GetFileFromPathAsync(fileNode.FilePath);
-                await file.CopyAsync(rootFolder);
-            }
-        }
     }
 
     [RelayCommand]
@@ -393,12 +406,32 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     {
         if (file != null)
         {
-            IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
+            using IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
             try
             {
                 BitmapImage bitmapImage = new();
                 await bitmapImage.SetSourceAsync(stream);
-                CoverFile = file;
+                await ResourcesHelper.SetCoverAsync(file.Path);
+
+                VolumeCover = bitmapImage;
+                IsVolumeCoverError = false;
+            }
+            catch (COMException ex) when (ex.ErrorCode == -2003292336)
+            {
+                IsVolumeCoverError = true;
+            }
+        }
+    }
+
+    private async Task SetCoverByStream(Stream? dotnetStream)
+    {
+        if (dotnetStream != null)
+        {
+            using IRandomAccessStream stream = dotnetStream.AsRandomAccessStream();
+            try
+            {
+                BitmapImage bitmapImage = new();
+                await bitmapImage.SetSourceAsync(stream);
 
                 VolumeCover = bitmapImage;
                 IsVolumeCoverError = false;
@@ -411,7 +444,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    private async Task AddWordFileItem()
+    private async Task ImportWordFileItem()
     {
         nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
 
@@ -427,26 +460,27 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         {
             foreach (StorageFile file in files)
             {
-                await AddSingleWordFileItem(file);
+                await ImportSingleWordFileItem(file);
             }
         }
     }
 
     [RelayCommand]
-    private void AddEmptyWordFileItem()
+    private void AddEmptyArticle()
     {
-        MarkdownWrapper emptyMarkdownFile = new("<自定义文件>", string.Empty, MarkdownWrapperType.Others);
-        WordFiles.Add(emptyMarkdownFile);
+        MarkdownWrapper emptyMarkdownFile = new("<自定义文章>", string.Empty, MarkdownWrapperType.Others);
+        Articles.Add(emptyMarkdownFile);
     }
 
     [RelayCommand]
-    private void AddPaintingWordFileItem()
+    private void AddPaintingArticle()
     {
+        // TODO: 会有吗？
         MarkdownWrapper paintingMarkdownFile = new("<自定义文件>", string.Empty, MarkdownWrapperType.Paintings);
-        WordFiles.Add(paintingMarkdownFile);
+        Articles.Add(paintingMarkdownFile);
     }
 
-    public async Task AddSingleWordFileItem(StorageFile file)
+    public async Task ImportSingleWordFileItem(StorageFile file)
     {
         MarkdownWrapper toMarkdownFile;
 
@@ -454,7 +488,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         {
             string markdown = await Task.Run(() => WordToMarkdownService.GetMarkdown(file.Path));
             toMarkdownFile = new(file.DisplayName, markdown);
-            WordFiles.Add(toMarkdownFile);
+            Articles.Add(toMarkdownFile);
         }
         catch (FileFormatException ex)
         {
@@ -463,24 +497,24 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    private void RemoveWordFileItem(MarkdownWrapper target)
+    private void RemoveArticle(MarkdownWrapper target)
     {
-        WordFiles.Remove(target);
+        Articles.Remove(target);
     }
-    
+
     [RelayCommand]
-    private void ViewWordFileItem(MarkdownWrapper wrapper)
+    private void ViewArticle(MarkdownWrapper wrapper)
     {
         MarkdownEditWindow window = new()
         {
-            Model = (wrapper, ImageFiles, CoverFile),
+            Model = (wrapper, Assets, ResourcesHelper),
             Title = $"{wrapper.DisplayName} - Markdown 编辑窗口"
         };
         window.Activate();
     }
 
     [RelayCommand]
-    private static async Task AddImageFile(FolderNode node)
+    private async Task AddAsset(FolderNode? parentNode)
     {
         nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
 
@@ -496,26 +530,35 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
         if (files is not null)
         {
+            ObservableCollection<AssetNode> target = parentNode is null ? Assets : parentNode.Children;
+
             foreach (StorageFile file in files)
             {
-                if (!node.Children.Any(node => node is FileNode fileNode && fileNode.FilePath == file.Path))
+                if (!target.Any(node => node is FileNode fileNode && fileNode.FilePath == file.Path))
                 {
-                    node.Children.Add(new FileNode(file, node));
+                    target.Add(new FileNode(file, parentNode));
+                    CommonValues.IsProjectSaved = false;
                 }
             }
-            CommonValues.IsProjectSaved = false;
         }
     }
 
     [RelayCommand]
-    private static void RemoveImageFile(FileNode node)
+    private void RemoveAsset(FileNode node)
     {
-        node.Parent?.Children.Remove(node);
+        if (node.Parent is null)
+        {
+            Assets.Remove(node);
+        }
+        else
+        {
+            node.Parent?.Children.Remove(node);
+        }
         CommonValues.IsProjectSaved = false;
     }
 
     [RelayCommand]
-    private static async Task RepairImageFile(FileNode node)
+    private static async Task RepairAsset(FileNode node)
     {
         nint hwnd = WindowNative.GetWindowHandle((Application.Current as App)?.Window);
 
@@ -534,33 +577,69 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         }
 
         node.FilePath = file.Path;
-        CommonValues.IsProjectSaved = true;
+        CommonValues.IsProjectSaved = false;
     }
 
     [RelayCommand]
-    private void WordFileItemGoUp(MarkdownWrapper wrapper)
+    private async Task AddAssetFolder(FolderNode? parentNode)
     {
-        int currentItemIndex = WordFiles.IndexOf(wrapper);
+        NewAssetFolderDialog dialog = new()
+        {
+            XamlRoot = View.XamlRoot
+        };
+
+        ContentDialogResult result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+        {
+            ObservableCollection<AssetNode> target = parentNode is null ? Assets : parentNode.Children;
+
+            string folderName = dialog.NewFolderName;
+            if (!target.Any(node => node.DisplayName == folderName))
+            {
+                target.Add(new FolderNode(folderName, parentNode));
+                CommonValues.IsProjectSaved = false;
+            }
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveAssetFolder(FolderNode node)
+    {
+        if (node.Parent is null)
+        {
+            Assets.Remove(node);
+        }
+        else
+        {
+            node.Parent?.Children.Remove(node);
+        }
+        CommonValues.IsProjectSaved = false;
+    }
+
+    [RelayCommand]
+    private void ArticleGoUp(MarkdownWrapper wrapper)
+    {
+        int currentItemIndex = Articles.IndexOf(wrapper);
         int upperIndex = currentItemIndex - 1;
 
         if (currentItemIndex == -1 || upperIndex < 0)
         {
             return;
         }
-        WordFiles.Move(currentItemIndex, upperIndex);
+        Articles.Move(currentItemIndex, upperIndex);
     }
 
     [RelayCommand]
-    private void WordFileItemGoDown(MarkdownWrapper wrapper)
+    private void ArticleGoDown(MarkdownWrapper wrapper)
     {
-        int currentItemIndex = WordFiles.IndexOf(wrapper);
+        int currentItemIndex = Articles.IndexOf(wrapper);
         int downIndex = currentItemIndex + 1;
 
-        if (currentItemIndex == -1 || downIndex + 1 > WordFiles.Count)
+        if (currentItemIndex == -1 || downIndex + 1 > Articles.Count)
         {
             return;
         }
-        WordFiles.Move(currentItemIndex, downIndex);
+        Articles.Move(currentItemIndex, downIndex);
     }
 
     [RelayCommand]
@@ -598,12 +677,12 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     {
         Dictionary<MarkdownWrapper, string> outputFileNameMapping = GetOutputFileNameDictionary();
 
-        if (WordFiles.Any(wrapper => wrapper.Type == MarkdownWrapperType.Intro))
+        if (Articles.Any(wrapper => wrapper.Type == MarkdownWrapperType.Intro))
         {
             builder.AppendLine("- [**卷首语**](intro.html)");
         }
 
-        IEnumerable<IGrouping<PredefinedCategory, MarkdownWrapper>> articleGroups = WordFiles
+        IEnumerable<IGrouping<PredefinedCategory, MarkdownWrapper>> articleGroups = Articles
             .Where(wrapper => wrapper.CategoryInIndexPage.HasValue)
             .GroupBy(wrapper => wrapper.CategoryInIndexPage!.Value);
         foreach (IGrouping<PredefinedCategory, MarkdownWrapper> articleGroup in articleGroups)
@@ -618,27 +697,27 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             }
         }
 
-        if (WordFiles.Any(wrapper => wrapper.Type == MarkdownWrapperType.Interview))
+        if (Articles.Any(wrapper => wrapper.Type == MarkdownWrapperType.Interview))
         {
             builder.AppendLine("- **创作者访谈**");
-            foreach (MarkdownWrapper item in WordFiles.Where(wrapper => wrapper.Type == MarkdownWrapperType.Interview))
+            foreach (MarkdownWrapper item in Articles.Where(wrapper => wrapper.Type == MarkdownWrapperType.Interview))
             {
                 string title = GetTitleInMarkdown(item.Markdown) ?? item.DisplayName;
                 builder.AppendLine($"  - [{title}](interview.html)");
             }
         }
 
-        if (WordFiles.Any(wrapper => wrapper.Type == MarkdownWrapperType.OperatorSecret))
+        if (Articles.Any(wrapper => wrapper.Type == MarkdownWrapperType.OperatorSecret))
         {
             builder.AppendLine("- **干员秘闻**");
-            foreach (MarkdownWrapper item in WordFiles.Where(wrapper => wrapper.Type == MarkdownWrapperType.OperatorSecret))
+            foreach (MarkdownWrapper item in Articles.Where(wrapper => wrapper.Type == MarkdownWrapperType.OperatorSecret))
             {
                 string title = GetTitleInMarkdown(item.Markdown) ?? item.DisplayName;
                 builder.AppendLine($"  - [{title}](ope_sec.html)");
             }
         }
 
-        foreach (MarkdownWrapper item in WordFiles.Where(item => item.Type == MarkdownWrapperType.Others))
+        foreach (MarkdownWrapper item in Articles.Where(item => item.Type == MarkdownWrapperType.Others))
         {
             builder.AppendLine($"- **{item.OutputTitle}**");
         }
@@ -668,12 +747,12 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
     private Dictionary<MarkdownWrapper, string> GetOutputFileNameDictionary()
     {
-        Dictionary<MarkdownWrapper, string> pairs = new(WordFiles.Count);
+        Dictionary<MarkdownWrapper, string> pairs = new(Articles.Count);
 
         int articleIndex = 1;
         int comicIndex = 1;
 
-        foreach (MarkdownWrapper wrapper in WordFiles)
+        foreach (MarkdownWrapper wrapper in Articles)
         {
             string saveFileName = string.Empty;
 
@@ -736,44 +815,6 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         {
             return $"{wrapper.OutputTitle}.md";
         }
-    }
-
-    private static bool CheckImageFilesPathAllExist(IEnumerable<ImageListNode> nodes, [NotNullWhen(false)] out string? errorMessage)
-    {
-        bool isSuccess = true;
-        StringBuilder builder = new();
-
-        foreach (ImageListNode node in nodes)
-        {
-            if (node is FolderNode folderNode)
-            {
-                if (folderNode.Children.Count <= 0)
-                {
-                    continue;
-                }
-
-                bool success = CheckImageFilesPathAllExist(folderNode.Children, out string? msg);
-
-                if (!success)
-                {
-                    builder.AppendLine(msg);
-                    isSuccess = false;
-                }
-            }
-            else if (node is FileNode fileNode)
-            {
-                fileNode.EnsurePathExist();
-
-                if (!fileNode.IsFileExist)
-                {
-                    builder.AppendLine(fileNode.FilePath);
-                    isSuccess = false;
-                }
-            }
-        }
-
-        errorMessage = builder.ToString();
-        return isSuccess;
     }
 
     /// <summary>

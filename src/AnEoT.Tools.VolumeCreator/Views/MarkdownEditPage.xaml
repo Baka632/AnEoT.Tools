@@ -38,7 +38,7 @@
             </TreeViewItem>
         </DataTemplate>
 
-        <DataTemplate x:Key="FolderNodeTemplate" x:DataType="models:ImageListNode">
+        <DataTemplate x:Key="FolderNodeTemplate" x:DataType="models:AssetNode">
             <TreeViewItem Background="Transparent" ItemsSource="{x:Bind Children}">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -59,7 +59,7 @@
             </TreeViewItem>
         </DataTemplate>
 
-        <helpers:ImageNodeDataTemplateSelector
+        <helpers:AssetNodeDataTemplateSelector
             x:Key="NodeTemplateSelector"
             FileTemplate="{StaticResource FileNodeTemplate}"
             FolderTemplate="{StaticResource FolderNodeTemplate}" />
@@ -130,7 +130,7 @@
                             CanReorderItems="False"
                             ItemInvoked="OnFileTreeViewItemInvoked"
                             ItemTemplateSelector="{StaticResource NodeTemplateSelector}"
-                            ItemsSource="{x:Bind ViewModel.ImageFiles, Mode=OneWay}"
+                            ItemsSource="{x:Bind ViewModel.Assets, Mode=OneWay}"
                             SelectionMode="None" />
                     </Flyout>
                 </AppBarButton.Flyout>

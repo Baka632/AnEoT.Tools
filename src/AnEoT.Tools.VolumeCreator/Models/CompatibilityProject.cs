@@ -3,20 +3,21 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace AnEoT.Tools.VolumeCreator.Models;
 
-public sealed class Project
+[Obsolete($"除非是为了兼容性用途，否则请使用 {nameof(ProjectPackage)} 类。")]
+public sealed class CompatibilityProject
 {
-    public Project()
+    public CompatibilityProject()
     {
     }
 
     [SetsRequiredMembers]
-    public Project(string? coverImagePath,
+    public CompatibilityProject(string coverImagePath,
                         bool imageConvertToWebp,
                         bool isCoverSizeFixed,
-                        string? volumeFolderName,
-                        string? volumeName,
+                        string volumeFolderName,
+                        string volumeName,
                         ObservableCollection<MarkdownWrapper> wordFiles,
-                        ObservableCollection<ImageListNode> imageFiles,
+                        ObservableCollection<AssetNode> imageFiles,
                         MarkdownWrapper? indexMarkdown)
     {
         CoverImagePath = coverImagePath;
@@ -32,7 +33,7 @@ public sealed class Project
     /// <summary>
     /// 期刊封面图像路径
     /// </summary>
-    public required string? CoverImagePath { get; set; }
+    public required string CoverImagePath { get; set; }
     
     /// <summary>
     /// 指示图像是否转换为 WEBP 图像的值
@@ -47,12 +48,12 @@ public sealed class Project
     /// <summary>
     /// 期刊文件夹名称
     /// </summary>
-    public required string? VolumeFolderName { get; set; }
+    public required string VolumeFolderName { get; set; }
 
     /// <summary>
     /// 期刊名称
     /// </summary>
-    public required string? VolumeName { get; set; }
+    public required string VolumeName { get; set; }
 
     /// <summary>
     /// DOCX 文件列表
@@ -62,10 +63,27 @@ public sealed class Project
     /// <summary>
     /// 图像文件列表
     /// </summary>
-    public required ObservableCollection<ImageListNode> ImageFiles { get; set; }
+    public required ObservableCollection<AssetNode> ImageFiles { get; set; }
 
     /// <summary>
     /// 目录页
     /// </summary>
     public required MarkdownWrapper? IndexMarkdown { get; set; }
+
+    public static CompatibilityProject CreateEmpty()
+    {
+        CompatibilityProject project = new()
+        {
+            VolumeName = string.Empty,
+            VolumeFolderName = string.Empty,
+            CoverImagePath = string.Empty,
+            ImageConvertToWebp = true,
+            IsCoverSizeFixed = true,
+            WordFiles = [],
+            ImageFiles = [],
+            IndexMarkdown = null
+        };
+
+        return project;
+    }
 }
