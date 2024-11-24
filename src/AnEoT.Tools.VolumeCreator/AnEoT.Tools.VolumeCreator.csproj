@@ -31,7 +31,14 @@
     <Title>AnEoT Volume Creator</Title>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <EnableAotAnalyzer>True</EnableAotAnalyzer>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="RootDescriptor.xml" CopyToOutputDirectory="Always"/>
+    <TrimmerRootDescriptor Include="RootDescriptor.xml" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Remove="AppPackages\**" />
   </ItemGroup>
@@ -156,3 +163,4 @@
     </Page>
   </ItemGroup>
 </Project>
+ 

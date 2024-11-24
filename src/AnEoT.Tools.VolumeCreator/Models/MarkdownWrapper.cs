@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace AnEoT.Tools.VolumeCreator.Models;
 
-public sealed class MarkdownWrapper(string displayName, string markdown, MarkdownWrapperType type = default, string outputTitle = "", PredefinedCategory? categoryInIndexPage = null) : INotifyPropertyChanged
+public sealed partial class MarkdownWrapper(string displayName, string markdown, MarkdownWrapperType type = default, string outputTitle = "", PredefinedCategory? categoryInIndexPage = null) : INotifyPropertyChanged
 {
     [JsonIgnore]
     public static readonly List<MarkdownWrapperType> AvailableTypes =

@@ -16,10 +16,6 @@ using Markdig;
 using Markdig.Syntax;
 using Markdig.Extensions.Yaml;
 using System.Diagnostics.CodeAnalysis;
-using YamlDotNet.Core;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization;
-using YamlDotNet.Core.Events;
 using AnEoT.Tools.Shared.Models;
 using SixLabors.ImageSharp.Processing;
 using AnEoT.Tools.VolumeCreator.Models.Resources;
@@ -138,6 +134,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         await LoadProject(file);
     }
 
+    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "已经保留了必需的类型信息")]
     public async Task LoadProject(StorageFile? file)
     {
         if (file is null)
@@ -735,7 +732,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
 
         string yaml = markdown.Substring(yamlBlock.Span.Start, yamlBlock.Span.Length);
 
-        if (TryReadYaml(yaml, out FrontMatter result))
+        if (FrontMatter.TryParse(yaml, out FrontMatter result))
         {
             return result.Title;
         }
@@ -864,38 +861,5 @@ public sealed partial class ContentPageViewModel : ObservableValidator
         TeachingTipIconSource = icon;
 
         IsShowTeachingTip = true;
-    }
-
-    [RequiresDynamicCode("此方法调用了不支持 IL 裁剪的 YamlDotNet.Serialization.DeserializerBuilder.DeserializerBuilder()")]
-    public static bool TryReadYaml<T>(string yaml, [MaybeNullWhen(false)] out T result)
-    {
-        if (string.IsNullOrWhiteSpace(yaml))
-        {
-            result = default;
-            return false;
-        }
-
-        T obj;
-        try
-        {
-            StringReader input = new(yaml);
-            Parser yamlParser = new(input);
-            yamlParser.Consume<StreamStart>();
-            yamlParser.Consume<DocumentStart>();
-
-            IDeserializer yamlDes = new DeserializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .Build();
-            obj = yamlDes.Deserialize<T>(yamlParser);
-            yamlParser.Consume<DocumentEnd>();
-        }
-        catch
-        {
-            result = default;
-            return false;
-        }
-
-        result = obj;
-        return true;
     }
 }

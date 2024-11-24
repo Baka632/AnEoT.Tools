@@ -390,6 +390,8 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
         }
     }
 
+    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "已经保留了必需的类型信息")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "已经保留了必需的类型信息")]
     private static async Task InitializePackageFor<T>(ProjectPackage package, string packageFileName, Action<T?> operationForPackage, string parseErrorMessage, bool required = false, string fileNotFoundErrorMessage = "")
     {
         if (package.TryGetEntryStream(packageFileName, out Stream? entryStream))
@@ -413,6 +415,8 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
         }
     }
 
+    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "已经保留了必需的类型信息")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "已经保留了必需的类型信息")]
     private async Task SavePackageFor<T>(string entryName, T value)
     {
         if (value is null || value.Equals(default))

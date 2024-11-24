@@ -3,7 +3,7 @@ using AnEoT.Tools.VolumeCreator.Models;
 
 namespace AnEoT.Tools.VolumeCreator.Helpers.Converters;
 
-public sealed class MarkdownWrapperTypeToStringConverter : IValueConverter
+public sealed partial class MarkdownWrapperTypeToStringConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
