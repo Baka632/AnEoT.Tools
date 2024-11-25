@@ -18,7 +18,7 @@ partial class ContentPageViewModel
     public bool ShowNotifyGenerateIndex => IndexMarkdown.Count <= 0;
     [Required]
     [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateResourcesHelper))]
-    public IVoulmeResourcesHelper ResourcesHelper
+    public IVolumeResourcesHelper ResourcesHelper
     {
         get => resourcesHelper;
         set
@@ -27,9 +27,9 @@ partial class ContentPageViewModel
             ResourcesHelperForValidation = value;
         }
     }
-    public static IVoulmeResourcesHelper ResourcesHelperForValidation { get; set; } = new MemoryResourcesHelper();
+    public static IVolumeResourcesHelper ResourcesHelperForValidation { get; set; } = new MemoryResourcesHelper();
 
-    private IVoulmeResourcesHelper resourcesHelper = new MemoryResourcesHelper();
+    private IVolumeResourcesHelper resourcesHelper = new MemoryResourcesHelper();
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsVolumeCoverNotExist))]
@@ -147,7 +147,7 @@ partial class ContentPageViewModel
     }
     #endregion
 
-    public static ValidationResult ValidateResourcesHelper(IVoulmeResourcesHelper helper)
+    public static ValidationResult ValidateResourcesHelper(IVolumeResourcesHelper helper)
     {
         if (!helper.HasCover)
         {

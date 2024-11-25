@@ -3,7 +3,7 @@ using Windows.Storage;
 
 namespace AnEoT.Tools.VolumeCreator.Models.Resources;
 
-public interface IVoulmeResourcesHelper
+public interface IVolumeResourcesHelper
 {
     public bool ConvertWebP { get; set; }
     public bool HasCover { get; }

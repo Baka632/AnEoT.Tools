@@ -1,13 +1,12 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
-using AnEoT.Tools.VolumeCreator.Models;
 using AnEoT.Tools.VolumeCreator.Views;
-using AnEoT.Tools.Shared.Models;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization;
+using AnEoT.Tools.VolumeCreator.Models;
+using AnEoT.Tools.VolumeCreator.Models.Resources;
 using System.Text;
 using System.Collections.ObjectModel;
-using AnEoT.Tools.VolumeCreator.Models.Resources;
+using AnEoT.Tools.Shared;
+using AnEoT.Tools.Shared.Models;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -15,7 +14,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
 {
     public MarkdownWrapper MarkdownWrapper { get; }
     public ObservableCollection<AssetNode> Assets { get; }
-    public IVoulmeResourcesHelper ResourcesHelper { get; }
+    public IVolumeResourcesHelper ResourcesHelper { get; }
     public Dictionary<string, FileNode> MarkdownImageUriToFileMapping { get; } = new(10);
 
     private readonly MarkdownEditPage view;
@@ -25,7 +24,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     [ObservableProperty]
     private string articleQuote = string.Empty;
 
-    public MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage viewPage, ObservableCollection<AssetNode> assets, IVoulmeResourcesHelper resourcesHelper)
+    public MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage viewPage, ObservableCollection<AssetNode> assets, IVolumeResourcesHelper resourcesHelper)
     {
         markdownString = wrapper.Markdown;
         view = viewPage;
@@ -125,7 +124,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
         {
             (FrontMatter frontMatter, PredefinedCategory? predefinedCategory) = dialog.Result;
             MarkdownWrapper.CategoryInIndexPage = predefinedCategory;
-            string yamlHeader = GetYamlFrontMatterString(frontMatter);
+            string yamlHeader = MarkdownHelper.GetYamlHeaderString(frontMatter);
 
             int orderValueIndex = yamlHeader.IndexOf("order:");
             if (orderValueIndex != -1)
@@ -312,22 +311,5 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
         }
 
         return fileNodes;
-    }
-
-    private static string GetYamlFrontMatterString(FrontMatter frontMatter)
-    {
-        ISerializer serializer = new SerializerBuilder()
-                        .WithIndentedSequences()
-                        .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                        .Build();
-        string yamlString = serializer.Serialize(frontMatter).Trim();
-
-        StringBuilder stringBuilder = new(200);
-        stringBuilder.AppendLine("---");
-        stringBuilder.AppendLine(yamlString);
-        stringBuilder.AppendLine("---");
-        stringBuilder.AppendLine();
-
-        return stringBuilder.ToString();
     }
 }

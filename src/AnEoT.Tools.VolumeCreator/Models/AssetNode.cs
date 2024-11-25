@@ -29,7 +29,7 @@ public abstract class AssetNode : INotifyPropertyChanged
 
     public AssetNode? Parent { get; set; } = null;
 
-    public ImageListNodeType Type { get; set; }
+    public AssetNodeType Type { get; set; }
 
     public override string ToString() => DisplayName;
 
@@ -43,7 +43,7 @@ public abstract class AssetNode : INotifyPropertyChanged
     }
 }
 
-public sealed class FileNode : AssetNode
+public sealed partial class FileNode : AssetNode
 {
     private string _filePath = string.Empty;
 
@@ -88,7 +88,7 @@ public sealed class FileNode : AssetNode
 
     public FileNode()
     {
-        Type = ImageListNodeType.File;
+        Type = AssetNodeType.File;
     }
 
     public void EnsurePathExist()
@@ -97,22 +97,22 @@ public sealed class FileNode : AssetNode
     }
 }
 
-public sealed class FolderNode : AssetNode
+public sealed partial class FolderNode : AssetNode
 {
     public FolderNode(string folderName, AssetNode? parent)
     {
         DisplayName = folderName;
-        Type = ImageListNodeType.Folder;
+        Type = AssetNodeType.Folder;
         Parent = parent;
     }
 
     public FolderNode()
     {
-        Type = ImageListNodeType.Folder;
+        Type = AssetNodeType.Folder;
     }
 }
 
-public enum ImageListNodeType
+public enum AssetNodeType
 {
     /// <summary>
     /// 文件节点

@@ -1,7 +1,9 @@
 ﻿using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Text.Unicode;
+using AnEoT.Tools.VolumeCreator.Models;
 using Markdig;
 
 namespace AnEoT.Tools.VolumeCreator;
@@ -17,14 +19,22 @@ public class CommonValues
             .UseYamlFrontMatter()
             .Build();
 
-    public static readonly JsonSerializerOptions DefaultJsonSerializerOption = new()
+    public static readonly JsonSerializerOptions DefaultJsonSerializerOption = CreateJsonSerializerOption(null);
+
+    public static JsonSerializerOptions CreateJsonSerializerOption(IJsonTypeInfoResolver? typeInfoResolver)
     {
-        WriteIndented = true,
-        Converters =
+        return new()
         {
-            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
-        },
-        ReferenceHandler = ReferenceHandler.Preserve,
-        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-    };
+            WriteIndented = true,
+            Converters =
+            {
+                new JsonStringEnumConverter<PredefinedCategory>(JsonNamingPolicy.CamelCase),
+                new JsonStringEnumConverter<MarkdownWrapperType>(JsonNamingPolicy.CamelCase),
+                new JsonStringEnumConverter<AssetNodeType>(JsonNamingPolicy.CamelCase),
+            },
+            TypeInfoResolver = typeInfoResolver,
+            ReferenceHandler = ReferenceHandler.Preserve,
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+        };
+    }
 }

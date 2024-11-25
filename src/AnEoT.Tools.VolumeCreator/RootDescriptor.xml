@@ -1,0 +1,5 @@
+﻿<!-- 不要裁剪我😭 -->
+<linker>
+    <assembly fullname="AnEoT.Tools.VolumeCreator" preserve="all"/>
+    <assembly fullname="CommunityToolkit.WinUI.Controls.SettingsControls" preserve="all"/>
+</linker>

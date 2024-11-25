@@ -2,7 +2,7 @@
 
 namespace AnEoT.Tools.VolumeCreator.Helpers;
 
-public sealed class AssetNodeDataTemplateSelector : DataTemplateSelector
+public sealed partial class AssetNodeDataTemplateSelector : DataTemplateSelector
 {
     public DataTemplate? FileTemplate { get; set; }
     public DataTemplate? FolderTemplate { get; set; }
@@ -13,8 +13,8 @@ public sealed class AssetNodeDataTemplateSelector : DataTemplateSelector
 
         return model.Type switch
         {
-            ImageListNodeType.File => FileTemplate!,
-            ImageListNodeType.Folder => FolderTemplate!,
+            AssetNodeType.File => FileTemplate!,
+            AssetNodeType.Folder => FolderTemplate!,
             _ => throw new NotImplementedException(),
         };
     }

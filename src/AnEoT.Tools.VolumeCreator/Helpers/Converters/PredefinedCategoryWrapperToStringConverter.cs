@@ -2,7 +2,7 @@
 
 namespace AnEoT.Tools.VolumeCreator.Helpers.Converters;
 
-public sealed class PredefinedCategoryWrapperToStringConverter : IValueConverter
+public sealed partial class PredefinedCategoryWrapperToStringConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {

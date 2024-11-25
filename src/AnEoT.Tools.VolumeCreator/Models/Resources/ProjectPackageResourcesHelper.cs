@@ -6,7 +6,7 @@ using ImageSharpImage = SixLabors.ImageSharp.Image;
 
 namespace AnEoT.Tools.VolumeCreator.Models.Resources;
 
-internal sealed class ProjectPackageResourcesHelper(ProjectPackage projectPackage) : IVoulmeResourcesHelper, IDisposable, IAsyncDisposable
+internal sealed partial class ProjectPackageResourcesHelper(ProjectPackage projectPackage) : IVolumeResourcesHelper, IDisposable, IAsyncDisposable
 {
     public bool ConvertWebP
     {
@@ -41,11 +41,11 @@ internal sealed class ProjectPackageResourcesHelper(ProjectPackage projectPackag
 
     private async Task ExportAssetsCore(AssetNode node, StorageFolder outputFolder)
     {
-        if (node.Type == ImageListNodeType.Folder)
+        if (node.Type == AssetNodeType.Folder)
         {
             foreach (AssetNode item in node.Children)
             {
-                if (item.Type == ImageListNodeType.Folder)
+                if (item.Type == AssetNodeType.Folder)
                 {
                     if (item.Children.Count > 0)
                     {
@@ -57,13 +57,13 @@ internal sealed class ProjectPackageResourcesHelper(ProjectPackage projectPackag
                         }
                     }
                 }
-                else if (item.Type == ImageListNodeType.File && item is FileNode fileNode)
+                else if (item.Type == AssetNodeType.File && item is FileNode fileNode)
                 {
                     await SaveFileNode(fileNode, outputFolder);
                 }
             }
         }
-        else if (node.Type == ImageListNodeType.File && node is FileNode fileNode)
+        else if (node.Type == AssetNodeType.File && node is FileNode fileNode)
         {
             await SaveFileNode(fileNode, outputFolder);
         }

@@ -19,7 +19,20 @@ public partial class App : Application
     /// </summary>
     public static string AppVersion => $"{Package.Current.Id.Version.Major}.{Package.Current.Id.Version.Minor}.{Package.Current.Id.Version.Build}.{Package.Current.Id.Version.Revision}";
 
+    public static string AppName { get; }
+
     public Window Window { get; private set; }
+
+    static App()
+    {
+        DateTimeOffset now = DateTimeOffset.Now;
+        AppName = now switch
+        {
+            { Month: 1, Day: 4 } => $"{Package.Current.DisplayName} - 尤里卡生日快乐！",
+            { Month: 5, Day: 17 } => $"{Package.Current.DisplayName} - 回归线生日快乐！",
+            _ => Package.Current.DisplayName
+        };
+    }
 
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -71,7 +84,7 @@ public partial class App : Application
         MainWindow mainWindow = new()
         {
             ExtendsContentIntoTitleBar = true,
-            Title = "AnEoT Volume Creator",
+            Title = AppName,
         };
         Window = mainWindow;
 

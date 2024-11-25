@@ -58,7 +58,15 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
             stream.Seek(0, SeekOrigin.Begin);
         }
 
-        zipArchive = new ZipArchive(stream, ZipArchiveMode.Update);
+        try
+        {
+            zipArchive = new ZipArchive(stream, ZipArchiveMode.Update);
+        }
+        catch
+        {
+            stream.Dispose();
+            throw;
+        }
     }
 
     /// <summary>
@@ -163,7 +171,6 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
         }
         catch (Exception ex)
         {
-            package?.zipArchive?.Dispose();
             throw new InvalidDataException("工程文件无效，请查阅内部异常以获取更多信息。", ex);
         }
     }
@@ -390,6 +397,8 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
         }
     }
 
+    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "已经保留了必需的类型信息")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "已经保留了必需的类型信息")]
     private static async Task InitializePackageFor<T>(ProjectPackage package, string packageFileName, Action<T?> operationForPackage, string parseErrorMessage, bool required = false, string fileNotFoundErrorMessage = "")
     {
         if (package.TryGetEntryStream(packageFileName, out Stream? entryStream))
@@ -413,6 +422,8 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
         }
     }
 
+    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "已经保留了必需的类型信息")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "已经保留了必需的类型信息")]
     private async Task SavePackageFor<T>(string entryName, T value)
     {
         if (value is null || value.Equals(default))

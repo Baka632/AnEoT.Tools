@@ -6,7 +6,7 @@ namespace AnEoT.Tools.VolumeCreator.Models;
 /// <summary>
 /// 用于支持双向数据绑定的字符串包装类
 /// </summary>
-public sealed class StringView : INotifyPropertyChanged, IEquatable<StringView?>
+public sealed partial class StringView : INotifyPropertyChanged, IEquatable<StringView?>
 {
     public event PropertyChangedEventHandler? PropertyChanged;
     private string _StringContent = string.Empty;

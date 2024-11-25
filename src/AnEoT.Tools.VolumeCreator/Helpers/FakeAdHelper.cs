@@ -61,7 +61,8 @@ public static class FakeAdHelper
     {
         StorageFile adJsonFile = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Assets/fake-ads/ads.json"));
         using Stream utf8Json = await adJsonFile.OpenStreamForReadAsync();
-        Dictionary<string, FakeAdConfiguration> adConfig = await JsonSerializer.DeserializeAsync<Dictionary<string, FakeAdConfiguration>>(utf8Json) ?? throw new FileNotFoundException("未能找到配置「泰拉广告」的 JSON 文件。");
+        Dictionary<string, FakeAdConfiguration> adConfig = await JsonSerializer.DeserializeAsync(utf8Json, StringFakeAdConfigContext.Default.DictionaryStringFakeAdConfiguration)
+            ?? throw new FileNotFoundException("未能找到配置「泰拉广告」的 JSON 文件。");
 
         return adConfig;
     }

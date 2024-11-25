@@ -6,7 +6,7 @@ using ImageSharpImage = SixLabors.ImageSharp.Image;
 
 namespace AnEoT.Tools.VolumeCreator.Models.Resources;
 
-internal sealed class MemoryResourcesHelper : IVoulmeResourcesHelper
+internal sealed class MemoryResourcesHelper : IVolumeResourcesHelper
 {
     private StorageFile? coverFile;
 
@@ -67,11 +67,11 @@ internal sealed class MemoryResourcesHelper : IVoulmeResourcesHelper
 
     private async Task CopyContentRecursively(AssetNode node, StorageFolder rootFolder)
     {
-        if (node.Type == ImageListNodeType.Folder)
+        if (node.Type == AssetNodeType.Folder)
         {
             foreach (AssetNode item in node.Children)
             {
-                if (item.Type == ImageListNodeType.Folder)
+                if (item.Type == AssetNodeType.Folder)
                 {
                     if (item.Children.Count > 0)
                     {
@@ -83,13 +83,13 @@ internal sealed class MemoryResourcesHelper : IVoulmeResourcesHelper
                         }
                     }
                 }
-                else if (item.Type == ImageListNodeType.File && item is FileNode fileNode && File.Exists(fileNode.FilePath))
+                else if (item.Type == AssetNodeType.File && item is FileNode fileNode && File.Exists(fileNode.FilePath))
                 {
                     await SaveFileNode(fileNode, rootFolder);
                 }
             }
         }
-        else if (node.Type == ImageListNodeType.File && node is FileNode fileNode && File.Exists(fileNode.FilePath))
+        else if (node.Type == AssetNodeType.File && node is FileNode fileNode && File.Exists(fileNode.FilePath))
         {
             await SaveFileNode(fileNode, rootFolder);
         }
