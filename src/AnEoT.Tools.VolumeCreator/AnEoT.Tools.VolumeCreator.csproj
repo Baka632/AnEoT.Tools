@@ -50,17 +50,7 @@
 
   <ItemGroup>
     <None Remove="AppPackages\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Controls\Eod.xaml" />
-    <None Remove="Controls\FakeAds.xaml" />
-    <None Remove="Views\ContentPage.xaml" />
-    <None Remove="Views\EditorsInfoDialog.xaml" />
-    <None Remove="Views\FrontMatterDialog.xaml" />
-    <None Remove="Views\InsertStyleDialog.xaml" />
-    <None Remove="Views\MarkdownEditPage.xaml" />
-    <None Remove="Views\MarkdownEditWindow.xaml" />
-    <None Remove="Views\NewAssetFolderDialog.xaml" />
+    <PRIResource Remove="AppPackages\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -70,6 +60,24 @@
     <Content Include="Assets\Square44x44Logo.scale-200.png" />
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.UI.Xaml" />
+    <Using Include="Microsoft.UI.Xaml.Data" />
+    <Using Include="Microsoft.UI.Xaml.Input" />
+    <Using Include="Microsoft.UI.Xaml.Media" />
+    <Using Include="Microsoft.UI.Xaml.Navigation" />
+    <Using Include="Microsoft.UI.Xaml.Controls" />
+    <Using Include="Microsoft.UI.Xaml.Controls.Primitives" />
+    <Using Include="Windows.Foundation" />
+    <Using Include="Windows.Foundation.Collections" />
+    <Using Include="System.Runtime.InteropServices.WindowsRuntime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Controls\*.xaml" />
+    <None Remove="Views\*.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -101,53 +109,6 @@
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
   </ItemGroup>
-  <ItemGroup>
-    <Using Include="Microsoft.UI.Xaml" />
-    <Using Include="Microsoft.UI.Xaml.Data" />
-    <Using Include="Microsoft.UI.Xaml.Input" />
-    <Using Include="Microsoft.UI.Xaml.Media" />
-    <Using Include="Microsoft.UI.Xaml.Navigation" />
-    <Using Include="Microsoft.UI.Xaml.Controls" />
-    <Using Include="Microsoft.UI.Xaml.Controls.Primitives" />
-    <Using Include="Windows.Foundation" />
-    <Using Include="Windows.Foundation.Collections" />
-    <Using Include="System.Runtime.InteropServices.WindowsRuntime" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Controls\FakeAds.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\EditorsInfoDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\FrontMatterDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\MarkdownEditPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\MarkdownEditWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\ContentPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Controls\Eod.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
 
   <!-- 
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution 
@@ -157,18 +118,5 @@
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
   </PropertyGroup>
-  <ItemGroup>
-    <PRIResource Remove="AppPackages\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\NewAssetFolderDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\InsertStyleDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
 </Project>
  
