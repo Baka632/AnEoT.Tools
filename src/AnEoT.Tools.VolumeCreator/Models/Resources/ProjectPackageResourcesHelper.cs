@@ -6,7 +6,7 @@ using ImageSharpImage = SixLabors.ImageSharp.Image;
 
 namespace AnEoT.Tools.VolumeCreator.Models.Resources;
 
-internal sealed partial class ProjectPackageResourcesHelper(ProjectPackage projectPackage) : IVoulmeResourcesHelper, IDisposable, IAsyncDisposable
+internal sealed partial class ProjectPackageResourcesHelper(ProjectPackage projectPackage) : IVolumeResourcesHelper, IDisposable, IAsyncDisposable
 {
     public bool ConvertWebP
     {

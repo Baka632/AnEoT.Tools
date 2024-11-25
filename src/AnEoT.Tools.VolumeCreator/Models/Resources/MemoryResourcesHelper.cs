@@ -6,7 +6,7 @@ using ImageSharpImage = SixLabors.ImageSharp.Image;
 
 namespace AnEoT.Tools.VolumeCreator.Models.Resources;
 
-internal sealed class MemoryResourcesHelper : IVoulmeResourcesHelper
+internal sealed class MemoryResourcesHelper : IVolumeResourcesHelper
 {
     private StorageFile? coverFile;
 

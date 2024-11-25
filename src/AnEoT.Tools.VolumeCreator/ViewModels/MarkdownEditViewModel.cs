@@ -14,7 +14,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
 {
     public MarkdownWrapper MarkdownWrapper { get; }
     public ObservableCollection<AssetNode> Assets { get; }
-    public IVoulmeResourcesHelper ResourcesHelper { get; }
+    public IVolumeResourcesHelper ResourcesHelper { get; }
     public Dictionary<string, FileNode> MarkdownImageUriToFileMapping { get; } = new(10);
 
     private readonly MarkdownEditPage view;
@@ -24,7 +24,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     [ObservableProperty]
     private string articleQuote = string.Empty;
 
-    public MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage viewPage, ObservableCollection<AssetNode> assets, IVoulmeResourcesHelper resourcesHelper)
+    public MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage viewPage, ObservableCollection<AssetNode> assets, IVolumeResourcesHelper resourcesHelper)
     {
         markdownString = wrapper.Markdown;
         view = viewPage;
