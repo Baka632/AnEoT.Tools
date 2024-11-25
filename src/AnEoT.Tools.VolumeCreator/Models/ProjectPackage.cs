@@ -58,7 +58,15 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
             stream.Seek(0, SeekOrigin.Begin);
         }
 
-        zipArchive = new ZipArchive(stream, ZipArchiveMode.Update);
+        try
+        {
+            zipArchive = new ZipArchive(stream, ZipArchiveMode.Update);
+        }
+        catch
+        {
+            stream.Dispose();
+            throw;
+        }
     }
 
     /// <summary>
@@ -163,7 +171,6 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
         }
         catch (Exception ex)
         {
-            package?.zipArchive?.Dispose();
             throw new InvalidDataException("工程文件无效，请查阅内部异常以获取更多信息。", ex);
         }
     }

@@ -24,7 +24,7 @@
             HorizontalAlignment="Stretch"
             VerticalAlignment="Top"
             Style="{StaticResource CaptionTextBlockStyle}"
-            Text="AnEoT Volume Creator" />
+            Text="{x:Bind local:App.AppName}" />
 
         <Frame
             x:Name="MainFrame"

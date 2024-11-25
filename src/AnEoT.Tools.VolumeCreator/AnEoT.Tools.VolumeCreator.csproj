@@ -13,7 +13,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <DefaultLanguage>zh-CN</DefaultLanguage>
-    <PackageCertificateThumbprint>DDB65A16ADD7329008B9ACC55F0B4C6AF71848B5</PackageCertificateThumbprint>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
@@ -33,6 +32,16 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <EnableAotAnalyzer>True</EnableAotAnalyzer>
   </PropertyGroup>
+
+  <PropertyGroup>
+      <PackageCertificateThumbprint Condition="$(Configuration) != 'Release'">70211FC3C97E403131B9A07F4D5F11FB3C59A2A4</PackageCertificateThumbprint>
+      <PackageCertificateThumbprint Condition="$(Configuration) == 'Release'">DDB65A16ADD7329008B9ACC55F0B4C6AF71848B5</PackageCertificateThumbprint>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest" Condition="$(Configuration) == 'Release'" SubType="Designer" />
+    <AppxManifest Include="Package-Debug.appxmanifest" Condition="$(Configuration) != 'Release'" SubType="Designer" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="RootDescriptor.xml" CopyToOutputDirectory="Always" />
@@ -80,6 +89,7 @@
     <PackageReference Include="System.Private.Uri" Version="4.3.2" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
     <PackageReference Include="WinUIEx" Version="2.5.0" />
+    <ProjectReference Include="..\AnEoT.Tools.Shared\AnEoT.Tools.Shared.csproj" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
@@ -90,9 +100,6 @@
   -->
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AnEoT.Tools.Shared\AnEoT.Tools.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Using Include="Microsoft.UI.Xaml" />

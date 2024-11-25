@@ -222,7 +222,7 @@
                 <AppBarButton.Flyout>
                     <Flyout>
                         <StackPanel Spacing="5">
-                            <TextBlock FontWeight="SemiLight" Text="AnEoT Volume Creator" />
+                            <TextBlock FontWeight="SemiLight" Text="{x:Bind app:App.AppName}" />
                             <TextBlock Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}">
                                 <Run Text="版本：" />
                                 <Run Text="{x:Bind app:App.AppVersion}" />
