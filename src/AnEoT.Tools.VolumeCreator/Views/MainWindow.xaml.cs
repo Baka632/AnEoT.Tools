@@ -73,5 +73,7 @@ public sealed partial class MainWindow : WindowEx
                 MainFrame.Navigate(typeof(VolumeCreationPage), parameter);
             }
         }
+
+        UtilitiesFrame.Navigate(typeof(UtilitiesPage));
     }
 }

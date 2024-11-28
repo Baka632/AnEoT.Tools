@@ -1,0 +1,47 @@
+<Page
+    x:Class="AnEoT.Tools.VolumeCreator.Views.UtilitiesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:AnEoT.Tools.VolumeCreator.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="using:AnEoT.Tools.VolumeCreator.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:UtilitiesViewModel}"
+    mc:Ignorable="d">
+
+    <Grid>
+        <GridView
+            IsItemClickEnabled="False"
+            ItemsSource="{x:Bind UtilitiyItems}"
+            SelectionMode="None">
+            <GridView.ItemTemplate>
+                <DataTemplate x:DataType="local:UtilitiyItem">
+                    <Button
+                        Width="135"
+                        Height="135"
+                        Command="{x:Bind Command}">
+                        <StackPanel>
+                            <FontIcon
+                                Margin="0,0,0,10"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="35"
+                                Glyph="{x:Bind IconGlyph}" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Text="{x:Bind Title}" />
+                        </StackPanel>
+                    </Button>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+
+            <GridView.ItemContainerStyle>
+                <Style BasedOn="{StaticResource DefaultGridViewItemStyle}" TargetType="GridViewItem">
+                    <Setter Property="Margin" Value="0,10,10,10" />
+                </Style>
+            </GridView.ItemContainerStyle>
+
+        </GridView>
+    </Grid>
+</Page>
