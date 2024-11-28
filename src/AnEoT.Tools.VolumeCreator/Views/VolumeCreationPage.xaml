@@ -1,5 +1,5 @@
 <Page
-    x:Class="AnEoT.Tools.VolumeCreator.Views.ContentPage"
+    x:Class="AnEoT.Tools.VolumeCreator.Views.VolumeCreationPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:app="using:AnEoT.Tools.VolumeCreator"
@@ -10,7 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:AnEoT.Tools.VolumeCreator.Models"
     xmlns:viewmodels="using:AnEoT.Tools.VolumeCreator.ViewModels"
-    d:DataContext="{d:DesignInstance Type=viewmodels:ContentPageViewModel}"
+    d:DataContext="{d:DesignInstance Type=viewmodels:VolumeCreationPageViewModel}"
     mc:Ignorable="d">
 
     <Page.Resources>

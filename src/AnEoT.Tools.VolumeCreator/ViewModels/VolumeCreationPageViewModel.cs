@@ -24,11 +24,11 @@ using System.Collections.ObjectModel;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
-public sealed partial class ContentPageViewModel : ObservableValidator
+public sealed partial class VolumeCreationPageViewModel : ObservableValidator
 {
-    public ContentPage View { get; }
+    public VolumeCreationPage View { get; }
 
-    public ContentPageViewModel(ContentPage view)
+    public VolumeCreationPageViewModel(VolumeCreationPage view)
     {
         Articles.CollectionChanged += OnWordFilesCollectionChanged;
         Assets.CollectionChanged += OnImagesFilesCollectionChanged;

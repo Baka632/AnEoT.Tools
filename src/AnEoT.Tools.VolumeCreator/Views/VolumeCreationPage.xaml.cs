@@ -8,13 +8,13 @@ namespace AnEoT.Tools.VolumeCreator.Views;
 /// <summary>
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class ContentPage : Page
+public sealed partial class VolumeCreationPage : Page
 {
-    public ContentPageViewModel ViewModel { get; }
+    public VolumeCreationPageViewModel ViewModel { get; }
 
-    public ContentPage()
+    public VolumeCreationPage()
     {
-        ViewModel = new ContentPageViewModel(this);
+        ViewModel = new VolumeCreationPageViewModel(this);
         this.InitializeComponent();
     }
 

@@ -9,7 +9,7 @@ using AnEoT.Tools.VolumeCreator.Models.Resources;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
-partial class ContentPageViewModel
+partial class VolumeCreationPageViewModel
 {
     public bool IsVolumeCoverNotExist => VolumeCover is null;
     public VerticalAlignment CoverImageVerticalAlignmentMode => VolumeCover is null ? VerticalAlignment.Stretch : VerticalAlignment.Top;
@@ -17,7 +17,7 @@ partial class ContentPageViewModel
     public bool ShowNotifyAddAssets => Assets.Count <= 0;
     public bool ShowNotifyGenerateIndex => IndexMarkdown.Count <= 0;
     [Required]
-    [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateResourcesHelper))]
+    [CustomValidation(typeof(VolumeCreationPageViewModel), nameof(ValidateResourcesHelper))]
     public IVolumeResourcesHelper ResourcesHelper
     {
         get => resourcesHelper;
@@ -53,11 +53,11 @@ partial class ContentPageViewModel
 
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateVolumeFolderName))]
+    [CustomValidation(typeof(VolumeCreationPageViewModel), nameof(ValidateVolumeFolderName))]
     private string _volumeFolderName = string.Empty;
     [ObservableProperty]
     [NotifyDataErrorInfo]
-    [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateVolumeDisplayName))]
+    [CustomValidation(typeof(VolumeCreationPageViewModel), nameof(ValidateVolumeDisplayName))]
     private string _volumeName = string.Empty;
     [ObservableProperty]
     private bool convertToWebp = true;
@@ -65,15 +65,15 @@ partial class ContentPageViewModel
     private bool isCoverSizeFixed = true;
     [ObservableProperty]
     [Required, NotifyDataErrorInfo]
-    [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateArticles))]
+    [CustomValidation(typeof(VolumeCreationPageViewModel), nameof(ValidateArticles))]
     private ObservableCollection<MarkdownWrapper> articles = [];
     [ObservableProperty, Required, NotifyDataErrorInfo]
-    [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateAssets))]
+    [CustomValidation(typeof(VolumeCreationPageViewModel), nameof(ValidateAssets))]
     private ObservableCollection<AssetNode> assets = [];
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowNotifyGenerateIndex))]
     [NotifyDataErrorInfo]
-    [CustomValidation(typeof(ContentPageViewModel), nameof(ValidateIndexMarkdown))]
+    [CustomValidation(typeof(VolumeCreationPageViewModel), nameof(ValidateIndexMarkdown))]
     private ObservableCollection<MarkdownWrapper> indexMarkdown = [];
 
     private void InitializeAssets()

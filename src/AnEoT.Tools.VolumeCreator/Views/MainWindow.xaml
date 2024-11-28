@@ -20,15 +20,48 @@
         <TextBlock
             x:Name="TitleBarTextBlock"
             Grid.Row="0"
-            Margin="11,8,0,10"
+            Margin="11,8,0,0"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Top"
             Style="{StaticResource CaptionTextBlockStyle}"
             Text="{x:Bind local:App.AppName}" />
 
-        <Frame
-            x:Name="MainFrame"
-            Grid.Row="1"
-            Margin="11,0,0,0" />
+        <Pivot Grid.Row="1">
+            <PivotItem>
+                <PivotItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon
+                            Margin="0,0,10,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Glyph="&#xECCD;" />
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Text="创建期刊" />
+                    </StackPanel>
+                </PivotItem.Header>
+
+                <Frame x:Name="MainFrame" />
+            </PivotItem>
+
+            <PivotItem>
+                <PivotItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <FontIcon
+                            Margin="0,0,10,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Glyph="&#xEC7A;" />
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Text="实用工具" />
+                    </StackPanel>
+                </PivotItem.Header>
+
+                <Frame x:Name="UtilitiesFrame" />
+            </PivotItem>
+        </Pivot>
     </Grid>
 </winex:WindowEx>

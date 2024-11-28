@@ -58,7 +58,7 @@ public sealed partial class MainWindow : WindowEx
 
     public async void InitalizeWindow(object? parameter = null)
     {
-        if (MainFrame.Content is ContentPage page && parameter is not null)
+        if (MainFrame.Content is VolumeCreationPage page && parameter is not null)
         {
             await page.ParseParameter(parameter);
         }
@@ -66,11 +66,11 @@ public sealed partial class MainWindow : WindowEx
         {
             if (parameter is null)
             {
-                MainFrame.Navigate(typeof(ContentPage));
+                MainFrame.Navigate(typeof(VolumeCreationPage));
             }
             else
             {
-                MainFrame.Navigate(typeof(ContentPage), parameter);
+                MainFrame.Navigate(typeof(VolumeCreationPage), parameter);
             }
         }
     }
