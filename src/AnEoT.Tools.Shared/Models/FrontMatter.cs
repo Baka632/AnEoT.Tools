@@ -99,7 +99,7 @@ internal class ClassFrontMatter
 
     public string GetYamlString()
     {
-        ISerializer serializer = new StaticSerializerBuilder(new FrontMatterStaticContext())
+        ISerializer serializer = new StaticSerializerBuilder(new ClassFrontMatterStaticContext())
                         .WithIndentedSequences()
                         .WithNamingConvention(CamelCaseNamingConvention.Instance)
                         .Build();
@@ -122,7 +122,7 @@ internal class ClassFrontMatter
             yamlParser.Consume<StreamStart>();
             yamlParser.Consume<DocumentStart>();
 
-            IDeserializer yamlDes = new StaticDeserializerBuilder(new FrontMatterStaticContext())
+            IDeserializer yamlDes = new StaticDeserializerBuilder(new ClassFrontMatterStaticContext())
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build();
             result = yamlDes.Deserialize<FrontMatter>(yamlParser);

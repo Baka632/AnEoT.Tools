@@ -45,6 +45,21 @@
 
   <ItemGroup>
     <None Update="RootDescriptor.xml" CopyToOutputDirectory="Always" />
+    <Page Update="Views\LofterDownload\Dialogs\WebView2LoginDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\LofterDownload\LofterLoginPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\LofterDownload\DownloadCompletePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\LofterDownload\DownloadOptionPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\LofterDownload\SelectTargetImagePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <TrimmerRootDescriptor Include="RootDescriptor.xml" />
   </ItemGroup>
 
@@ -78,6 +93,13 @@
   <ItemGroup>
     <None Remove="Controls\*.xaml" />
     <None Remove="Views\*.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Views\LofterDownload\Dialogs\WebView2LoginDialog.xaml" />
+    <None Remove="Views\LofterDownload\DownloadOptionPage.xaml" />
+    <None Remove="Views\LofterDownload\LofterLoginPage.xaml" />
+    <None Remove="Views\LofterDownload\SelectTargetImagePage.xaml" />
   </ItemGroup>
 
   <ItemGroup>

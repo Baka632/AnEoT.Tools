@@ -17,8 +17,8 @@
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="local:UtilitiyItem">
                     <Button
-                        Width="135"
-                        Height="135"
+                        Width="145"
+                        Height="145"
                         Command="{x:Bind Command}">
                         <StackPanel>
                             <FontIcon

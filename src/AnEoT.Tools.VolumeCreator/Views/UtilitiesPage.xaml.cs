@@ -16,8 +16,8 @@ public sealed partial class UtilitiesPage : Page
     {
         this.InitializeComponent();
         UtilitiyItems = [
-            new("Lofter 图像下载", "\xEBD3"),
-            new("图像转 WebP", "\xE91B"),
+            new("Lofter 图像下载", "\xEBD3", ViewModel.OpenLofterDownloadWindowCommand),
+            new("图像转 WebP 格式", "\xE91B", ViewModel.OpenConvertWebPWindowCommand),
         ];
     }
 }
