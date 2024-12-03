@@ -24,16 +24,21 @@ public static class LofterDownloadHelper
     /// <returns>一个包含图像内容的 <see cref="Stream"/>。</returns>
     /// <exception cref="ArgumentNullException"><paramref name="imageUri"/> 或 <paramref name="sourcePageUri"/> 为 <see langword="null"/>。</exception>
     /// <exception cref="HttpRequestException">HTTP 请求出错。</exception>
-    public static async Task<Stream> GetImage(Uri imageUri, Uri sourcePageUri, string cookie)
+    public static async Task<Stream> GetImage(Uri imageUri, Uri sourcePageUri)
     {
-        using HttpResponseMessage response = await GetHttpResponseMessage(imageUri, sourcePageUri, cookie);
+        using HttpResponseMessage response = await GetHttpResponseMessage(imageUri, sourcePageUri);
 
-        Stream content = await response.Content.ReadAsStreamAsync();
+        using Stream content = await response.Content.ReadAsStreamAsync();
         content.Seek(0, SeekOrigin.Begin);
-        return content;
+
+        MemoryStream stream = new();
+        content.CopyTo(stream);
+        stream.Seek(0, SeekOrigin.Begin);
+
+        return stream;
     }
 
-    private static async Task<HttpResponseMessage> GetHttpResponseMessage(Uri targetUri, Uri refererUri, string cookie)
+    private static async Task<HttpResponseMessage> GetHttpResponseMessage(Uri targetUri, Uri refererUri, string? cookie = null)
     {
         ArgumentNullException.ThrowIfNull(targetUri);
         ArgumentNullException.ThrowIfNull(refererUri);

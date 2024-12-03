@@ -1,8 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Net;
 using System.Text;
-using AnEoT.Tools.VolumeCreator.ViewModels;
+using AnEoT.Tools.VolumeCreator.Models.Lofter;
 using AnEoT.Tools.VolumeCreator.Views.LofterDownload.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Web.WebView2.Core;
@@ -16,7 +15,6 @@ namespace AnEoT.Tools.VolumeCreator.Views.LofterDownload;
 public sealed partial class LofterLoginPage : Page
 {
     private LofterDownloadWindowAccessor windowAccessor;
-    private LofterDownloadData data;
     private LofterCookieProvider cookieProvider;
 
     private bool blockTextBoxCookieProvider;
@@ -45,9 +43,9 @@ public sealed partial class LofterLoginPage : Page
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        if (e.Parameter is ValueTuple<LofterDownloadWindowAccessor, LofterDownloadData> tuple)
+        if (e.Parameter is LofterDownloadWindowAccessor accessor)
         {
-            (windowAccessor, data) = tuple;
+            windowAccessor = accessor;
         }
     }
 
@@ -61,7 +59,7 @@ public sealed partial class LofterLoginPage : Page
     {
         if (ValidateWebsiteAddress(out Uri? websiteAddress))
         {
-            data.PageUri = websiteAddress;
+            windowAccessor.DownloadData = windowAccessor.DownloadData with { PageUri = websiteAddress };
             TargetUriSelected = true;
             WarningInfoBar.IsOpen = false;
         }
@@ -102,7 +100,7 @@ public sealed partial class LofterLoginPage : Page
 
         if (cookieProvider.VerfiyCookie())
         {
-            data.LofterCookie = cookieProvider.Cookie;
+            windowAccessor.DownloadData = windowAccessor.DownloadData with { LofterCookie = cookieProvider.Cookie };
             CookieSelected = true;
         }
         else
@@ -127,7 +125,7 @@ public sealed partial class LofterLoginPage : Page
             blockTextBoxCookieProvider = true;
             CookieTextBox.Text = string.Empty;
             blockTextBoxCookieProvider = false;
-            data.LofterCookie = cookieProvider.Cookie;
+            windowAccessor.DownloadData = windowAccessor.DownloadData with { LofterCookie = cookieProvider.Cookie };
             CookieSelected = true;
         }
         else
@@ -160,7 +158,7 @@ public sealed partial class LofterLoginPage : Page
 
             if (LofterCookieProvider.VerfiyCookieCore(cookieString))
             {
-                data.LofterCookie = cookieString;
+                windowAccessor.DownloadData = windowAccessor.DownloadData with { LofterCookie = cookieString };
                 CookieSelected = true;
             }
         }

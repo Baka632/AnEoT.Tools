@@ -62,9 +62,9 @@
                     <TextBox
                         x:Name="CookieTextBox"
                         Width="200"
-                        TextWrapping="NoWrap"
                         PlaceholderText="请输入 Cookie"
-                        TextChanged="OnCookieTextBoxTextChanged" />
+                        TextChanged="OnCookieTextBoxTextChanged"
+                        TextWrapping="NoWrap" />
                 </controls:SettingsCard>
 
                 <controls:SettingsCard Description="我们尊重您的隐私，此应用仅将登陆 Cookie 保存在本地，并且只用于获取 Lofter 站点的网页。">
@@ -83,7 +83,7 @@
                 IsOpen="False"
                 Message="输入无效。若复制过来的地址没有添加协议名，则请在地址前面附加“https://”或“http://”。"
                 Severity="Error" />
-            <controls:SettingsCard Header="输入页面地址">
+            <controls:SettingsCard Header="输入页面地址" IsEnabled="{x:Bind IsInitializingCookie, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}">
                 <controls:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE62F;" />
                 </controls:SettingsCard.HeaderIcon>

@@ -72,7 +72,7 @@ public sealed partial class LofterDownloadWindow : WindowEx
                 : SlideNavigationTransitionEffect.FromLeft
         };
 
-        ContentFrame.Navigate(targetPage, (ViewModel.WindowAccessor, ViewModel.DownloadData), transition);
+        ContentFrame.Navigate(targetPage, ViewModel.WindowAccessor, transition);
 
         if (currentIndex + 1 >= count)
         {

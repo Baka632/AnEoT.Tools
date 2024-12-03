@@ -1,5 +1,3 @@
-#pragma warning disable CS8618
-
 using System.Collections.ObjectModel;
 using AnEoT.Tools.VolumeCreator.Helpers;
 using AnEoT.Tools.VolumeCreator.Models;
@@ -7,6 +5,7 @@ using AnEoT.Tools.VolumeCreator.Models.Resources;
 using AnEoT.Tools.VolumeCreator.ViewModels;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.Storage.Streams;
 
 namespace AnEoT.Tools.VolumeCreator.Views;
 
@@ -17,7 +16,9 @@ public sealed partial class MarkdownEditPage : Page
 {
     public MarkdownEditViewModel ViewModel { get; private set; }
 
+#pragma warning disable CS8618 // OnNavigatedTo，启动！
     public MarkdownEditPage()
+#pragma warning restore CS8618
     {
         this.InitializeComponent();
         MarkdownRenderTextBlock.SetRenderer<AnEoTMarkdownRenderer>();
@@ -69,7 +70,8 @@ public sealed partial class MarkdownEditPage : Page
             using (stream)
             {
                 BitmapImage image = new();
-                await image.SetSourceAsync(stream.AsRandomAccessStream());
+                using IRandomAccessStream streamSource = stream.AsRandomAccessStream();
+                await image.SetSourceAsync(streamSource);
 
                 e.Image = image;
                 e.Handled = true;
