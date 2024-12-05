@@ -3,4 +3,5 @@
 public sealed record LofterDownloadData(
     Uri? PageUri,
     string? LofterCookie,
-    IEnumerable<LofterImageInfo>? ImageInfos);
+    IEnumerable<LofterImageInfo>? ImageInfos,
+    LofterDownloadOptions DownloadOptions);

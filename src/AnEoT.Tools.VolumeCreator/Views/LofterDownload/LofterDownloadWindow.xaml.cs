@@ -12,12 +12,14 @@ public sealed partial class LofterDownloadWindow : WindowEx
 {
     private int previousSelectIndex;
 
-    public LofterDownloadViewModel ViewModel { get; } = new LofterDownloadViewModel();
+    public LofterDownloadViewModel ViewModel { get; }
 
     public LofterDownloadWindow()
     {
         ExtendsContentIntoTitleBar = true;
         this.InitializeComponent();
+
+        ViewModel = new LofterDownloadViewModel(this);
 
         if (MicaController.IsSupported())
         {

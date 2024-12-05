@@ -1,8 +1,10 @@
 ﻿using AnEoT.Tools.VolumeCreator.ViewModels;
+using AnEoT.Tools.VolumeCreator.Views.LofterDownload;
+using WinRT.Interop;
 
 namespace AnEoT.Tools.VolumeCreator.Models.Lofter;
 
-public sealed class LofterDownloadWindowAccessor(LofterDownloadViewModel viewModel)
+public sealed class LofterDownloadWindowAccessor(LofterDownloadViewModel viewModel, LofterDownloadWindow window)
 {
     public bool EnableForward
     {
@@ -14,5 +16,10 @@ public sealed class LofterDownloadWindowAccessor(LofterDownloadViewModel viewMod
     {
         get => viewModel.DownloadData;
         set => viewModel.DownloadData = value;
+    }
+
+    public nint GetWindowHandle()
+    {
+        return WindowNative.GetWindowHandle(window);
     }
 }

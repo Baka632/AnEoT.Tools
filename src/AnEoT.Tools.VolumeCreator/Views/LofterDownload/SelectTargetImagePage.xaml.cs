@@ -62,7 +62,7 @@ public sealed partial class SelectTargetImagePage : Page
 
     private async void OnPageLoaded(object sender, RoutedEventArgs e)
     {
-        windowAccessor.EnableForward = false;
+        windowAccessor.EnableForward = ImagesGridView.SelectedItems.Count > 0;
 
         if (data?.PageUri is null || data?.LofterCookie is null)
         {

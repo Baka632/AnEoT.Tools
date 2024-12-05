@@ -1,4 +1,5 @@
 ﻿using AnEoT.Tools.VolumeCreator.Models.Lofter;
+using AnEoT.Tools.VolumeCreator.Views.LofterDownload;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
@@ -15,11 +16,11 @@ public partial class LofterDownloadViewModel : ObservableObject
 
     public bool ShowForward { get => !ShowComplete; }
 
-    public LofterDownloadData DownloadData { get; set; } = new(null, null, null);
+    public LofterDownloadData DownloadData { get; set; } = new(null, null, null, default);
     public LofterDownloadWindowAccessor WindowAccessor { get; }
 
-    public LofterDownloadViewModel()
+    public LofterDownloadViewModel(LofterDownloadWindow view)
     {
-        WindowAccessor = new(this);
+        WindowAccessor = new(this, view);
     }
 }
