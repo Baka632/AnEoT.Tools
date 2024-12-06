@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text;
 using AnEoT.Tools.VolumeCreator.Helpers;
 using SixLabors.ImageSharp;
 using ImageSharpImage = SixLabors.ImageSharp.Image;
@@ -44,17 +45,17 @@ public partial class LofterDownloadItem(
             State = LofterDownloadItemState.Downloading;
             (string savePath, bool convertWebP, bool trimUriQueryPart) = downloadOptions;
 
-            string queryTrimmedUri = imageInfo.ImageUri
+            string queryTrimmedUri = imageInfo.ImageUri.OriginalString
                     .Split('?', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                     [0];
 
             Uri imageUri = trimUriQueryPart
                 ? new(queryTrimmedUri, UriKind.Absolute)
-                : new(imageInfo.ImageUri, UriKind.Absolute);
+                : imageInfo.ImageUri;
             Uri sourcePageUri = imageInfo.SourcePageUri;
             string fileName = convertWebP
-                ? Path.ChangeExtension(Path.GetFileName(queryTrimmedUri), ".webp")
-                : Path.GetFileName(queryTrimmedUri);
+                ? $"{ReplaceInvaildFileNameChars(imageInfo.Title)}.webp"
+                : $"{ReplaceInvaildFileNameChars(imageInfo.Title)}{Path.GetExtension(queryTrimmedUri)}";
             string filePath = Path.Combine(savePath, fileName);
 
             using Stream imageStream = await LofterDownloadHelper.GetImage(imageUri, sourcePageUri);
@@ -89,5 +90,25 @@ public partial class LofterDownloadItem(
     public void OnPropertiesChanged([CallerMemberName] string propertyName = "")
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    /// <summary>
+    /// 将字符串中不能作为文件名的部分字符替换为相近的合法字符
+    /// </summary>
+    /// <param name="fileName">文件名字符串</param>
+    /// <returns>新的字符串</returns>
+    private static string ReplaceInvaildFileNameChars(string fileName)
+    {
+        StringBuilder stringBuilder = new(fileName);
+        stringBuilder.Replace('"', '\'');
+        stringBuilder.Replace('<', '[');
+        stringBuilder.Replace('>', ']');
+        stringBuilder.Replace('|', 'I');
+        stringBuilder.Replace(':', '：');
+        stringBuilder.Replace('*', '★');
+        stringBuilder.Replace('?', '？');
+        stringBuilder.Replace('/', '↗');
+        stringBuilder.Replace('\\', '↘');
+        return stringBuilder.ToString();
     }
 }

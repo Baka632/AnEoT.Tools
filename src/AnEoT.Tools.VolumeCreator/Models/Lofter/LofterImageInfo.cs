@@ -3,21 +3,13 @@ using System.Runtime.CompilerServices;
 
 namespace AnEoT.Tools.VolumeCreator.Models.Lofter;
 
-public partial class LofterImageInfo(string imageUri, string title, Uri sourcePageUri) : INotifyPropertyChanged
+public sealed partial class LofterImageInfo(Uri imageUri, string title, Uri sourcePageUri) : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public Uri SourcePageUri { get; } = sourcePageUri;
 
-    public string ImageUri
-    {
-        get => imageUri;
-        set
-        {
-            imageUri = value;
-            OnPropertiesChanged();
-        }
-    }
+    public Uri ImageUri { get; } = imageUri;
 
     public string Title
     {

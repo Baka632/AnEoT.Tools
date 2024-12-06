@@ -111,7 +111,7 @@ public sealed partial class SelectTargetImagePage : Page
                         : Path.ChangeExtension(image.AlternativeText, Path.GetExtension(rawFileName));
 
                     return Uri.TryCreate(rawSource, UriKind.Absolute, out Uri? uri)
-                        ? new LofterImageInfo(uri.ToString(), title, pageUri)
+                        ? new LofterImageInfo(uri, title, pageUri)
                         : null;
                 })
                 .Where(info => info is not null)
@@ -174,7 +174,7 @@ public sealed partial class SelectTargetImagePage : Page
 
         try
         {
-            using Stream imageStream = await LofterDownloadHelper.GetImage(new Uri(info.ImageUri, UriKind.Absolute), info.SourcePageUri);
+            using Stream imageStream = await LofterDownloadHelper.GetImage(info.ImageUri, info.SourcePageUri);
             using IRandomAccessStream winrtStream = imageStream.AsRandomAccessStream();
 
             BitmapImage bitmapImage = new()

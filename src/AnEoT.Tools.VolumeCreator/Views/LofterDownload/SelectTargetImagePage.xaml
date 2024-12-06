@@ -31,13 +31,22 @@
             </InfoBar.ActionButton>
         </InfoBar>
 
-        <InfoBar
+        <StackPanel
             Grid.Row="1"
             Margin="0,0,0,10"
-            IsClosable="False"
-            IsOpen="{x:Bind ShowCopyrightInfoBar, Mode=OneWay}"
-            Message="你应当尊重原作者的权利，并负责任地使用这些图像。"
-            Severity="Informational" />
+            Spacing="5">
+            <InfoBar
+                IsClosable="False"
+                IsOpen="{x:Bind ShowCopyrightInfoBar, Mode=OneWay}"
+                Message="你应当尊重原作者的权利，并负责任地使用这些图像。"
+                Severity="Informational" />
+
+            <InfoBar
+                IsClosable="True"
+                IsOpen="{x:Bind ShowCopyrightInfoBar, Mode=OneWay}"
+                Message="可以在这里更改图像的标题，其会作为保存文件的文件名。请注意，不需要额外添加扩展名。"
+                Severity="Informational" />
+        </StackPanel>
 
         <GridView
             x:Name="ImagesGridView"
@@ -47,21 +56,17 @@
             SelectionMode="Multiple">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="lofterModels:LofterImageInfo">
-                    <Grid>
+                    <Grid MinHeight="100" ToolTipService.ToolTip="{x:Bind ImageUri.ToString()}">
                         <Image
                             DataContext="{x:Bind}"
                             Loaded="OnImageLoaded"
                             Opacity="0.5"
                             Stretch="Uniform" />
-                        <TextBlock
-                            MaxHeight="300"
+                        <TextBox
                             Margin="10,0,10,10"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Bottom"
-                            Text="{x:Bind Title}"
-                            TextTrimming="CharacterEllipsis"
-                            TextWrapping="Wrap"
-                            ToolTipService.ToolTip="{x:Bind ImageUri.ToString()}" />
+                            Text="{x:Bind Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </Grid>
                 </DataTemplate>
             </GridView.ItemTemplate>

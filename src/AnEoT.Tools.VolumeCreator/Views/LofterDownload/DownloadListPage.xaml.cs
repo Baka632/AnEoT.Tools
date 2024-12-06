@@ -29,7 +29,9 @@ public sealed partial class DownloadListPage : Page
     {
         ShowEmptyList = Downloads.Count == 0;
 
-        if (!Downloads.Where(item => item.State == LofterDownloadItemState.Completed).Any())
+        if (!Downloads.Where(item => item.State is LofterDownloadItemState.Completed
+            or LofterDownloadItemState.Paused
+            or LofterDownloadItemState.Downloading).Any())
         {
             windowAccessor.EnableForward = true;
             windowAccessor.ShowComplete = true;

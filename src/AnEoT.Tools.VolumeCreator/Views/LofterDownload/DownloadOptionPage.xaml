@@ -32,13 +32,13 @@
             IsExpanded="True">
             <controls:SettingsExpander.Items>
                 <controls:SettingsCard
+                    Command="{x:Bind SelectSaveFolderCommand}"
                     Description="{x:Bind SaveFolder.Path, Mode=OneWay}"
                     Header="文件保存位置"
-                    IsClickEnabled="True"
-                    Command="{x:Bind SelectSaveFolderCommand}"
-                    HeaderIcon="MoveToFolder" />
+                    HeaderIcon="MoveToFolder"
+                    IsClickEnabled="True" />
 
-                <controls:SettingsCard Header="转换为 WebP 格式" Description="WebP 是一种新兴的图像格式，其适合用于网页。">
+                <controls:SettingsCard Description="WebP 是一种新兴的图像格式，其适合用于网页。" Header="转换为 WebP 格式">
                     <controls:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE91B;" />
                     </controls:SettingsCard.HeaderIcon>
