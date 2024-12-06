@@ -65,6 +65,7 @@
 
   <ItemGroup>
     <None Remove="AppPackages\**" />
+    <Content Remove="Assets\Debug-Icon\**" Condition="$(Configuration) == 'Release'" />
     <PRIResource Remove="AppPackages\**" />
   </ItemGroup>
 
