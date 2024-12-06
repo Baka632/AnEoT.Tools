@@ -5,9 +5,6 @@ using WinUIEx;
 
 namespace AnEoT.Tools.VolumeCreator.Views.LofterDownload;
 
-/// <summary>
-/// An empty window that can be used on its own or navigated to within a Frame.
-/// </summary>
 public sealed partial class LofterDownloadWindow : WindowEx
 {
     private int previousSelectIndex;
@@ -63,7 +60,7 @@ public sealed partial class LofterDownloadWindow : WindowEx
             "LoginAndAddress" => typeof(LofterLoginPage),
             "TargetImage" => typeof(SelectTargetImagePage),
             "DownloadOption" => typeof(DownloadOptionPage),
-            "Complete" => typeof(DownloadCompletePage),
+            "List" => typeof(DownloadListPage),
             _ => throw new InvalidOperationException("ÎÞÐ§µÄ SelectorBarItem Tag¡£")
         };
 
@@ -79,7 +76,7 @@ public sealed partial class LofterDownloadWindow : WindowEx
         if (currentIndex + 1 >= count)
         {
             ViewModel.EnableForward = false;
-            ViewModel.EnablePrevious = ViewModel.ShowComplete = true;
+            ViewModel.EnablePrevious = true;
         }
         else if (currentIndex - 1 < 0)
         {
@@ -94,5 +91,10 @@ public sealed partial class LofterDownloadWindow : WindowEx
         }
 
         previousSelectIndex = currentIndex;
+    }
+
+    private void CloseWindowClick(object sender, RoutedEventArgs e)
+    {
+        Close();
     }
 }

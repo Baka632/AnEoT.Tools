@@ -38,7 +38,7 @@
                     Command="{x:Bind SelectSaveFolderCommand}"
                     HeaderIcon="MoveToFolder" />
 
-                <controls:SettingsCard Header="转换为 WebP 格式">
+                <controls:SettingsCard Header="转换为 WebP 格式" Description="WebP 是一种新兴的图像格式，其适合用于网页。">
                     <controls:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE91B;" />
                     </controls:SettingsCard.HeaderIcon>

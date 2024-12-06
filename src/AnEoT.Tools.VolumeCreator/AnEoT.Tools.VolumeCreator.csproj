@@ -45,13 +45,13 @@
 
   <ItemGroup>
     <None Update="RootDescriptor.xml" CopyToOutputDirectory="Always" />
+    <Page Update="Views\LofterDownload\DownloadListPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Views\LofterDownload\Dialogs\WebView2LoginDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\LofterDownload\LofterLoginPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\LofterDownload\DownloadCompletePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\LofterDownload\DownloadOptionPage.xaml">
@@ -97,6 +97,7 @@
 
   <ItemGroup>
     <None Remove="Views\LofterDownload\Dialogs\WebView2LoginDialog.xaml" />
+    <None Remove="Views\LofterDownload\DownloadListPage.xaml" />
     <None Remove="Views\LofterDownload\DownloadOptionPage.xaml" />
     <None Remove="Views\LofterDownload\LofterLoginPage.xaml" />
     <None Remove="Views\LofterDownload\SelectTargetImagePage.xaml" />

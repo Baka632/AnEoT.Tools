@@ -18,6 +18,12 @@ public sealed class LofterDownloadWindowAccessor(LofterDownloadViewModel viewMod
         set => viewModel.DownloadData = value;
     }
 
+    public bool ShowComplete
+    {
+        get => viewModel.ShowComplete;
+        set => viewModel.ShowComplete = value;
+    }
+
     public nint GetWindowHandle()
     {
         return WindowNative.GetWindowHandle(window);
