@@ -1,6 +1,7 @@
-﻿using AnEoT.Tools.VolumeCreator.Views.LofterDownload;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AnEoT.Tools.VolumeCreator.Views.ImageConvert;
+using AnEoT.Tools.VolumeCreator.Views.LofterDownload;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -14,9 +15,9 @@ public sealed partial class UtilitiesViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private static void OpenConvertWebPWindow()
+    private static void OpenImageConvertWindow()
     {
-        // TODO: 
-        // ;)
+        ImageConvertWindow window = new();
+        window.Activate();
     }
 }

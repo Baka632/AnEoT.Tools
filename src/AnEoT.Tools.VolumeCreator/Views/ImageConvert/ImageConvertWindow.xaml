@@ -1,0 +1,45 @@
+<winex:WindowEx
+    x:Class="AnEoT.Tools.VolumeCreator.Views.ImageConvert.ImageConvertWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:AnEoT.Tools.VolumeCreator.Views.ImageConvert"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:winex="using:WinUIEx"
+    Title="图像格式转换窗口"
+    mc:Ignorable="d">
+
+    <Grid Margin="11,0,10,15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            x:Name="TitleBarTextBlock"
+            Grid.Row="0"
+            Margin="0,8,0,10"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Top"
+            Style="{StaticResource CaptionTextBlockStyle}"
+            Text="{x:Bind Title}" />
+
+        <ScrollViewer Grid.Row="1" Margin="0,0,0,5">
+            <Frame x:Name="ContentFrame" />
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Spacing="5">
+            <Button
+                Click="OnTickStartButtonClick"
+                Content="开始"
+                IsEnabled="{x:Bind EnableStart, Mode=OneWay}"
+                Visibility="{x:Bind local:ImageConvertWindow.ReverseBooleanToVisibility(ShowCompleted), Mode=OneWay}" />
+            <Button
+                Click="OnCompletedButtonClick"
+                Content="完成"
+                Visibility="{x:Bind ShowCompleted, Mode=OneWay}" />
+        </StackPanel>
+    </Grid>
+</winex:WindowEx>

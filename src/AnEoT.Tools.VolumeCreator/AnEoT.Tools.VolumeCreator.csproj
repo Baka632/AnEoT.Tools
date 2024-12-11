@@ -45,6 +45,9 @@
 
   <ItemGroup>
     <None Update="RootDescriptor.xml" CopyToOutputDirectory="Always" />
+    <Page Update="Views\ImageConvert\ImageConvertPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Views\LofterDownload\DownloadListPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -97,6 +100,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Views\ImageConvert\ImageConvertPage.xaml" />
     <None Remove="Views\LofterDownload\Dialogs\WebView2LoginDialog.xaml" />
     <None Remove="Views\LofterDownload\DownloadListPage.xaml" />
     <None Remove="Views\LofterDownload\DownloadOptionPage.xaml" />

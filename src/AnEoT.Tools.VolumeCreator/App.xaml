@@ -18,6 +18,9 @@
             <helperConverters:MarkdownWrapperTypeToStringConverter x:Key="MarkdownWrapperTypeToStringConverter" />
             <helperConverters:PredefinedCategoryWrapperToStringConverter x:Key="PredefinedCategoryWrapperToStringConverter" />
             <helperConverters:LofterDownloadItemStateToStringConverter x:Key="LofterDownloadItemStateToStringConverter" />
+            <helperConverters:ImageFormatTypeToStringConverter x:Key="ImageFormatTypeToStringConverter" />
+            <helperConverters:ImageConvertSaveMethodConverter x:Key="ImageConvertSaveMethodConverter" />
+            <helperConverters:ImageConvertItemStateToStringConverter x:Key="ImageConvertItemStateToStringConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

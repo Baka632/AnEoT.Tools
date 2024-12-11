@@ -2,14 +2,10 @@ using System.Collections.ObjectModel;
 using AnEoT.Tools.VolumeCreator.Models;
 using AnEoT.Tools.VolumeCreator.Models.Resources;
 using Microsoft.UI.Composition.SystemBackdrops;
-using Windows.Storage;
 using WinUIEx;
 
 namespace AnEoT.Tools.VolumeCreator.Views;
 
-/// <summary>
-/// An empty window that can be used on its own or navigated to within a Frame.
-/// </summary>
 public sealed partial class MarkdownEditWindow : WindowEx
 {
     public (MarkdownWrapper? Markdown, ObservableCollection<AssetNode> Assets, IVolumeResourcesHelper ResourceHelper) Model { get; set; }
