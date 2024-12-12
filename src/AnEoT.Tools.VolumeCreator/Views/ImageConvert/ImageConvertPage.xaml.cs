@@ -50,22 +50,12 @@ public sealed partial class ImageConvertPage : Page
     partial void OnSelectedSaveMethodIndexChanged(int value)
     {
         ShowSelectOtherFolder = SelectedSaveMethod == ImageConvertSaveMethod.SelectOtherFolder;
-        if (ShowSelectOtherFolder && !Directory.Exists(SelectedSaveFolderPath))
-        {
-            WindowAccessor.EnableStart = false;
-        }
-        else
-        {
-            WindowAccessor.EnableStart = true;
-        }
+        ChooseEnableStart();
     }
 
     partial void OnSelectedSaveFolderPathChanged(string? value)
     {
-        if (ShowSelectOtherFolder)
-        {
-            WindowAccessor.EnableStart = Directory.Exists(SelectedSaveFolderPath);
-        }
+        ChooseEnableStart();
     }
 
     public ImageFormatType SelectedImageFormat { get => ImageFormats[SelectedImageFormatIndex]; }
@@ -83,6 +73,12 @@ public sealed partial class ImageConvertPage : Page
     private void OnImagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         ImagesHasItems = Images.Count > 0;
+
+        if (!ShowConverting)
+        {
+            ChooseEnableStart();
+        }
+
         if (ShowConverting && !Images.Any(item => item.State is ImageConvertItemState.None
             or ImageConvertItemState.Converting
             or ImageConvertItemState.Completed))
@@ -98,6 +94,7 @@ public sealed partial class ImageConvertPage : Page
         if (e.Parameter is ImageConvertWindowAccessor accessor)
         {
             WindowAccessor = accessor;
+            WindowAccessor.EnableStart = false;
             accessor.ConvertStarted += OnConvertStarted;
         }
     }
@@ -106,17 +103,10 @@ public sealed partial class ImageConvertPage : Page
     {
         ShowConverting = true;
         WindowAccessor.EnableStart = false;
-        try
+        foreach (ImageConvertItem item in Images.ToArray())
         {
-            foreach (ImageConvertItem item in Images.ToArray())
-            {
-                item.PropertyChanged += OnImageConvertItemPropertyChanged;
-                _ = item.ConvertItemAsync(SelectedImageFormat, SelectedSaveMethod, SelectedSaveFolderPath);
-            }
-        }
-        finally
-        {
-            WindowAccessor.EnableStart = true;
+            item.PropertyChanged += OnImageConvertItemPropertyChanged;
+            _ = item.ConvertItemAsync(SelectedImageFormat, SelectedSaveMethod, SelectedSaveFolderPath);
         }
 
         void OnImageConvertItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -204,5 +194,24 @@ public sealed partial class ImageConvertPage : Page
             true => Visibility.Visible,
             false => Visibility.Collapsed,
         };
+    }
+
+    private void ChooseEnableStart()
+    {
+        if (ShowConverting)
+        {
+            WindowAccessor.EnableStart = false;
+        }
+        else
+        {
+            if (ShowSelectOtherFolder)
+            {
+                WindowAccessor.EnableStart = ImagesHasItems && Directory.Exists(SelectedSaveFolderPath);
+            }
+            else
+            {
+                WindowAccessor.EnableStart = ImagesHasItems;
+            }
+        }
     }
 }
