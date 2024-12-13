@@ -8,7 +8,7 @@ namespace AnEoT.Tools.VolumeCreator.Views;
 
 public sealed partial class MarkdownEditWindow : WindowEx
 {
-    public (MarkdownWrapper? Markdown, ObservableCollection<AssetNode> Assets, IVolumeResourcesHelper ResourceHelper) Model { get; set; }
+    public (MarkdownWrapper? Markdown, ObservableCollection<AssetNode> Assets, IVolumeResourcesHelper ResourceHelper, bool ConvertWebP) Model { get; set; }
 
     public MarkdownEditWindow()
     {

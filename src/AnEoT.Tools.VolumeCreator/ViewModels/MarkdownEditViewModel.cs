@@ -19,6 +19,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     public MarkdownWrapper MarkdownWrapper { get; }
     public ObservableCollection<AssetNode> Assets { get; }
     public IVolumeResourcesHelper ResourcesHelper { get; }
+    public bool ConvertWebP { get; set; }
     public Dictionary<string, FileNode> MarkdownImageUriToFileMapping { get; } = new(10);
 
     private readonly MarkdownEditPage view;
@@ -28,13 +29,14 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     [ObservableProperty]
     private string articleQuote = string.Empty;
 
-    public MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage viewPage, ObservableCollection<AssetNode> assets, IVolumeResourcesHelper resourcesHelper)
+    public MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage viewPage, ObservableCollection<AssetNode> assets, IVolumeResourcesHelper resourcesHelper, bool convertWebP)
     {
         markdownString = wrapper.Markdown;
         view = viewPage;
         ResourcesHelper = resourcesHelper;
         Assets = assets;
         MarkdownWrapper = wrapper;
+        ConvertWebP = convertWebP;
 
         assets.CollectionChanged += (s, e) => InitializeImageFileMapping();
         InitializeImageFileMapping();
@@ -298,6 +300,10 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     public void InsertImageToText(TextBox textBox, FileNode fileNode)
     {
         string imageUri = ConstructImageUriByFileNode(fileNode);
+        if (ConvertWebP)
+        {
+            imageUri = Path.ChangeExtension(imageUri, ".webp");
+        }
         string markdownImageMark = $"![]({imageUri})";
 
         int position = textBox.SelectionStart;
