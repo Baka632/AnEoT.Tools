@@ -35,7 +35,7 @@
 
   <PropertyGroup>
       <PackageCertificateThumbprint Condition="$(Configuration) != 'Release'">70211FC3C97E403131B9A07F4D5F11FB3C59A2A4</PackageCertificateThumbprint>
-      <PackageCertificateThumbprint Condition="$(Configuration) == 'Release'">DDB65A16ADD7329008B9ACC55F0B4C6AF71848B5</PackageCertificateThumbprint>
+      <PackageCertificateThumbprint Condition="$(Configuration) == 'Release'">D9B5F2BA3F9EC73CFE90208E263D1F5704100BAE</PackageCertificateThumbprint>
   </PropertyGroup>
 
   <ItemGroup>
