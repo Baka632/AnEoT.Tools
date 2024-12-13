@@ -1,6 +1,7 @@
 using WinUIEx;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace AnEoT.Tools.VolumeCreator.Views;
 
@@ -75,5 +76,31 @@ public sealed partial class MainWindow : WindowEx
         }
 
         UtilitiesFrame.Navigate(typeof(UtilitiesPage));
+    }
+
+    private void OnAboutImageLoaded(object sender, RoutedEventArgs e)
+    {
+        Image image = (Image)sender;
+        Uri aboutImageUri;
+
+#if DEBUG
+        aboutImageUri = new Uri("ms-appx:///Assets/App-Logo/Logo-Dev.png");
+#else
+        aboutImageUri = App.Current.RequestedTheme == ApplicationTheme.Dark
+            ? new Uri("ms-appx:///Assets/App-Logo/Logo-White.png")
+            : new Uri("ms-appx:///Assets/App-Logo/Logo-Black.png");
+#endif
+
+        image.Source = new BitmapImage(aboutImageUri);
+    }
+
+    private void OnQuoteRichTextBlockPointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        QuoteRichTextBlock.Opacity = 1;
+    }
+
+    private void OnQuoteRichTextBlockPointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        QuoteRichTextBlock.Opacity = 0;
     }
 }

@@ -11,6 +11,8 @@
 
     <Grid>
         <GridView
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
             IsItemClickEnabled="False"
             ItemsSource="{x:Bind UtilitiyItems}"
             SelectionMode="None">

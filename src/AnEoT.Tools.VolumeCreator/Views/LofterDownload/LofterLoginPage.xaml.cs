@@ -9,9 +9,6 @@ using Microsoft.Web.WebView2.Core;
 namespace AnEoT.Tools.VolumeCreator.Views.LofterDownload;
 
 [INotifyPropertyChanged]
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
 public sealed partial class LofterLoginPage : Page
 {
     private LofterDownloadWindowAccessor windowAccessor;
@@ -161,6 +158,10 @@ public sealed partial class LofterLoginPage : Page
                 windowAccessor.DownloadData = windowAccessor.DownloadData with { LofterCookie = cookieString };
                 CookieSelected = true;
             }
+        }
+        catch
+        {
+            // Ignore all exceptions.
         }
         finally
         {
