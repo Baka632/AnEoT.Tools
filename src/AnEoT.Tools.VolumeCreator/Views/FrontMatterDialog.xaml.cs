@@ -55,6 +55,8 @@ public sealed partial class FrontMatterDialog : ContentDialog
     private PredefinedCategory? predefinedCategoryValue;
     [ObservableProperty]
     private int predefinedCategoryIndex = 0;
+    [ObservableProperty]
+    private bool isArticle = true;
 
     private void OnTagsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
@@ -142,6 +144,7 @@ public sealed partial class FrontMatterDialog : ContentDialog
             Author = this.Author,
             Order = this.Order,
             Description = this.Description,
+            Article = IsArticle,
         };
 
         Result = (frontMatter, PredefinedCategoryValue);

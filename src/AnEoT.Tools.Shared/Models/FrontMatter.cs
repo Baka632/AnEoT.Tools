@@ -4,19 +4,23 @@ using AnEoT.Tools.Shared.StaticContexts;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel;
+using System.Collections;
+using YamlDotNet.Serialization.ObjectFactories;
 
 namespace AnEoT.Tools.Shared.Models;
 
 public readonly record struct FrontMatter(
-    [property: YamlMember(Order = 2)] string Title,
-    [property: YamlMember(Order = 3, DefaultValuesHandling = DefaultValuesHandling.OmitNull)] string? ShortTitle,
     [property: YamlMember(Order = 1, DefaultValuesHandling = DefaultValuesHandling.OmitNull)] string Icon,
-    [property: YamlMember(Order = 4, DefaultValuesHandling = DefaultValuesHandling.OmitNull)] string? Author,
-    [property: YamlMember(Order = 5, DefaultValuesHandling = DefaultValuesHandling.OmitNull)] string? Date,
-    [property: YamlMember(Order = 6, DefaultValuesHandling = DefaultValuesHandling.OmitNull | DefaultValuesHandling.OmitEmptyCollections)] IEnumerable<string>? Category,
-    [property: YamlMember(Order = 7, DefaultValuesHandling = DefaultValuesHandling.OmitNull | DefaultValuesHandling.OmitEmptyCollections)] IEnumerable<string>? Tag,
-    [property: YamlMember(Order = 9)] int Order,
-    [property: YamlMember(Order = 8, DefaultValuesHandling = DefaultValuesHandling.OmitNull)] string? Description)
+    [property: YamlMember(Order = 2, DefaultValuesHandling = DefaultValuesHandling.OmitDefaults), DefaultValue(true)] bool Article,
+    [property: YamlMember(Order = 3)] string Title,
+    [property: YamlMember(Order = 4, DefaultValuesHandling = DefaultValuesHandling.OmitNull)] string? ShortTitle,
+    [property: YamlMember(Order = 5, DefaultValuesHandling = DefaultValuesHandling.OmitNull)] string? Author,
+    [property: YamlMember(Order = 6, DefaultValuesHandling = DefaultValuesHandling.OmitNull)] string? Date,
+    [property: YamlMember(Order = 7, DefaultValuesHandling = DefaultValuesHandling.OmitNull | DefaultValuesHandling.OmitEmptyCollections)] IEnumerable<string>? Category,
+    [property: YamlMember(Order = 8, DefaultValuesHandling = DefaultValuesHandling.OmitNull | DefaultValuesHandling.OmitEmptyCollections)] IEnumerable<string>? Tag,
+    [property: YamlMember(Order = 9, DefaultValuesHandling = DefaultValuesHandling.OmitNull)] string? Description,
+    [property: YamlMember(Order = 10)] int Order)
 {
     [RequiresDynamicCode("此方法调用了不支持 IL 裁剪的 YamlDotNet.Serialization.SerializerBuilder.SerializerBuilder()")]
     public string GetYamlString()
@@ -50,6 +54,7 @@ public readonly record struct FrontMatter(
             yamlParser.Consume<DocumentStart>();
 
             IDeserializer yamlDes = new DeserializerBuilder()
+                .WithObjectFactory(new FrontMatterFactory())
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .Build();
             //IDeserializer yamlDes = new StaticDeserializerBuilder(new FrontMatterStaticContext())
@@ -65,6 +70,58 @@ public readonly record struct FrontMatter(
         }
 
         return true;
+    }
+}
+
+file sealed class FrontMatterFactory : IObjectFactory
+{
+    private readonly DefaultObjectFactory defaultFactory = new();
+
+    public object Create(Type type)
+    {
+        if (type == typeof(FrontMatter))
+        {
+            return new FrontMatter() { Article = true };
+        }
+        else
+        {
+            return defaultFactory.Create(type);
+        }
+    }
+
+    public object? CreatePrimitive(Type type)
+    {
+        return defaultFactory.CreatePrimitive(type);
+    }
+
+    public void ExecuteOnDeserialized(object value)
+    {
+        defaultFactory.ExecuteOnDeserialized(value);
+    }
+
+    public void ExecuteOnDeserializing(object value)
+    {
+        defaultFactory.ExecuteOnDeserializing(value);
+    }
+
+    public void ExecuteOnSerialized(object value)
+    {
+        defaultFactory.ExecuteOnSerialized(value);
+    }
+
+    public void ExecuteOnSerializing(object value)
+    {
+        defaultFactory.ExecuteOnSerializing(value);
+    }
+
+    public bool GetDictionary(IObjectDescriptor descriptor, out IDictionary? dictionary, out Type[]? genericArguments)
+    {
+        return defaultFactory.GetDictionary(descriptor, out dictionary, out genericArguments);
+    }
+
+    public Type GetValueType(Type type)
+    {
+        return defaultFactory.GetValueType(type);
     }
 }
 
