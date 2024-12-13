@@ -67,10 +67,18 @@
                         TextWrapping="NoWrap" />
                 </controls:SettingsCard>
 
-                <controls:SettingsCard Description="我们尊重您的隐私，此应用仅将登陆 Cookie 保存在本地，并且只用于获取 Lofter 站点的网页。">
+                <controls:SettingsCard>
                     <controls:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE727;" />
                     </controls:SettingsCard.HeaderIcon>
+                    <controls:SettingsCard.Description>
+                        <RichTextBlock>
+                            <Paragraph>我们尊重您的隐私，此应用仅将登陆 Cookie 保存在本地，并且只用于获取 Lofter 站点的网页。</Paragraph>
+                            <Paragraph>
+                                <Hyperlink NavigateUri="https://raw.githubusercontent.com/Baka632/Baka632-Privacy-Statement/main/AnEoT-Volume-Creator/AnEoT-Volume-Creator-Privacy-Statement.md" UnderlineStyle="None">请参阅我们的隐私声明...</Hyperlink>
+                            </Paragraph>
+                        </RichTextBlock>
+                    </controls:SettingsCard.Description>
                 </controls:SettingsCard>
             </controls:SettingsExpander.Items>
         </controls:SettingsExpander>
