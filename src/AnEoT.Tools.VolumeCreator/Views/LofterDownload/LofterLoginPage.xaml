@@ -10,12 +10,34 @@
     mc:Ignorable="d">
 
     <StackPanel Spacing="10">
+        <StackPanel Spacing="5">
+            <InfoBar
+                x:Name="UriErrorInfoBar"
+                Title="错误"
+                IsClosable="False"
+                IsOpen="False"
+                Message="输入无效。若复制过来的地址没有添加协议名，则请在地址前面附加“https://”或“http://”。"
+                Severity="Error" />
+
+            <controls:SettingsCard Header="输入页面地址">
+                <controls:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE62F;" />
+                </controls:SettingsCard.HeaderIcon>
+
+                <TextBox
+                    x:Name="WebsiteAddressTextBox"
+                    MinWidth="300"
+                    PlaceholderText="请在地址前面附加“https://”或“http://”"
+                    TextChanged="OnWebsiteAddressTextBoxTextChanged" />
+            </controls:SettingsCard>
+        </StackPanel>
+
         <controls:SettingsExpander
             Description="由于 Lofter 的部分帖子需要登陆才能访问，因此需要登陆 Lofter。"
             Header="选择登陆方式"
             HeaderIcon="OtherUser"
-            IsEnabled="{x:Bind IsInitializingCookie, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}"
-            IsExpanded="True">
+            IsExpanded="True"
+            Visibility="{x:Bind ShowLofterLogin, Mode=OneWay}">
             <controls:SettingsExpander.ItemsHeader>
                 <Grid>
                     <InfoBar
@@ -33,13 +55,6 @@
                                 Content="清除登陆状态" />
                         </InfoBar.ActionButton>
                     </InfoBar>
-                    <InfoBar
-                        Title="正在尝试自动登陆 Lofter..."
-                        BorderThickness="0"
-                        CornerRadius="0"
-                        IsClosable="False"
-                        IsOpen="{x:Bind IsInitializingCookie, Mode=OneWay}"
-                        Severity="Informational" />
                 </Grid>
             </controls:SettingsExpander.ItemsHeader>
 
@@ -82,26 +97,5 @@
                 </controls:SettingsCard>
             </controls:SettingsExpander.Items>
         </controls:SettingsExpander>
-
-        <StackPanel>
-            <InfoBar
-                x:Name="WarningInfoBar"
-                Title="错误"
-                IsClosable="False"
-                IsOpen="False"
-                Message="输入无效。若复制过来的地址没有添加协议名，则请在地址前面附加“https://”或“http://”。"
-                Severity="Error" />
-            <controls:SettingsCard Header="输入页面地址" IsEnabled="{x:Bind IsInitializingCookie, Mode=OneWay, Converter={StaticResource BoolNegationConverter}}">
-                <controls:SettingsCard.HeaderIcon>
-                    <FontIcon Glyph="&#xE62F;" />
-                </controls:SettingsCard.HeaderIcon>
-
-                <TextBox
-                    x:Name="WebsiteAddressTextBox"
-                    MinWidth="300"
-                    PlaceholderText="请在地址前面附加“https://”或“http://”"
-                    TextChanged="OnWebsiteAddressTextBoxTextChanged" />
-            </controls:SettingsCard>
-        </StackPanel>
     </StackPanel>
 </Page>

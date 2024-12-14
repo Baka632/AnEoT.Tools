@@ -64,10 +64,9 @@ public sealed partial class SelectTargetImagePage : Page
     {
         windowAccessor.EnableForward = ImagesGridView.SelectedItems.Count > 0;
 
-        if (data?.PageUri is null || data?.LofterCookie is null)
+        if (data?.PageUri is null)
         {
-            SetInfoBar("目标地址或者 Lofter 登陆 Cookie 为空",
-                       "你是怎么到这里来的？滚回去！（车尔尼音）");
+            SetInfoBar("目标地址为空", "你是怎么到这里来的？滚回去！（车尔尼音）");
         }
         else
         {
@@ -86,7 +85,7 @@ public sealed partial class SelectTargetImagePage : Page
         }
     }
 
-    private async Task GetTargetPageImage(Uri pageUri, string lofterCookie)
+    private async Task GetTargetPageImage(Uri pageUri, string? lofterCookie)
     {
         IsLoading = true;
 
@@ -99,7 +98,7 @@ public sealed partial class SelectTargetImagePage : Page
             using IBrowsingContext context = BrowsingContext.New(configuration);
             using IDocument document = await context.OpenAsync(res => res.Content(html).Address(pageUri));
 
-            IEnumerable<LofterImageInfo> images = document.Body?.Descendants<IHtmlImageElement>()
+            LofterImageInfo[] images = document.Body?.Descendants<IHtmlImageElement>()
                 .Where(image => !image.ClassList.Contains("avatar") && !image.ClassList.Contains("itag"))
                 .Select(image =>
                 {
@@ -107,8 +106,8 @@ public sealed partial class SelectTargetImagePage : Page
                     string? rawFileName = Path.GetFileName(rawSource);
 
                     string title = string.IsNullOrWhiteSpace(image.AlternativeText)
-                        ? WebUtility.UrlDecode(rawFileName) ?? "未知图像"
-                        : Path.ChangeExtension(image.AlternativeText, Path.GetExtension(rawFileName));
+                        ? Path.GetFileNameWithoutExtension(WebUtility.UrlDecode(rawFileName)) ?? "未知图像"
+                        : image.AlternativeText;
 
                     return Uri.TryCreate(rawSource, UriKind.Absolute, out Uri? uri)
                         ? new LofterImageInfo(uri, title, pageUri)
@@ -116,7 +115,21 @@ public sealed partial class SelectTargetImagePage : Page
                 })
                 .Where(info => info is not null)
                 .Select(info => info!)
-                .DistinctBy(info => info.ImageUri) ?? [];
+                .DistinctBy(info => info.ImageUri)
+                .ToArray() ?? [];
+            foreach (IGrouping<string, LofterImageInfo> group in images.GroupBy(item => item.Title))
+            {
+                if (group.Count() > 1)
+                {
+                    foreach ((int index, LofterImageInfo item) in group.Index())
+                    {
+                        if (index > 0)
+                        {
+                            item.Title = $"{item.Title} ({index})";
+                        }
+                    }
+                }
+            }
             ImageInfos = images;
         }
         catch (HttpRequestException ex)
@@ -137,7 +150,7 @@ public sealed partial class SelectTargetImagePage : Page
     [RelayCommand]
     private async Task RetryGetImage()
     {
-        if (data.PageUri is not null && data.LofterCookie is not null)
+        if (data.PageUri is not null)
         {
             ShowInfoBar = false;
             await GetTargetPageImage(data.PageUri, data.LofterCookie);
@@ -171,6 +184,11 @@ public sealed partial class SelectTargetImagePage : Page
     {
         Image img = (Image)sender;
         LofterImageInfo info = (LofterImageInfo)img.DataContext;
+
+        if (img.Source is not null)
+        {
+            return;
+        }
 
         try
         {

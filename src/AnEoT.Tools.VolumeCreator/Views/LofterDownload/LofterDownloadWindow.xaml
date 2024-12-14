@@ -6,7 +6,7 @@
     xmlns:local="using:AnEoT.Tools.VolumeCreator.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:winex="using:WinUIEx"
-    Title="Lofter 图像下载窗口"
+    Title="图像下载窗口"
     MinWidth="600"
     MinHeight="400"
     IsMinimizable="False"
@@ -47,7 +47,7 @@
                 <SelectorBarItem
                     IsSelected="True"
                     Tag="LoginAndAddress"
-                    Text="登陆方式+页面地址" />
+                    Text="页面地址" />
                 <SelectorBarItem Tag="TargetImage" Text="选择目标图像" />
                 <SelectorBarItem Tag="DownloadOption" Text="配置下载选项" />
                 <SelectorBarItem Tag="List" Text="下载列表" />

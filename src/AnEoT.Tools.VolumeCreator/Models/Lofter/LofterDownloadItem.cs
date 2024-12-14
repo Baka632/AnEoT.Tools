@@ -53,10 +53,27 @@ public partial class LofterDownloadItem(
                 ? new(queryTrimmedUri, UriKind.Absolute)
                 : imageInfo.ImageUri;
             Uri sourcePageUri = imageInfo.SourcePageUri;
-            string fileName = convertWebP
-                ? $"{ReplaceInvaildFileNameChars(imageInfo.Title)}.webp"
-                : $"{ReplaceInvaildFileNameChars(imageInfo.Title)}{Path.GetExtension(queryTrimmedUri)}";
+
+            string queryTrimmedUriExtension = Path.GetExtension(queryTrimmedUri);
+            string suitableTitle = ReplaceInvaildFileNameChars(imageInfo.Title);
+
+            string fileExtension = convertWebP
+                ? ".webp"
+                : (string.IsNullOrWhiteSpace(queryTrimmedUriExtension) ? ".jpg" : queryTrimmedUriExtension);
+            string fileNameWithoutExtension = string.IsNullOrWhiteSpace(suitableTitle)
+                ? Path.GetRandomFileName()
+                : suitableTitle;
+
+            string fileName = $"{fileNameWithoutExtension}{fileExtension}";
             string filePath = Path.Combine(savePath, fileName);
+
+            int duplicateCount = 1;
+            while (File.Exists(filePath))
+            {
+                string newFileName = $"{fileNameWithoutExtension}({duplicateCount}){fileExtension}";
+                filePath = Path.Combine(savePath, newFileName);
+                duplicateCount++;
+            }
 
             using Stream imageStream = await LofterDownloadHelper.GetImage(imageUri, sourcePageUri);
             using FileStream fileStream = File.Create(filePath);

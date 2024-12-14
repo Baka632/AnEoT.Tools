@@ -7,7 +7,7 @@ public static class LofterDownloadHelper
 {
     private static readonly HttpClient HttpClient = new();
 
-    public static async Task<string> GetPageHtml(Uri pageUri, string cookie)
+    public static async Task<string> GetPageHtml(Uri pageUri, string? cookie)
     {
         using HttpResponseMessage response = await GetHttpResponseMessage(pageUri, pageUri, cookie);
 
@@ -56,7 +56,7 @@ public static class LofterDownloadHelper
         HttpRequestMessage message = new(HttpMethod.Get, targetUri);
         message.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0");
         message.Headers.Add("Referer", $"{refererUri.Scheme}://{refererUri.Host}");
-        if (!string.IsNullOrWhiteSpace(cookie))
+        if (!string.IsNullOrWhiteSpace(cookie) && CommonValues.GetLofterDomainVerifyRegex().IsMatch(targetUri.Host))
         {
             message.Headers.Add("Cookie", cookie);
         }

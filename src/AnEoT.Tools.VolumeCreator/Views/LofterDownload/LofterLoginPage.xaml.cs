@@ -15,14 +15,14 @@ public sealed partial class LofterLoginPage : Page
     private LofterCookieProvider cookieProvider;
 
     private bool blockTextBoxCookieProvider;
-    private bool triedCookieInitialization;
+    private bool allowWithoutCookie;
 
-    [ObservableProperty]
-    private bool isInitializingCookie = true;
     [ObservableProperty]
     private bool targetUriSelected;
     [ObservableProperty]
     private bool cookieSelected;
+    [ObservableProperty]
+    private bool showLofterLogin;
 
 #pragma warning disable CS8618 // OnNavigatedTo 会出手
     public LofterLoginPage()
@@ -46,10 +46,9 @@ public sealed partial class LofterLoginPage : Page
         }
     }
 
-    private async void OnPageLoaded(object sender, RoutedEventArgs e)
+    private void OnPageLoaded(object sender, RoutedEventArgs e)
     {
         DetermineCanMoveNext();
-        await TryLoadCookie();
     }
 
     private void OnWebsiteAddressTextBoxTextChanged(object sender, TextChangedEventArgs e)
@@ -58,12 +57,24 @@ public sealed partial class LofterLoginPage : Page
         {
             windowAccessor.DownloadData = windowAccessor.DownloadData with { PageUri = websiteAddress };
             TargetUriSelected = true;
-            WarningInfoBar.IsOpen = false;
+            UriErrorInfoBar.IsOpen = false;
+
+            if (!CommonValues.GetLofterDomainVerifyRegex().IsMatch(websiteAddress.Host))
+            {
+                allowWithoutCookie = true;
+                ShowLofterLogin = false;
+            }
+            else
+            {
+                // 是 Lofter
+                allowWithoutCookie = false;
+                ShowLofterLogin = true;
+            }
         }
         else
         {
             TargetUriSelected = false;
-            WarningInfoBar.IsOpen = true;
+            UriErrorInfoBar.IsOpen = true;
         }
 
         DetermineCanMoveNext();
@@ -78,7 +89,12 @@ public sealed partial class LofterLoginPage : Page
 
     private void DetermineCanMoveNext()
     {
-        windowAccessor.EnableForward = TargetUriSelected && CookieSelected;
+        windowAccessor.EnableForward = TargetUriSelected && (CookieSelected || allowWithoutCookie);
+    }
+
+    private void SetCookie(string? cookie)
+    {
+        windowAccessor.DownloadData = windowAccessor.DownloadData with { LofterCookie = cookie };
     }
 
     private async void OnCookieTextBoxTextChanged(object sender, TextChangedEventArgs e)
@@ -97,7 +113,7 @@ public sealed partial class LofterLoginPage : Page
 
         if (cookieProvider.VerfiyCookie())
         {
-            windowAccessor.DownloadData = windowAccessor.DownloadData with { LofterCookie = cookieProvider.Cookie };
+            SetCookie(cookieProvider.Cookie);
             CookieSelected = true;
         }
         else
@@ -122,52 +138,12 @@ public sealed partial class LofterLoginPage : Page
             blockTextBoxCookieProvider = true;
             CookieTextBox.Text = string.Empty;
             blockTextBoxCookieProvider = false;
-            windowAccessor.DownloadData = windowAccessor.DownloadData with { LofterCookie = cookieProvider.Cookie };
+            SetCookie(cookieProvider.Cookie);
             CookieSelected = true;
         }
         else
         {
             CookieSelected = false;
-        }
-    }
-
-    private async Task TryLoadCookie()
-    {
-        if (triedCookieInitialization)
-        {
-            return;
-        }
-
-        IsInitializingCookie = true;
-
-        StringBuilder stringBuilder = new();
-        WebView2 webView2 = new();
-        try
-        {
-            await webView2.EnsureCoreWebView2Async();
-            IReadOnlyList<CoreWebView2Cookie> cookies = await webView2.CoreWebView2.CookieManager.GetCookiesAsync("https://www.lofter.com/");
-            foreach (CoreWebView2Cookie cookie in cookies)
-            {
-                stringBuilder.Append($"{cookie.Name}={cookie.Value}; ");
-            }
-
-            string cookieString = stringBuilder.ToString().TrimEnd();
-
-            if (LofterCookieProvider.VerfiyCookieCore(cookieString))
-            {
-                windowAccessor.DownloadData = windowAccessor.DownloadData with { LofterCookie = cookieString };
-                CookieSelected = true;
-            }
-        }
-        catch
-        {
-            // Ignore all exceptions.
-        }
-        finally
-        {
-            webView2.Close();
-            IsInitializingCookie = false;
-            triedCookieInitialization = true;
         }
     }
 

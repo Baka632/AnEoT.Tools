@@ -3,9 +3,6 @@ using AnEoT.Tools.VolumeCreator.ViewModels;
 
 namespace AnEoT.Tools.VolumeCreator.Views;
 
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
 public sealed partial class UtilitiesPage : Page
 {
     public UtilitiyItem[] UtilitiyItems { get; }
@@ -16,7 +13,7 @@ public sealed partial class UtilitiesPage : Page
     {
         this.InitializeComponent();
         UtilitiyItems = [
-            new("Lofter 图像下载", "\xEBD3", ViewModel.OpenLofterDownloadWindowCommand),
+            new("图像下载", "\xEBD3", ViewModel.OpenLofterDownloadWindowCommand),
             new("图像格式转换", "\xE91B", ViewModel.OpenImageConvertWindowCommand),
         ];
     }
