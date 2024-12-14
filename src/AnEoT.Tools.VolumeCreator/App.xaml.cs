@@ -84,8 +84,13 @@ public partial class App : Application
         MainWindow mainWindow = new()
         {
             ExtendsContentIntoTitleBar = true,
-            Title = AppName,
+            Title = AppName
         };
+#if DEBUG
+        mainWindow.AppWindow.SetIcon("Assets/App-Logo/App-Icon-Dev.ico");
+#else
+        mainWindow.AppWindow.SetIcon("Assets/App-Logo/App-Icon.ico");
+#endif
         Window = mainWindow;
 
         if (activatedArgs.Kind == ExtendedActivationKind.File)

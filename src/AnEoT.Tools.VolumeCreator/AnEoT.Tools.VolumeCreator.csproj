@@ -35,7 +35,7 @@
 
   <PropertyGroup>
       <PackageCertificateThumbprint Condition="$(Configuration) != 'Release'">70211FC3C97E403131B9A07F4D5F11FB3C59A2A4</PackageCertificateThumbprint>
-      <PackageCertificateThumbprint Condition="$(Configuration) == 'Release'">DDB65A16ADD7329008B9ACC55F0B4C6AF71848B5</PackageCertificateThumbprint>
+      <PackageCertificateThumbprint Condition="$(Configuration) == 'Release'">D9B5F2BA3F9EC73CFE90208E263D1F5704100BAE</PackageCertificateThumbprint>
   </PropertyGroup>
 
   <ItemGroup>
@@ -45,11 +45,30 @@
 
   <ItemGroup>
     <None Update="RootDescriptor.xml" CopyToOutputDirectory="Always" />
+    <Page Update="Views\ImageConvert\ImageConvertPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\LofterDownload\DownloadListPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\LofterDownload\Dialogs\WebView2LoginDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\LofterDownload\LofterLoginPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\LofterDownload\DownloadOptionPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\LofterDownload\SelectTargetImagePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <TrimmerRootDescriptor Include="RootDescriptor.xml" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="AppPackages\**" />
+    <Content Remove="Assets\Debug-Icon\**" Condition="$(Configuration) == 'Release'" />
     <PRIResource Remove="AppPackages\**" />
   </ItemGroup>
 
@@ -81,6 +100,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Views\ImageConvert\ImageConvertPage.xaml" />
+    <None Remove="Views\LofterDownload\Dialogs\WebView2LoginDialog.xaml" />
+    <None Remove="Views\LofterDownload\DownloadListPage.xaml" />
+    <None Remove="Views\LofterDownload\DownloadOptionPage.xaml" />
+    <None Remove="Views\LofterDownload\LofterLoginPage.xaml" />
+    <None Remove="Views\LofterDownload\SelectTargetImagePage.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="1.1.2" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
     <PackageReference Include="CommunityToolkit.WinUI.Behaviors" Version="8.1.240916" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.1.240916" />

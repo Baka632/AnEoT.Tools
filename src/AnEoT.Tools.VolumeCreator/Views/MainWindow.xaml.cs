@@ -1,6 +1,7 @@
 using WinUIEx;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace AnEoT.Tools.VolumeCreator.Views;
 
@@ -58,7 +59,7 @@ public sealed partial class MainWindow : WindowEx
 
     public async void InitalizeWindow(object? parameter = null)
     {
-        if (MainFrame.Content is ContentPage page && parameter is not null)
+        if (MainFrame.Content is VolumeCreationPage page && parameter is not null)
         {
             await page.ParseParameter(parameter);
         }
@@ -66,12 +67,40 @@ public sealed partial class MainWindow : WindowEx
         {
             if (parameter is null)
             {
-                MainFrame.Navigate(typeof(ContentPage));
+                MainFrame.Navigate(typeof(VolumeCreationPage));
             }
             else
             {
-                MainFrame.Navigate(typeof(ContentPage), parameter);
+                MainFrame.Navigate(typeof(VolumeCreationPage), parameter);
             }
         }
+
+        UtilitiesFrame.Navigate(typeof(UtilitiesPage));
+    }
+
+    private void OnAboutImageLoaded(object sender, RoutedEventArgs e)
+    {
+        Image image = (Image)sender;
+        Uri aboutImageUri;
+
+#if DEBUG
+        aboutImageUri = new Uri("ms-appx:///Assets/App-Logo/Logo-Dev.png");
+#else
+        aboutImageUri = App.Current.RequestedTheme == ApplicationTheme.Dark
+            ? new Uri("ms-appx:///Assets/App-Logo/Logo-White.png")
+            : new Uri("ms-appx:///Assets/App-Logo/Logo-Black.png");
+#endif
+
+        image.Source = new BitmapImage(aboutImageUri);
+    }
+
+    private void OnQuoteRichTextBlockPointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        QuoteRichTextBlock.Opacity = 1;
+    }
+
+    private void OnQuoteRichTextBlockPointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        QuoteRichTextBlock.Opacity = 0;
     }
 }

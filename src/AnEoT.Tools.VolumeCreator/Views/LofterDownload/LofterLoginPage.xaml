@@ -1,0 +1,101 @@
+<Page
+    x:Class="AnEoT.Tools.VolumeCreator.Views.LofterDownload.LofterLoginPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:AnEoT.Tools.VolumeCreator.Views.LofterDownload"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Loaded="OnPageLoaded"
+    mc:Ignorable="d">
+
+    <StackPanel Spacing="10">
+        <StackPanel Spacing="5">
+            <InfoBar
+                x:Name="UriErrorInfoBar"
+                Title="错误"
+                IsClosable="False"
+                IsOpen="False"
+                Message="输入无效。若复制过来的地址没有添加协议名，则请在地址前面附加“https://”或“http://”。"
+                Severity="Error" />
+
+            <controls:SettingsCard Header="输入页面地址">
+                <controls:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE62F;" />
+                </controls:SettingsCard.HeaderIcon>
+
+                <TextBox
+                    x:Name="WebsiteAddressTextBox"
+                    MinWidth="300"
+                    PlaceholderText="请在地址前面附加“https://”或“http://”"
+                    TextChanged="OnWebsiteAddressTextBoxTextChanged" />
+            </controls:SettingsCard>
+        </StackPanel>
+
+        <controls:SettingsExpander
+            Description="由于 Lofter 的部分帖子需要登陆才能访问，因此需要登陆 Lofter。"
+            Header="选择登陆方式"
+            HeaderIcon="OtherUser"
+            IsExpanded="True"
+            Visibility="{x:Bind ShowLofterLogin, Mode=OneWay}">
+            <controls:SettingsExpander.ItemsHeader>
+                <Grid>
+                    <InfoBar
+                        Title="已登陆 Lofter"
+                        BorderThickness="0"
+                        CornerRadius="0"
+                        IsClosable="False"
+                        IsIconVisible="False"
+                        IsOpen="{x:Bind CookieSelected, Mode=OneWay}"
+                        Severity="Success">
+                        <InfoBar.ActionButton>
+                            <Button
+                                HorizontalAlignment="Right"
+                                Click="OnClearLofterLoginButtonClick"
+                                Content="清除登陆状态" />
+                        </InfoBar.ActionButton>
+                    </InfoBar>
+                </Grid>
+            </controls:SettingsExpander.ItemsHeader>
+
+            <controls:SettingsExpander.Items>
+                <controls:SettingsCard
+                    Click="OnInAppLoginSettingsCardClick"
+                    Description="这会打开一个网页窗口，请您在其中登陆您的 Lofter 账号。"
+                    Header="应用中登陆"
+                    IsClickEnabled="True">
+                    <controls:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE737;" />
+                    </controls:SettingsCard.HeaderIcon>
+                </controls:SettingsCard>
+
+                <controls:SettingsCard Description="请您手动输入 Lofter 网页的 Cookie，此选项适合高级用户。" Header="Cookie 登陆">
+                    <controls:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xED56;" />
+                    </controls:SettingsCard.HeaderIcon>
+
+                    <TextBox
+                        x:Name="CookieTextBox"
+                        Width="200"
+                        PlaceholderText="请输入 Cookie"
+                        TextChanged="OnCookieTextBoxTextChanged"
+                        TextWrapping="NoWrap" />
+                </controls:SettingsCard>
+
+                <controls:SettingsCard>
+                    <controls:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE727;" />
+                    </controls:SettingsCard.HeaderIcon>
+                    <controls:SettingsCard.Description>
+                        <RichTextBlock>
+                            <Paragraph>我们尊重您的隐私，此应用仅将登陆 Cookie 保存在本地，并且只用于获取 Lofter 站点的网页。</Paragraph>
+                            <Paragraph>
+                                <Hyperlink NavigateUri="https://raw.githubusercontent.com/Baka632/Baka632-Privacy-Statement/main/AnEoT-Volume-Creator/AnEoT-Volume-Creator-Privacy-Statement.md" UnderlineStyle="None">请参阅我们的隐私声明...</Hyperlink>
+                            </Paragraph>
+                        </RichTextBlock>
+                    </controls:SettingsCard.Description>
+                </controls:SettingsCard>
+            </controls:SettingsExpander.Items>
+        </controls:SettingsExpander>
+    </StackPanel>
+</Page>

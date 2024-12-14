@@ -1,5 +1,3 @@
-#pragma warning disable CS8618
-
 using System.Collections.ObjectModel;
 using AnEoT.Tools.VolumeCreator.Helpers;
 using AnEoT.Tools.VolumeCreator.Models;
@@ -7,17 +5,17 @@ using AnEoT.Tools.VolumeCreator.Models.Resources;
 using AnEoT.Tools.VolumeCreator.ViewModels;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.Storage.Streams;
 
 namespace AnEoT.Tools.VolumeCreator.Views;
 
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
 public sealed partial class MarkdownEditPage : Page
 {
     public MarkdownEditViewModel ViewModel { get; private set; }
 
+#pragma warning disable CS8618 // OnNavigatedTo，启动！
     public MarkdownEditPage()
+#pragma warning restore CS8618
     {
         this.InitializeComponent();
         MarkdownRenderTextBlock.SetRenderer<AnEoTMarkdownRenderer>();
@@ -25,9 +23,9 @@ public sealed partial class MarkdownEditPage : Page
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        if (e.Parameter is ValueTuple<MarkdownWrapper, ObservableCollection<AssetNode>, IVolumeResourcesHelper> tuple)
+        if (e.Parameter is ValueTuple<MarkdownWrapper, ObservableCollection<AssetNode>, IVolumeResourcesHelper, bool> tuple)
         {
-            ViewModel = new MarkdownEditViewModel(tuple.Item1, this, tuple.Item2, tuple.Item3);
+            ViewModel = new MarkdownEditViewModel(tuple.Item1, this, tuple.Item2, tuple.Item3, tuple.Item4);
         }
 
         base.OnNavigatedTo(e);
@@ -51,13 +49,25 @@ public sealed partial class MarkdownEditPage : Page
         Deferral deferral = e.GetDeferral();
         Stream? stream;
 
-        if (e.Url == "./res/cover.webp")
+        string url = e.Url;
+        if (url == "./res/cover.webp")
         {
             stream = await ViewModel.ResourcesHelper.GetCoverAsync();
         }
-        else if (ViewModel.MarkdownImageUriToFileMapping.TryGetValue(e.Url, out FileNode? file))
+        else if (ViewModel.MarkdownImageUriToFileMapping.TryGetValue(url, out FileNode? file))
         {
             stream = await ViewModel.ResourcesHelper.GetAssetsAsync(file);
+        }
+        else if (ViewModel.ConvertWebP)
+        {
+            FileNode? targetNode = ViewModel.MarkdownImageUriToFileMapping.FirstOrDefault(pair =>
+            {
+                string pathWithWebpExtension = Path.ChangeExtension(pair.Key, ".webp");
+                return pathWithWebpExtension == url;
+            }).Value;
+            stream = targetNode is null
+                ? null
+                : await ViewModel.ResourcesHelper.GetAssetsAsync(targetNode);
         }
         else
         {
@@ -68,8 +78,13 @@ public sealed partial class MarkdownEditPage : Page
         {
             using (stream)
             {
-                BitmapImage image = new();
-                await image.SetSourceAsync(stream.AsRandomAccessStream());
+                BitmapImage image = new()
+                {
+                    DecodePixelType = DecodePixelType.Physical,
+                    DecodePixelWidth = 200
+                };
+                using IRandomAccessStream streamSource = stream.AsRandomAccessStream();
+                await image.SetSourceAsync(streamSource);
 
                 e.Image = image;
                 e.Handled = true;

@@ -2,13 +2,14 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using System.Text.RegularExpressions;
 using System.Text.Unicode;
 using AnEoT.Tools.VolumeCreator.Models;
 using Markdig;
 
 namespace AnEoT.Tools.VolumeCreator;
 
-public class CommonValues
+public partial class CommonValues
 {
     public static bool IsProjectSaved { get; set; } = true;
 
@@ -37,4 +38,7 @@ public class CommonValues
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
         };
     }
+
+    [GeneratedRegex(@"^([a-z0-9-]+\.)*lofter\.com\.*$")]
+    public static partial Regex GetLofterDomainVerifyRegex();
 }

@@ -7,6 +7,10 @@ using System.Text;
 using System.Collections.ObjectModel;
 using AnEoT.Tools.Shared;
 using AnEoT.Tools.Shared.Models;
+using Markdig.Extensions.Yaml;
+using Markdig.Syntax;
+using System.Globalization;
+using Markdig;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -15,6 +19,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     public MarkdownWrapper MarkdownWrapper { get; }
     public ObservableCollection<AssetNode> Assets { get; }
     public IVolumeResourcesHelper ResourcesHelper { get; }
+    public bool ConvertWebP { get; set; }
     public Dictionary<string, FileNode> MarkdownImageUriToFileMapping { get; } = new(10);
 
     private readonly MarkdownEditPage view;
@@ -24,13 +29,14 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     [ObservableProperty]
     private string articleQuote = string.Empty;
 
-    public MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage viewPage, ObservableCollection<AssetNode> assets, IVolumeResourcesHelper resourcesHelper)
+    public MarkdownEditViewModel(MarkdownWrapper wrapper, MarkdownEditPage viewPage, ObservableCollection<AssetNode> assets, IVolumeResourcesHelper resourcesHelper, bool convertWebP)
     {
         markdownString = wrapper.Markdown;
         view = viewPage;
         ResourcesHelper = resourcesHelper;
         Assets = assets;
         MarkdownWrapper = wrapper;
+        ConvertWebP = convertWebP;
 
         assets.CollectionChanged += (s, e) => InitializeImageFileMapping();
         InitializeImageFileMapping();
@@ -116,8 +122,47 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     {
         FrontMatterDialog dialog = new()
         {
-            XamlRoot = view.XamlRoot
+            XamlRoot = view.XamlRoot,
+            PredefinedCategoryIndex = FrontMatterDialog.AvailablePredefinedCategories.IndexOf(MarkdownWrapper.CategoryInIndexPage)
         };
+
+        bool shouldReplaceYaml = false;
+        SourceSpan originalYamlSpan = default;
+        MarkdownDocument document = Markdown.Parse(MarkdownString, CommonValues.MarkdownPipeline);
+        YamlFrontMatterBlock? yamlBlock = document.Descendants<YamlFrontMatterBlock>().FirstOrDefault();
+
+        if (yamlBlock is not null)
+        {
+            string yaml = MarkdownString.Substring(yamlBlock.Span.Start, yamlBlock.Span.Length);
+
+            if (FrontMatter.TryParse(yaml, out FrontMatter frontMatter))
+            {
+                shouldReplaceYaml = true;
+                originalYamlSpan = yamlBlock.Span;
+
+                dialog.ArticleTitle = frontMatter.Title;
+                dialog.ArticleShortTitle = frontMatter.ShortTitle;
+                dialog.IconString = frontMatter.Icon;
+                dialog.Author = frontMatter.Author;
+                dialog.Order = frontMatter.Order;
+                dialog.Description = frontMatter.Description;
+                dialog.IsArticle = frontMatter.Article;
+
+                if (DateTimeOffset.TryParse(frontMatter.Date, CultureInfo.InvariantCulture, out DateTimeOffset date))
+                {
+                    dialog.ArticleDate = date;
+                }
+                if (frontMatter.Category is not null)
+                {
+                    dialog.Categories = new(frontMatter.Category.Select(str => new StringView(str)));
+                }
+                if (frontMatter.Tag is not null)
+                {
+                    dialog.Tags = new(frontMatter.Tag.Select(str => new StringView(str)));
+                }
+            }
+        }
+
         ContentDialogResult result = await dialog.ShowAsync();
 
         if (result == ContentDialogResult.Primary)
@@ -132,7 +177,16 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
                 yamlHeader = yamlHeader.Insert(orderValueIndex, Environment.NewLine);
             }
 
-            MarkdownString = MarkdownString.Insert(0, yamlHeader);
+            StringBuilder builder = new(MarkdownString);
+
+            if (shouldReplaceYaml)
+            {
+                yamlHeader = yamlHeader.TrimEnd();
+                builder.Remove(originalYamlSpan.Start, originalYamlSpan.Length);
+            }
+            builder.Insert(0, yamlHeader);
+
+            MarkdownString = builder.ToString();
             textBox.Select(0, 0);
         }
     }
@@ -246,6 +300,10 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     public void InsertImageToText(TextBox textBox, FileNode fileNode)
     {
         string imageUri = ConstructImageUriByFileNode(fileNode);
+        if (ConvertWebP)
+        {
+            imageUri = Path.ChangeExtension(imageUri, ".webp");
+        }
         string markdownImageMark = $"![]({imageUri})";
 
         int position = textBox.SelectionStart;

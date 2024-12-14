@@ -1,0 +1,51 @@
+<Page
+    x:Class="AnEoT.Tools.VolumeCreator.Views.LofterDownload.DownloadOptionPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:AnEoT.Tools.VolumeCreator.Views.LofterDownload"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Loaded="OnPageLoaded"
+    mc:Ignorable="d">
+
+    <StackPanel Spacing="10">
+        <controls:SettingsExpander
+            Description="调整影响下载过程的选项"
+            Header="下载选项"
+            HeaderIcon="Download"
+            IsExpanded="True">
+            <controls:SettingsExpander.Items>
+                <controls:SettingsCard
+                    Description="某些查询参数可能会影响图像的质量，可以去除这些参数来获取原图。若出现无法下载的情况，请取消此选项。"
+                    Header="去除下载地址中的查询参数"
+                    HeaderIcon="Cut">
+                    <ToggleSwitch IsOn="{x:Bind TrimQueryArgs, Mode=TwoWay}" />
+                </controls:SettingsCard>
+            </controls:SettingsExpander.Items>
+        </controls:SettingsExpander>
+
+        <controls:SettingsExpander
+            Description="调整与图像保存相关的选项"
+            Header="保存选项"
+            HeaderIcon="Save"
+            IsExpanded="True">
+            <controls:SettingsExpander.Items>
+                <controls:SettingsCard
+                    Command="{x:Bind SelectSaveFolderCommand}"
+                    Description="{x:Bind SaveFolder.Path, Mode=OneWay}"
+                    Header="文件保存位置"
+                    HeaderIcon="MoveToFolder"
+                    IsClickEnabled="True" />
+
+                <controls:SettingsCard Description="WebP 是一种新兴的图像格式，其适合用于网页。" Header="转换为 WebP 格式">
+                    <controls:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE91B;" />
+                    </controls:SettingsCard.HeaderIcon>
+
+                    <ToggleSwitch IsOn="{x:Bind ConvertWebP, Mode=TwoWay}" />
+                </controls:SettingsCard>
+            </controls:SettingsExpander.Items>
+        </controls:SettingsExpander>
+    </StackPanel>
+</Page>

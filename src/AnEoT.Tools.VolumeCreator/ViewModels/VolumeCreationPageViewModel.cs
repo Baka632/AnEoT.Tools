@@ -24,11 +24,11 @@ using System.Collections.ObjectModel;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
-public sealed partial class ContentPageViewModel : ObservableValidator
+public sealed partial class VolumeCreationPageViewModel : ObservableValidator
 {
-    public ContentPage View { get; }
+    public VolumeCreationPage View { get; }
 
-    public ContentPageViewModel(ContentPage view)
+    public VolumeCreationPageViewModel(VolumeCreationPage view)
     {
         Articles.CollectionChanged += OnWordFilesCollectionChanged;
         Assets.CollectionChanged += OnImagesFilesCollectionChanged;
@@ -155,7 +155,10 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             VolumeCover = null;
             if (coverStream != null)
             {
-                await SetCoverByStream(coverStream);
+                using (coverStream)
+                {
+                    await SetCoverByStream(coverStream);
+                }
 
                 if (IsVolumeCoverError)
                 {
@@ -354,7 +357,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
             StorageFile file = await volumeFolder.CreateFileAsync(pair.Value, CreationCollisionOption.GenerateUniqueName);
             await FileIO.WriteTextAsync(file, pair.Key.Markdown);
         }
-
+           
         if (IndexMarkdown.Count > 0 && IndexMarkdown[0] is not null)
         {
             MarkdownWrapper target = IndexMarkdown[0];
@@ -504,7 +507,7 @@ public sealed partial class ContentPageViewModel : ObservableValidator
     {
         MarkdownEditWindow window = new()
         {
-            Model = (wrapper, Assets, ResourcesHelper),
+            Model = (wrapper, Assets, ResourcesHelper, ConvertToWebp),
             Title = $"{wrapper.DisplayName} - Markdown 编辑窗口"
         };
         window.Activate();
