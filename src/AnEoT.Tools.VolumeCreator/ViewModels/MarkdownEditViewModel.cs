@@ -78,7 +78,9 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
                 stringBuilder.AppendLine();
             }
 
-            stringBuilder.AppendLine(value.ReplaceLineEndings($"{Environment.NewLine}{Environment.NewLine}"));
+            string textkaiStyle = GenerateCssClassList("textkai");
+            string content = $"{value.TrimEnd().ReplaceLineEndings($"{textkaiStyle}{Environment.NewLine}{Environment.NewLine}")}{textkaiStyle}";
+            stringBuilder.AppendLine(content);
             stringBuilder.AppendLine();
             if (hasYaml)
             {
@@ -98,7 +100,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     [RelayCommand]
     private void AddEodTagToText(TextBox textBox)
     {
-        const string eodTag = "  <eod />";
+        const string eodTag = "<eod />";
 
         ArgumentNullException.ThrowIfNull(textBox);
         int position = textBox.SelectionStart;
