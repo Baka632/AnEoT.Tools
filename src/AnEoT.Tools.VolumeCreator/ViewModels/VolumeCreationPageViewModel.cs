@@ -21,7 +21,6 @@ using SixLabors.ImageSharp.Processing;
 using AnEoT.Tools.VolumeCreator.Models.Resources;
 using System.Text.Json;
 using System.Collections.ObjectModel;
-using static CommunityToolkit.WinUI.Animations.Expressions.ExpressionValues;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -31,6 +30,11 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
 
     public VolumeCreationPageViewModel(VolumeCreationPage view)
     {
+        resourcesHelper = new MemoryResourcesHelper()
+        {
+            ConvertWebP = ConvertToWebp
+        };
+
         Articles.CollectionChanged += OnWordFilesCollectionChanged;
         Assets.CollectionChanged += OnImagesFilesCollectionChanged;
         IndexMarkdown.CollectionChanged += OnIndexMarkdownCollectionChanged;

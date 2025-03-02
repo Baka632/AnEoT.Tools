@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
 using System.Text.Json;
 
@@ -9,6 +9,8 @@ namespace AnEoT.Tools.VolumeCreator.Models;
 /// </summary>
 public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
 {
+    private readonly Lock packageLock = new();
+
     /// <summary>
     /// 项目信息文件名。
     /// </summary>
@@ -437,17 +439,20 @@ public sealed partial class ProjectPackage : IDisposable, IAsyncDisposable
 
     private bool TryGetEntryStream(string fileRelativePath, [NotNullWhen(true)] out Stream? entryStream)
     {
-        ZipArchiveEntry? entry = zipArchive.GetEntry(fileRelativePath);
-        if (entry is null)
+        lock (packageLock)
         {
-            entryStream = null;
-            return false;
-        }
-        else
-        {
-            entryStream = entry.Open();
-            entryStream.Seek(0, SeekOrigin.Begin);
-            return true;
+            ZipArchiveEntry? entry = zipArchive.GetEntry(fileRelativePath);
+            if (entry is null)
+            {
+                entryStream = null;
+                return false;
+            }
+            else
+            {
+                entryStream = entry.Open();
+                entryStream.Seek(0, SeekOrigin.Begin);
+                return true;
+            }
         }
     }
 

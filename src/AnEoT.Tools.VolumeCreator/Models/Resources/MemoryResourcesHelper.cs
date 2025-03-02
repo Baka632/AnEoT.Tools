@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using SixLabors.ImageSharp;
 using Windows.Storage;
@@ -41,10 +41,10 @@ internal sealed class MemoryResourcesHelper : IVolumeResourcesHelper
 
     public async Task ExportAssetsAsync(IEnumerable<AssetNode> files, StorageFolder outputFolder)
     {
-        foreach (AssetNode node in files)
+        await Parallel.ForEachAsync(files, async (node, ct) =>
         {
             await CopyContentRecursively(node, outputFolder);
-        }
+        });
     }
 
     public async Task<Stream?> GetAssetsAsync(FileNode fileNode)
@@ -77,10 +77,10 @@ internal sealed class MemoryResourcesHelper : IVolumeResourcesHelper
                     {
                         StorageFolder folder = await rootFolder.CreateFolderAsync(item.DisplayName, CreationCollisionOption.OpenIfExists);
 
-                        foreach (AssetNode subItem in item.Children)
+                        await Parallel.ForEachAsync(item.Children, async (subItem, ct) =>
                         {
                             await CopyContentRecursively(subItem, folder);
-                        }
+                        });
                     }
                 }
                 else if (item.Type == AssetNodeType.File && item is FileNode fileNode && File.Exists(fileNode.FilePath))
