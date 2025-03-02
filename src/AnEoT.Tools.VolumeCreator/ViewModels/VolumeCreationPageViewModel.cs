@@ -1,4 +1,4 @@
-﻿using WinRT.Interop;
+using WinRT.Interop;
 using Windows.Storage.Pickers;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -21,6 +21,7 @@ using SixLabors.ImageSharp.Processing;
 using AnEoT.Tools.VolumeCreator.Models.Resources;
 using System.Text.Json;
 using System.Collections.ObjectModel;
+using static CommunityToolkit.WinUI.Animations.Expressions.ExpressionValues;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -355,7 +356,10 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
         foreach (KeyValuePair<MarkdownWrapper, string> pair in GetOutputFileNameDictionary())
         {
             StorageFile file = await volumeFolder.CreateFileAsync(pair.Value, CreationCollisionOption.GenerateUniqueName);
-            await FileIO.WriteTextAsync(file, pair.Key.Markdown);
+
+            using Stream fileStream = await file.OpenStreamForWriteAsync();
+            using StreamWriter streamWriter = new(fileStream);
+            await streamWriter.WriteAsync(pair.Key.Markdown.ReplaceLineEndings("\r\n"));
         }
            
         if (IndexMarkdown.Count > 0 && IndexMarkdown[0] is not null)
@@ -363,7 +367,10 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
             MarkdownWrapper target = IndexMarkdown[0];
 
             StorageFile file = await volumeFolder.CreateFileAsync("README.md", CreationCollisionOption.GenerateUniqueName);
-            await FileIO.WriteTextAsync(file, target.Markdown);
+
+            using Stream fileStream = await file.OpenStreamForWriteAsync();
+            using StreamWriter streamWriter = new(fileStream);
+            await streamWriter.WriteAsync(target.Markdown.ReplaceLineEndings("\r\n"));
         }
     }
 
