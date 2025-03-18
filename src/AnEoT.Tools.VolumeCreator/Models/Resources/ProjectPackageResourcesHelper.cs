@@ -49,11 +49,15 @@ internal sealed partial class ProjectPackageResourcesHelper(ProjectPackage proje
                 {
                     if (item.Children.Count > 0)
                     {
-                        StorageFolder folder = await outputFolder.CreateFolderAsync(item.DisplayName, CreationCollisionOption.OpenIfExists);
+                        StorageFolder currentNodeFolder = await outputFolder.CreateFolderAsync(item.DisplayName, CreationCollisionOption.OpenIfExists);
 
                         await Parallel.ForEachAsync(item.Children, async (subItem, ct) =>
                         {
-                            await ExportAssetsCore(subItem, folder);
+                            StorageFolder nextOutputFolder = subItem.Type == AssetNodeType.Folder
+                                ? (await currentNodeFolder.CreateFolderAsync(subItem.DisplayName, CreationCollisionOption.OpenIfExists))
+                                : currentNodeFolder;
+
+                            await ExportAssetsCore(subItem, nextOutputFolder);
                         });
                     }
                 }

@@ -67,6 +67,7 @@ internal sealed class MemoryResourcesHelper : IVolumeResourcesHelper
 
     private async Task CopyContentRecursively(AssetNode node, StorageFolder rootFolder)
     {
+        // TODO: 调查 inner folder 问题
         if (node.Type == AssetNodeType.Folder)
         {
             foreach (AssetNode item in node.Children)
@@ -75,11 +76,14 @@ internal sealed class MemoryResourcesHelper : IVolumeResourcesHelper
                 {
                     if (item.Children.Count > 0)
                     {
-                        StorageFolder folder = await rootFolder.CreateFolderAsync(item.DisplayName, CreationCollisionOption.OpenIfExists);
+                        StorageFolder currentNodeFolder = await rootFolder.CreateFolderAsync(item.DisplayName, CreationCollisionOption.OpenIfExists);
 
                         await Parallel.ForEachAsync(item.Children, async (subItem, ct) =>
                         {
-                            await CopyContentRecursively(subItem, folder);
+                            StorageFolder nextRootFolder = subItem.Type == AssetNodeType.Folder
+                                ? (await currentNodeFolder.CreateFolderAsync(subItem.DisplayName, CreationCollisionOption.OpenIfExists))
+                                : currentNodeFolder;
+                            await CopyContentRecursively(subItem, nextRootFolder);
                         });
                     }
                 }

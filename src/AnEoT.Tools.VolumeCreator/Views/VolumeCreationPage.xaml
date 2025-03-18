@@ -480,45 +480,10 @@
 
                             <controls:SettingsCard HorizontalContentAlignment="Stretch" ContentAlignment="Vertical">
                                 <StackPanel HorizontalAlignment="Stretch">
-                                    <Grid Margin="0,0,0,10">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-
-                                        <TextBlock
-                                            Grid.Column="0"
-                                            VerticalAlignment="Center"
-                                            Text="文件列表" />
-
-                                        <Button
-                                            Grid.Column="1"
-                                            Width="35"
-                                            Height="35"
-                                            Margin="10,0,0,0"
-                                            Padding="0"
-                                            HorizontalAlignment="Right"
-                                            VerticalAlignment="Center"
-                                            Background="Transparent"
-                                            ToolTipService.ToolTip="添加...">
-                                            <SymbolIcon Symbol="Add" />
-
-                                            <Button.Flyout>
-                                                <MenuFlyout>
-                                                    <MenuFlyoutItem
-                                                        Click="OnAddNewAssetMenuFlyoutItemClick"
-                                                        DataContext="{x:Null}"
-                                                        Icon="Document"
-                                                        Text="文件" />
-                                                    <MenuFlyoutItem
-                                                        Click="OnAddNewAssetFolderMenuFlyoutItemClick"
-                                                        DataContext="{x:Null}"
-                                                        Icon="Folder"
-                                                        Text="文件夹" />
-                                                </MenuFlyout>
-                                            </Button.Flyout>
-                                        </Button>
-                                    </Grid>
+                                    <TextBlock
+                                        Margin="0,0,0,10"
+                                        VerticalAlignment="Center"
+                                        Text="文件列表" />
 
                                     <TreeView
                                         CanDragItems="False"
