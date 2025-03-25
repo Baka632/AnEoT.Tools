@@ -67,7 +67,6 @@ internal sealed class MemoryResourcesHelper : IVolumeResourcesHelper
 
     private async Task CopyContentRecursively(AssetNode node, StorageFolder rootFolder)
     {
-        // TODO: 调查 inner folder 问题
         if (node.Type == AssetNodeType.Folder)
         {
             foreach (AssetNode item in node.Children)

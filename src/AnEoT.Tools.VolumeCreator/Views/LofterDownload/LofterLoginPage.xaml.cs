@@ -1,10 +1,8 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using AnEoT.Tools.VolumeCreator.Models.Lofter;
 using AnEoT.Tools.VolumeCreator.Views.LofterDownload.Dialogs;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Web.WebView2.Core;
 
 namespace AnEoT.Tools.VolumeCreator.Views.LofterDownload;
 
@@ -24,7 +22,7 @@ public sealed partial class LofterLoginPage : Page
     [ObservableProperty]
     private bool showLofterLogin;
 
-#pragma warning disable CS8618 // OnNavigatedTo »á³öÊÖ
+#pragma warning disable CS8618 // OnNavigatedTo ä¼šå‡ºæ‰‹
     public LofterLoginPage()
 #pragma warning restore CS8618
     {
@@ -66,7 +64,7 @@ public sealed partial class LofterLoginPage : Page
             }
             else
             {
-                // ÊÇ Lofter
+                // æ˜¯ Lofter
                 allowWithoutCookie = false;
                 ShowLofterLogin = true;
             }

@@ -93,7 +93,7 @@
             <TextBlock
                 HorizontalAlignment="Center"
                 FontSize="25"
-                Text="当前没有下载项" />
+                Text="下载完成" />
         </StackPanel>
     </Grid>
 </Page>

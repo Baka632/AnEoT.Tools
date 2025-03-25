@@ -71,10 +71,13 @@
                     Content="下一步"
                     IsEnabled="{x:Bind ViewModel.EnableForward, Mode=OneWay}"
                     Visibility="{x:Bind ViewModel.ShowForward, Mode=OneWay}" />
-                <Button
-                    Click="CloseWindowClick"
-                    Content="完成"
-                    Visibility="{x:Bind ViewModel.ShowComplete, Mode=OneWay}" />
+                <StackPanel Orientation="Horizontal" Visibility="{x:Bind ViewModel.ShowComplete, Mode=OneWay}">
+                    <Button
+                        Margin="0,0,5,0"
+                        Click="RestartDownloadClick"
+                        Content="再进行一次下载" />
+                    <Button Click="CloseWindowClick" Content="关闭窗口" />
+                </StackPanel>
             </StackPanel>
         </Grid>
     </Grid>

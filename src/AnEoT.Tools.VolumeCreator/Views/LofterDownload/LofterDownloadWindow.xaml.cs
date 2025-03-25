@@ -61,7 +61,7 @@ public sealed partial class LofterDownloadWindow : WindowEx
             "TargetImage" => typeof(SelectTargetImagePage),
             "DownloadOption" => typeof(DownloadOptionPage),
             "List" => typeof(DownloadListPage),
-            _ => throw new InvalidOperationException("ÎÞÐ§µÄ SelectorBarItem Tag¡£")
+            _ => throw new InvalidOperationException("æ— æ•ˆçš„ SelectorBarItem Tagã€‚")
         };
 
         SlideNavigationTransitionInfo transition = new()
@@ -96,5 +96,11 @@ public sealed partial class LofterDownloadWindow : WindowEx
     private void CloseWindowClick(object sender, RoutedEventArgs e)
     {
         Close();
+    }
+
+    private void RestartDownloadClick(object sender, RoutedEventArgs e)
+    {
+        ViewModel.DownloadData = ViewModel.DownloadData with { ImageInfos = null, PageUri = null };
+        StepSelectorBar.SelectedItem = StepSelectorBar.Items[0];
     }
 }

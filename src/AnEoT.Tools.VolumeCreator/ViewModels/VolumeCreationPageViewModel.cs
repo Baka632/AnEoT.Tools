@@ -179,8 +179,8 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
             Assets.CollectionChanged -= OnImagesFilesCollectionChanged;
             IndexMarkdown.CollectionChanged -= OnIndexMarkdownCollectionChanged;
 
-            Articles = new(resHelper.ProjectPackage.Articles);
-            Assets = new(resHelper.ProjectPackage.Assets);
+            Articles = [.. resHelper.ProjectPackage.Articles];
+            Assets = [.. resHelper.ProjectPackage.Assets];
             IndexMarkdown = resHelper.ProjectPackage.IndexMarkdown is null ? [] : [resHelper.ProjectPackage.IndexMarkdown];
 
             if (!resHelper.ValidateAssets(Assets, out string? msg))
