@@ -486,8 +486,11 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
     [RelayCommand]
     private void AddPaintingArticle()
     {
-        // TODO: 会有吗？
-        MarkdownWrapper paintingMarkdownFile = new("<自定义文件>", string.Empty, MarkdownWrapperType.Paintings);
+        // TODO: 会有吗？会有哦！
+        MarkdownWrapper paintingMarkdownFile = new("画中秘境",
+                                                   string.Empty,
+                                                   MarkdownWrapperType.Paintings,
+                                                   categoryInIndexPage: PredefinedCategory.Paintings);
         Articles.Add(paintingMarkdownFile);
     }
 

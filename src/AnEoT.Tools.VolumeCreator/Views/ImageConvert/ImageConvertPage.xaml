@@ -161,7 +161,7 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Spacing="5"
-                Visibility="{x:Bind ImagesHasItems, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=True}">
+                Visibility="{x:Bind IsConvertCompleted, Mode=OneWay}">
                 <FontIcon
                     HorizontalAlignment="Center"
                     FontSize="30"

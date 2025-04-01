@@ -41,44 +41,19 @@
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest" Condition="$(Configuration) == 'Release'" SubType="Designer" />
     <AppxManifest Include="Package-Debug.appxmanifest" Condition="$(Configuration) != 'Release'" SubType="Designer" />
+    <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="RootDescriptor.xml" CopyToOutputDirectory="Always" />
-    <Page Update="Views\ImageConvert\ImageConvertPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\LofterDownload\DownloadListPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\LofterDownload\Dialogs\WebView2LoginDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\LofterDownload\LofterLoginPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\LofterDownload\DownloadOptionPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\LofterDownload\SelectTargetImagePage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <TrimmerRootDescriptor Include="RootDescriptor.xml" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="AppPackages\**" />
-    <Content Remove="Assets\Debug-Icon\**" Condition="$(Configuration) == 'Release'" />
     <PRIResource Remove="AppPackages\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Assets\SplashScreen.scale-200.png" />
-    <Content Include="Assets\LockScreenLogo.scale-200.png" />
-    <Content Include="Assets\Square150x150Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Include="Assets\**" />
+    <Content Remove="Assets\Debug-Icon\**" Condition="$(Configuration) == 'Release'" />
   </ItemGroup>
 
   <ItemGroup>
@@ -92,20 +67,6 @@
     <Using Include="Windows.Foundation" />
     <Using Include="Windows.Foundation.Collections" />
     <Using Include="System.Runtime.InteropServices.WindowsRuntime" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Controls\*.xaml" />
-    <None Remove="Views\*.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Views\ImageConvert\ImageConvertPage.xaml" />
-    <None Remove="Views\LofterDownload\Dialogs\WebView2LoginDialog.xaml" />
-    <None Remove="Views\LofterDownload\DownloadListPage.xaml" />
-    <None Remove="Views\LofterDownload\DownloadOptionPage.xaml" />
-    <None Remove="Views\LofterDownload\LofterLoginPage.xaml" />
-    <None Remove="Views\LofterDownload\SelectTargetImagePage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -127,7 +88,6 @@
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
     <PackageReference Include="WinUIEx" Version="2.5.0" />
     <ProjectReference Include="..\AnEoT.Tools.Shared\AnEoT.Tools.Shared.csproj" />
-    <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
   <!-- 
