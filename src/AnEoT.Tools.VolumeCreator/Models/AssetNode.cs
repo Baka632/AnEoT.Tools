@@ -1,4 +1,4 @@
-﻿using Windows.Storage;
+using Windows.Storage;
 using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using System.Diagnostics.CodeAnalysis;

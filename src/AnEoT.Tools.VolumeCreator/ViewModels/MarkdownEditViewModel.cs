@@ -320,7 +320,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
 
         foreach (AssetNode node in Assets)
         {
-            foreach (FileNode fileNode in DescendantsFileNode(node))
+            foreach (FileNode fileNode in CommonValues.DescendantsFileNode(node))
             {
                 string imageUri = ConstructImageUriByFileNode(fileNode);
                 MarkdownImageUriToFileMapping[imageUri] = fileNode;
@@ -352,24 +352,5 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
 
         string imageUri = $"./{string.Join('/', targetParts)}";
         return imageUri;
-    }
-
-    private static List<FileNode> DescendantsFileNode(AssetNode node)
-    {
-        List<FileNode> fileNodes = new(10);
-
-        foreach (AssetNode item in node.Children)
-        {
-            if (item is FileNode fileNode)
-            {
-                fileNodes.Add(fileNode);
-            }
-            else if (item is FolderNode folderNode)
-            {
-                fileNodes.AddRange(DescendantsFileNode(folderNode));
-            }
-        }
-
-        return fileNodes;
     }
 }

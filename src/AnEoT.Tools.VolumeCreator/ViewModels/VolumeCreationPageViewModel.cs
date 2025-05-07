@@ -21,6 +21,8 @@ using SixLabors.ImageSharp.Processing;
 using AnEoT.Tools.VolumeCreator.Models.Resources;
 using System.Text.Json;
 using System.Collections.ObjectModel;
+using AnEoT.Tools.VolumeCreator.Views.CreatePaintingPage;
+using System.Threading.Tasks;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -484,14 +486,39 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    private void AddPaintingArticle()
+    private async Task AddPaintingArticle()
     {
-        // TODO: 会有吗？会有哦！
-        MarkdownWrapper paintingMarkdownFile = new("画中秘境",
-                                                   string.Empty,
-                                                   MarkdownWrapperType.Paintings,
-                                                   categoryInIndexPage: PredefinedCategory.Paintings);
-        Articles.Add(paintingMarkdownFile);
+        if (Assets.Any(CommonValues.ContainsFileNode))
+        {
+            CreatePaintingPageWindow window = new();
+            window.ViewModel.PaintingPageData = window.ViewModel.PaintingPageData with
+            {
+                SetGeneratedPaintingPageMarkdown = generatedMarkdown =>
+                {
+                    // TODO: 会有吗？会有哦！
+                    MarkdownWrapper paintingMarkdownFile = new("画中秘境",
+                                                           generatedMarkdown,
+                                                           MarkdownWrapperType.Paintings,
+                                                           categoryInIndexPage: PredefinedCategory.Paintings);
+                    Articles.Add(paintingMarkdownFile);
+                },
+                OriginalAssets = Assets
+            };
+
+            window.Activate();
+        }
+        else
+        {
+            ContentDialog dialog = new()
+            {
+                Title = "不能创建画中秘境页",
+                Content = "资源列表内没有文件。",
+                CloseButtonText = "确定",
+                XamlRoot = View.XamlRoot
+            };
+
+            await dialog.ShowAsync();
+        }
     }
 
     public async Task ImportSingleWordFileItem(StorageFile file)

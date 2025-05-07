@@ -46,6 +46,18 @@
 
   <ItemGroup>
     <None Update="RootDescriptor.xml" CopyToOutputDirectory="Always" />
+    <Page Update="Views\CreatePaintingPage\CompletePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\CreatePaintingPage\OrderAndRenameImagePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\CreatePaintingPage\SelectImagePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Views\CreatePaintingPage\CreatePaintingPageWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <TrimmerRootDescriptor Include="RootDescriptor.xml" />
   </ItemGroup>
 
@@ -54,6 +66,13 @@
     <PRIResource Remove="AppPackages\**" />
     <Content Include="Assets\**" />
     <Content Remove="Assets\Debug-Icon\**" Condition="$(Configuration) == 'Release'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Views\CreatePaintingPage\CompletePage.xaml" />
+    <None Remove="Views\CreatePaintingPage\CreatePaintingPageWindow.xaml" />
+    <None Remove="Views\CreatePaintingPage\OrderAndRenameImagePage.xaml" />
+    <None Remove="Views\CreatePaintingPage\SelectImagePage.xaml" />
   </ItemGroup>
 
   <ItemGroup>

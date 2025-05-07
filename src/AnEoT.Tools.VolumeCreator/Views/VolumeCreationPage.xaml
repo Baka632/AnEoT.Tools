@@ -319,7 +319,21 @@
                         </controls:SettingsExpander.HeaderIcon>
 
                         <StackPanel Orientation="Horizontal" Spacing="5">
-                            <Button Command="{x:Bind ViewModel.AddEmptyArticleCommand}" Content="创建自定义文章" />
+                            <DropDownButton Content="创建...">
+                                <DropDownButton.Flyout>
+                                    <MenuFlyout Placement="Bottom">
+                                        <MenuFlyoutItem
+                                            Command="{x:Bind ViewModel.AddEmptyArticleCommand}"
+                                            Icon="TwoPage"
+                                            Text="自定义文章" />
+                                        <MenuFlyoutItem Command="{x:Bind ViewModel.AddPaintingArticleCommand}" Text="画中秘境">
+                                            <MenuFlyoutItem.Icon>
+                                                <FontIcon Glyph="&#xE790;" />
+                                            </MenuFlyoutItem.Icon>
+                                        </MenuFlyoutItem>
+                                    </MenuFlyout>
+                                </DropDownButton.Flyout>
+                            </DropDownButton>
                             <Button Command="{x:Bind ViewModel.ImportWordFileItemCommand}" Content="从 DOCX 文件导入" />
                         </StackPanel>
 

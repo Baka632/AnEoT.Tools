@@ -1,4 +1,4 @@
-﻿using System.Text.Encodings.Web;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -41,4 +41,52 @@ public partial class CommonValues
 
     [GeneratedRegex(@"^([a-z0-9-]+\.)*lofter\.com\.*$")]
     public static partial Regex GetLofterDomainVerifyRegex();
+
+    public static List<FileNode> DescendantsFileNode(AssetNode node)
+    {
+        List<FileNode> fileNodes = new(10);
+
+        foreach (AssetNode item in node.Children)
+        {
+            if (item is FileNode fileNode)
+            {
+                fileNodes.Add(fileNode);
+            }
+            else if (item is FolderNode folderNode)
+            {
+                fileNodes.AddRange(DescendantsFileNode(folderNode));
+            }
+        }
+
+        return fileNodes;
+    }
+
+    public static bool ContainsFileNode(AssetNode node)
+    {
+        if (node is FileNode)
+        {
+            return true;
+        }
+
+        bool hasFileNode = false;
+
+        foreach (AssetNode item in node.Children)
+        {
+            if (item is FileNode)
+            {
+                hasFileNode = true;
+            }
+            else if (item is FolderNode)
+            {
+                hasFileNode = ContainsFileNode(item);
+            }
+
+            if (hasFileNode)
+            {
+                break;
+            }
+        }
+
+        return hasFileNode;
+    }
 }
