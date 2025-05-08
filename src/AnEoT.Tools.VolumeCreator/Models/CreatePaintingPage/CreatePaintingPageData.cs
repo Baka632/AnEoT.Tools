@@ -2,5 +2,8 @@ namespace AnEoT.Tools.VolumeCreator.Models.CreatePaintingPage;
 
 public sealed record CreatePaintingPageData(
     IEnumerable<AssetNode> OriginalAssets,
+    Action<string>? SetGeneratedPaintingPageMarkdown,
+    bool ConvertWebP,
     IEnumerable<FileNode> FileAssets,
-    Action<string>? SetGeneratedPaintingPageMarkdown);
+    IEnumerable<PaintingInfo> PaintingInfos,
+    string GeneratedMarkdown);

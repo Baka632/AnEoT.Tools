@@ -48,7 +48,7 @@
                     IsSelected="True"
                     Tag="SelectTargetImage"
                     Text="选择目标图像" />
-                <SelectorBarItem Tag="OrderAndRename" Text="排序+选择名称" />
+                <SelectorBarItem Tag="OrderAndRename" Text="排序+选择作者名称" />
                 <SelectorBarItem Tag="Complete" Text="完成" />
             </SelectorBar>
 

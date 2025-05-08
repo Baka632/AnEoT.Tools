@@ -502,7 +502,8 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
                                                            categoryInIndexPage: PredefinedCategory.Paintings);
                     Articles.Add(paintingMarkdownFile);
                 },
-                OriginalAssets = Assets
+                OriginalAssets = Assets,
+                ConvertWebP = ConvertToWebp
             };
 
             window.Activate();

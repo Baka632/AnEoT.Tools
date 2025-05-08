@@ -73,6 +73,12 @@ public sealed partial class CreatePaintingPageWindow : WindowEx
 
     private void CloseWindowClick(object sender, RoutedEventArgs e)
     {
+        string generatedMarkdown = ViewModel.PaintingPageData.GeneratedMarkdown;
+        if (!string.IsNullOrWhiteSpace(generatedMarkdown))
+        {
+            ViewModel.PaintingPageData.SetGeneratedPaintingPageMarkdown?.Invoke(generatedMarkdown);
+        }
+
         Close();
     }
 

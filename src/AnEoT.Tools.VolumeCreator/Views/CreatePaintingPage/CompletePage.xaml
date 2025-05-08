@@ -6,7 +6,25 @@
     xmlns:local="using:AnEoT.Tools.VolumeCreator.Views.CreatePaintingPage"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DataContext="{d:DesignInstance Type=local:CompletePage}"
+    Loaded="OnPageLoaded"
     mc:Ignorable="d">
 
-    <Grid />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <InfoBar
+            Grid.Row="0"
+            Margin="0,0,0,5"
+            IsClosable="False"
+            IsOpen="True"
+            Message="请查看下面自动生成的 Markdown 文档，无误后点击下方的“关闭窗口”按钮以将此文档添加到项目中。"
+            Severity="Informational" />
+        <TextBox
+            Grid.Row="1"
+            Text="{x:Bind GeneratedMarkdown, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="Wrap" />
+    </Grid>
 </Page>

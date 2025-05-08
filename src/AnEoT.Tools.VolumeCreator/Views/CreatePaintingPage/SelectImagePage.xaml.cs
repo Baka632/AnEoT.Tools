@@ -49,4 +49,9 @@ public sealed partial class SelectImagePage : Page
             windowAccessor.EnableForward = false;
         }
     }
+
+    private void OnPageLoaded(object sender, RoutedEventArgs e)
+    {
+        windowAccessor.EnableForward = false;
+    }
 }

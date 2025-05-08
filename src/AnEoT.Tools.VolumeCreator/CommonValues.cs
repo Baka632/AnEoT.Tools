@@ -89,4 +89,30 @@ public partial class CommonValues
 
         return hasFileNode;
     }
+
+    public static string ConstructImageUriByFileNode(FileNode fileNode)
+    {
+        List<string> targetParts = new(3);
+        AssetNode? parentNode = fileNode;
+        while (true)
+        {
+            if (parentNode is null)
+            {
+                break;
+            }
+            targetParts.Add(parentNode.DisplayName);
+
+            if (parentNode.DisplayName.Equals("res", StringComparison.OrdinalIgnoreCase))
+            {
+                break;
+            }
+
+            parentNode = parentNode.Parent;
+        }
+
+        targetParts.Reverse();
+
+        string imageUri = $"./{string.Join('/', targetParts)}";
+        return imageUri;
+    }
 }

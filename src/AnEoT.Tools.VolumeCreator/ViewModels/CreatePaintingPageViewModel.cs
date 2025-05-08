@@ -16,7 +16,7 @@ public partial class CreatePaintingPageViewModel : ObservableObject
 
     public bool ShowForward { get => !ShowComplete; }
 
-    public CreatePaintingPageData PaintingPageData { get; set; } = new([], [], null);
+    public CreatePaintingPageData PaintingPageData { get; set; } = new([], null, false, [], [], string.Empty);
 
     public CreatePaintingPageWindowAccessor WindowAccessor { get; }
 

@@ -301,7 +301,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
 
     public void InsertImageToText(TextBox textBox, FileNode fileNode)
     {
-        string imageUri = ConstructImageUriByFileNode(fileNode);
+        string imageUri = CommonValues.ConstructImageUriByFileNode(fileNode);
         if (ConvertWebP)
         {
             imageUri = Path.ChangeExtension(imageUri, ".webp");
@@ -322,35 +322,9 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
         {
             foreach (FileNode fileNode in CommonValues.DescendantsFileNode(node))
             {
-                string imageUri = ConstructImageUriByFileNode(fileNode);
+                string imageUri = CommonValues.ConstructImageUriByFileNode(fileNode);
                 MarkdownImageUriToFileMapping[imageUri] = fileNode;
             }
         }
-    }
-
-    private static string ConstructImageUriByFileNode(FileNode fileNode)
-    {
-        List<string> targetParts = new(3);
-        AssetNode? parentNode = fileNode;
-        while (true)
-        {
-            if (parentNode is null)
-            {
-                break;
-            }
-            targetParts.Add(parentNode.DisplayName);
-
-            if (parentNode.DisplayName.Equals("res", StringComparison.OrdinalIgnoreCase))
-            {
-                break;
-            }
-
-            parentNode = parentNode.Parent;
-        }
-
-        targetParts.Reverse();
-
-        string imageUri = $"./{string.Join('/', targetParts)}";
-        return imageUri;
     }
 }
