@@ -22,7 +22,8 @@ using AnEoT.Tools.VolumeCreator.Models.Resources;
 using System.Text.Json;
 using System.Collections.ObjectModel;
 using AnEoT.Tools.VolumeCreator.Views.CreatePaintingPage;
-using System.Threading.Tasks;
+using System.Windows.Input;
+using Windows.System;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -110,8 +111,17 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
 
             await ShowDialogAsync("导出成功",
                                       $"内容已导出在 {volumeFolder.Path} 中。",
+                                      primaryText: "打开导出文件夹",
+                                      primaryButtonCommand: OpenVolumeExportFolderCommand,
+                                      primaryButtonCommandParameter: volumeFolder.Path,
                                       closeText: "确定");
         }
+    }
+
+    [RelayCommand]
+    private static async Task OpenVolumeExportFolder(string path)
+    {
+        await Launcher.LaunchFolderPathAsync(path);
     }
 
     [RelayCommand]
@@ -867,8 +877,18 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
     /// <param name="primaryText">主按钮文本</param>
     /// <param name="secondaryText">第二按钮文本</param>
     /// <param name="closeText">关闭按钮文本</param>
+    /// <param name="primaryButtonCommand">主按钮命令</param>
+    /// <param name="primaryButtonCommandParameter">主按钮命令参数</param>
+    /// /// <param name="secondaryButtonCommand">第二按钮命令</param>
+    /// <param name="secondaryButtonCommandParameter">第二按钮命令参数</param>
     /// <returns>指示对话框结果的<seealso cref="ContentDialogResult"/></returns>
-    private static async Task<ContentDialogResult> ShowDialogAsync(string title, string message, string? primaryText = null, string? secondaryText = null, string? closeText = null)
+    private static async Task<ContentDialogResult> ShowDialogAsync(string title,
+                                                                   string message,
+                                                                   string? primaryText = null,
+                                                                   string? secondaryText = null,
+                                                                   string? closeText = null,
+                                                                   ICommand? primaryButtonCommand = null, object? primaryButtonCommandParameter = null,
+                                                                   ICommand? secondaryButtonCommand = null, object? secondaryButtonCommandParameter = null)
     {
         // null-coalescing 操作符——当 closeText 为空时才赋值
         closeText ??= "关闭";
@@ -880,7 +900,11 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
             Title = title,
             Content = new ScrollViewer() { Content = message },
             PrimaryButtonText = primaryText,
+            PrimaryButtonCommand = primaryButtonCommand,
+            PrimaryButtonCommandParameter = primaryButtonCommandParameter,
             SecondaryButtonText = secondaryText,
+            SecondaryButtonCommand = secondaryButtonCommand,
+            SecondaryButtonCommandParameter = secondaryButtonCommandParameter,
             CloseButtonText = closeText,
             XamlRoot = (Application.Current as App)?.Window.Content.XamlRoot
         };
