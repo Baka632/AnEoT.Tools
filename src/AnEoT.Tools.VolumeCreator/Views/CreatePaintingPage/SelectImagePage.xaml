@@ -1,0 +1,77 @@
+<Page
+    x:Class="AnEoT.Tools.VolumeCreator.Views.CreatePaintingPage.SelectImagePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="using:AnEoT.Tools.VolumeCreator.Helpers"
+    xmlns:local="using:AnEoT.Tools.VolumeCreator.Views.CreatePaintingPage"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:AnEoT.Tools.VolumeCreator.Models"
+    d:DataContext="{d:DesignInstance Type=local:SelectImagePage}"
+    Loaded="OnPageLoaded"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <DataTemplate x:Key="FileNodeTemplate" x:DataType="models:FileNode">
+            <TreeViewItem
+                ItemsSource="{x:Bind Children}"
+                ToolTipService.ToolTip="{x:Bind FilePath, Mode=OneWay}"
+                Visibility="{x:Bind IsFileExist, Mode=OneWay}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <SymbolIcon
+                        Grid.Column="0"
+                        Margin="0,0,5,0"
+                        VerticalAlignment="Center"
+                        Symbol="Document" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{x:Bind DisplayName}" />
+                </Grid>
+            </TreeViewItem>
+        </DataTemplate>
+
+        <DataTemplate x:Key="FolderNodeTemplate" x:DataType="models:AssetNode">
+            <TreeViewItem
+                Background="Transparent"
+                IsExpanded="True"
+                ItemsSource="{x:Bind Children}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <FontIcon
+                        Grid.Column="0"
+                        Margin="0,0,5,0"
+                        VerticalAlignment="Center"
+                        Glyph="&#xE8B7;" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Text="{x:Bind DisplayName}" />
+                </Grid>
+            </TreeViewItem>
+        </DataTemplate>
+
+        <helpers:AssetNodeDataTemplateSelector
+            x:Key="NodeTemplateSelector"
+            FileTemplate="{StaticResource FileNodeTemplate}"
+            FolderTemplate="{StaticResource FolderNodeTemplate}" />
+    </Page.Resources>
+
+    <Grid>
+        <TreeView
+            CanDragItems="False"
+            CanReorderItems="False"
+            ItemTemplateSelector="{StaticResource NodeTemplateSelector}"
+            ItemsSource="{x:Bind OriginalAssets, Mode=OneWay}"
+            SelectionChanged="OnAssetsTreeViewSelectionChanged"
+            SelectionMode="Multiple" />
+    </Grid>
+</Page>

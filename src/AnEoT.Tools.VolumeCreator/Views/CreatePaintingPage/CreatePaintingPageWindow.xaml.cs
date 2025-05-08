@@ -3,20 +3,19 @@ using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml.Media.Animation;
 using WinUIEx;
 
-namespace AnEoT.Tools.VolumeCreator.Views.LofterDownload;
+namespace AnEoT.Tools.VolumeCreator.Views.CreatePaintingPage;
 
-public sealed partial class LofterDownloadWindow : WindowEx
+public sealed partial class CreatePaintingPageWindow : WindowEx
 {
     private int previousSelectIndex;
 
-    public LofterDownloadViewModel ViewModel { get; }
+    public CreatePaintingPageViewModel ViewModel { get; }
 
-    public LofterDownloadWindow()
+    public CreatePaintingPageWindow()
     {
         ExtendsContentIntoTitleBar = true;
         this.InitializeComponent();
-
-        ViewModel = new LofterDownloadViewModel(this);
+        ViewModel = new(this);
 
         if (MicaController.IsSupported())
         {
@@ -30,26 +29,6 @@ public sealed partial class LofterDownloadWindow : WindowEx
         }
     }
 
-    private void ForwardClick(object sender, RoutedEventArgs e)
-    {
-        int currentIndex = StepSelectorBar.Items.IndexOf(StepSelectorBar.SelectedItem);
-
-        if (currentIndex != -1 && currentIndex + 1 < StepSelectorBar.Items.Count)
-        {
-            StepSelectorBar.SelectedItem = StepSelectorBar.Items[currentIndex + 1];
-        }
-    }
-
-    private void PreviousClick(object sender, RoutedEventArgs e)
-    {
-        int currentIndex = StepSelectorBar.Items.IndexOf(StepSelectorBar.SelectedItem);
-
-        if (currentIndex != -1 && currentIndex - 1 >= 0)
-        {
-            StepSelectorBar.SelectedItem = StepSelectorBar.Items[currentIndex - 1];
-        }
-    }
-
     private void OnStepSelectorBarSelectionChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
     {
         int currentIndex = sender.Items.IndexOf(StepSelectorBar.SelectedItem);
@@ -57,10 +36,9 @@ public sealed partial class LofterDownloadWindow : WindowEx
 
         Type targetPage = sender.SelectedItem.Tag switch
         {
-            "LoginAndAddress" => typeof(LofterLoginPage),
-            "TargetImage" => typeof(SelectTargetImagePage),
-            "DownloadOption" => typeof(DownloadOptionPage),
-            "List" => typeof(DownloadListPage),
+            "SelectTargetImage" => typeof(SelectImagePage),
+            "OrderAndRename" => typeof(OrderAndRenameImagePage),
+            "Complete" => typeof(CompletePage),
             _ => throw new InvalidOperationException("无效的 SelectorBarItem Tag。")
         };
 
@@ -95,12 +73,32 @@ public sealed partial class LofterDownloadWindow : WindowEx
 
     private void CloseWindowClick(object sender, RoutedEventArgs e)
     {
+        string generatedMarkdown = ViewModel.PaintingPageData.GeneratedMarkdown;
+        if (!string.IsNullOrWhiteSpace(generatedMarkdown))
+        {
+            ViewModel.PaintingPageData.SetGeneratedPaintingPageMarkdown?.Invoke(generatedMarkdown);
+        }
+
         Close();
     }
 
-    private void RestartDownloadClick(object sender, RoutedEventArgs e)
+    private void ForwardClick(object sender, RoutedEventArgs e)
     {
-        ViewModel.DownloadData = ViewModel.DownloadData with { ImageInfos = null, PageUri = null };
-        StepSelectorBar.SelectedItem = StepSelectorBar.Items[0];
+        int currentIndex = StepSelectorBar.Items.IndexOf(StepSelectorBar.SelectedItem);
+
+        if (currentIndex != -1 && currentIndex + 1 < StepSelectorBar.Items.Count)
+        {
+            StepSelectorBar.SelectedItem = StepSelectorBar.Items[currentIndex + 1];
+        }
+    }
+
+    private void PreviousClick(object sender, RoutedEventArgs e)
+    {
+        int currentIndex = StepSelectorBar.Items.IndexOf(StepSelectorBar.SelectedItem);
+
+        if (currentIndex != -1 && currentIndex - 1 >= 0)
+        {
+            StepSelectorBar.SelectedItem = StepSelectorBar.Items[currentIndex - 1];
+        }
     }
 }

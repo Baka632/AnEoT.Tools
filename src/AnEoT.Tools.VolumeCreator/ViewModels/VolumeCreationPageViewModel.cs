@@ -1,4 +1,4 @@
-﻿using WinRT.Interop;
+using WinRT.Interop;
 using Windows.Storage.Pickers;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -21,6 +21,9 @@ using SixLabors.ImageSharp.Processing;
 using AnEoT.Tools.VolumeCreator.Models.Resources;
 using System.Text.Json;
 using System.Collections.ObjectModel;
+using AnEoT.Tools.VolumeCreator.Views.CreatePaintingPage;
+using System.Windows.Input;
+using Windows.System;
 
 namespace AnEoT.Tools.VolumeCreator.ViewModels;
 
@@ -30,6 +33,11 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
 
     public VolumeCreationPageViewModel(VolumeCreationPage view)
     {
+        resourcesHelper = new MemoryResourcesHelper()
+        {
+            ConvertWebP = ConvertToWebp
+        };
+
         Articles.CollectionChanged += OnWordFilesCollectionChanged;
         Assets.CollectionChanged += OnImagesFilesCollectionChanged;
         IndexMarkdown.CollectionChanged += OnIndexMarkdownCollectionChanged;
@@ -103,8 +111,17 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
 
             await ShowDialogAsync("导出成功",
                                       $"内容已导出在 {volumeFolder.Path} 中。",
+                                      primaryText: "打开导出文件夹",
+                                      primaryButtonCommand: OpenVolumeExportFolderCommand,
+                                      primaryButtonCommandParameter: volumeFolder.Path,
                                       closeText: "确定");
         }
+    }
+
+    [RelayCommand]
+    private static async Task OpenVolumeExportFolder(string path)
+    {
+        await Launcher.LaunchFolderPathAsync(path);
     }
 
     [RelayCommand]
@@ -174,8 +191,8 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
             Assets.CollectionChanged -= OnImagesFilesCollectionChanged;
             IndexMarkdown.CollectionChanged -= OnIndexMarkdownCollectionChanged;
 
-            Articles = new(resHelper.ProjectPackage.Articles);
-            Assets = new(resHelper.ProjectPackage.Assets);
+            Articles = [.. resHelper.ProjectPackage.Articles];
+            Assets = [.. resHelper.ProjectPackage.Assets];
             IndexMarkdown = resHelper.ProjectPackage.IndexMarkdown is null ? [] : [resHelper.ProjectPackage.IndexMarkdown];
 
             if (!resHelper.ValidateAssets(Assets, out string? msg))
@@ -355,7 +372,10 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
         foreach (KeyValuePair<MarkdownWrapper, string> pair in GetOutputFileNameDictionary())
         {
             StorageFile file = await volumeFolder.CreateFileAsync(pair.Value, CreationCollisionOption.GenerateUniqueName);
-            await FileIO.WriteTextAsync(file, pair.Key.Markdown);
+
+            using Stream fileStream = await file.OpenStreamForWriteAsync();
+            using StreamWriter streamWriter = new(fileStream);
+            await streamWriter.WriteAsync(pair.Key.Markdown.ReplaceLineEndings("\r\n"));
         }
            
         if (IndexMarkdown.Count > 0 && IndexMarkdown[0] is not null)
@@ -363,7 +383,10 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
             MarkdownWrapper target = IndexMarkdown[0];
 
             StorageFile file = await volumeFolder.CreateFileAsync("README.md", CreationCollisionOption.GenerateUniqueName);
-            await FileIO.WriteTextAsync(file, target.Markdown);
+
+            using Stream fileStream = await file.OpenStreamForWriteAsync();
+            using StreamWriter streamWriter = new(fileStream);
+            await streamWriter.WriteAsync(target.Markdown.ReplaceLineEndings("\r\n"));
         }
     }
 
@@ -473,11 +496,40 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
     }
 
     [RelayCommand]
-    private void AddPaintingArticle()
+    private async Task AddPaintingArticle()
     {
-        // TODO: 会有吗？
-        MarkdownWrapper paintingMarkdownFile = new("<自定义文件>", string.Empty, MarkdownWrapperType.Paintings);
-        Articles.Add(paintingMarkdownFile);
+        if (Assets.Any(CommonValues.ContainsFileNode))
+        {
+            CreatePaintingPageWindow window = new();
+            window.ViewModel.PaintingPageData = window.ViewModel.PaintingPageData with
+            {
+                SetGeneratedPaintingPageMarkdown = generatedMarkdown =>
+                {
+                    // TODO: 会有吗？会有哦！
+                    MarkdownWrapper paintingMarkdownFile = new("画中秘境",
+                                                           generatedMarkdown,
+                                                           MarkdownWrapperType.Paintings,
+                                                           categoryInIndexPage: PredefinedCategory.Paintings);
+                    Articles.Add(paintingMarkdownFile);
+                },
+                OriginalAssets = Assets,
+                ConvertWebP = ConvertToWebp
+            };
+
+            window.Activate();
+        }
+        else
+        {
+            ContentDialog dialog = new()
+            {
+                Title = "不能创建画中秘境页",
+                Content = "资源列表内没有文件。",
+                CloseButtonText = "确定",
+                XamlRoot = View.XamlRoot
+            };
+
+            await dialog.ShowAsync();
+        }
     }
 
     public async Task ImportSingleWordFileItem(StorageFile file)
@@ -825,8 +877,18 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
     /// <param name="primaryText">主按钮文本</param>
     /// <param name="secondaryText">第二按钮文本</param>
     /// <param name="closeText">关闭按钮文本</param>
+    /// <param name="primaryButtonCommand">主按钮命令</param>
+    /// <param name="primaryButtonCommandParameter">主按钮命令参数</param>
+    /// /// <param name="secondaryButtonCommand">第二按钮命令</param>
+    /// <param name="secondaryButtonCommandParameter">第二按钮命令参数</param>
     /// <returns>指示对话框结果的<seealso cref="ContentDialogResult"/></returns>
-    private static async Task<ContentDialogResult> ShowDialogAsync(string title, string message, string? primaryText = null, string? secondaryText = null, string? closeText = null)
+    private static async Task<ContentDialogResult> ShowDialogAsync(string title,
+                                                                   string message,
+                                                                   string? primaryText = null,
+                                                                   string? secondaryText = null,
+                                                                   string? closeText = null,
+                                                                   ICommand? primaryButtonCommand = null, object? primaryButtonCommandParameter = null,
+                                                                   ICommand? secondaryButtonCommand = null, object? secondaryButtonCommandParameter = null)
     {
         // null-coalescing 操作符——当 closeText 为空时才赋值
         closeText ??= "关闭";
@@ -838,7 +900,11 @@ public sealed partial class VolumeCreationPageViewModel : ObservableValidator
             Title = title,
             Content = new ScrollViewer() { Content = message },
             PrimaryButtonText = primaryText,
+            PrimaryButtonCommand = primaryButtonCommand,
+            PrimaryButtonCommandParameter = primaryButtonCommandParameter,
             SecondaryButtonText = secondaryText,
+            SecondaryButtonCommand = secondaryButtonCommand,
+            SecondaryButtonCommandParameter = secondaryButtonCommandParameter,
             CloseButtonText = closeText,
             XamlRoot = (Application.Current as App)?.Window.Content.XamlRoot
         };

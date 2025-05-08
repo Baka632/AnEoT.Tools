@@ -1,4 +1,4 @@
-﻿using System.Text.Encodings.Web;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -41,4 +41,78 @@ public partial class CommonValues
 
     [GeneratedRegex(@"^([a-z0-9-]+\.)*lofter\.com\.*$")]
     public static partial Regex GetLofterDomainVerifyRegex();
+
+    public static List<FileNode> DescendantsFileNode(AssetNode node)
+    {
+        List<FileNode> fileNodes = new(10);
+
+        foreach (AssetNode item in node.Children)
+        {
+            if (item is FileNode fileNode)
+            {
+                fileNodes.Add(fileNode);
+            }
+            else if (item is FolderNode folderNode)
+            {
+                fileNodes.AddRange(DescendantsFileNode(folderNode));
+            }
+        }
+
+        return fileNodes;
+    }
+
+    public static bool ContainsFileNode(AssetNode node)
+    {
+        if (node is FileNode)
+        {
+            return true;
+        }
+
+        bool hasFileNode = false;
+
+        foreach (AssetNode item in node.Children)
+        {
+            if (item is FileNode)
+            {
+                hasFileNode = true;
+            }
+            else if (item is FolderNode)
+            {
+                hasFileNode = ContainsFileNode(item);
+            }
+
+            if (hasFileNode)
+            {
+                break;
+            }
+        }
+
+        return hasFileNode;
+    }
+
+    public static string ConstructImageUriByFileNode(FileNode fileNode)
+    {
+        List<string> targetParts = new(3);
+        AssetNode? parentNode = fileNode;
+        while (true)
+        {
+            if (parentNode is null)
+            {
+                break;
+            }
+            targetParts.Add(parentNode.DisplayName);
+
+            if (parentNode.DisplayName.Equals("res", StringComparison.OrdinalIgnoreCase))
+            {
+                break;
+            }
+
+            parentNode = parentNode.Parent;
+        }
+
+        targetParts.Reverse();
+
+        string imageUri = $"./{string.Join('/', targetParts)}";
+        return imageUri;
+    }
 }

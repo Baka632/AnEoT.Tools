@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using SixLabors.ImageSharp;
 using Windows.Storage;
@@ -33,10 +33,10 @@ internal sealed partial class ProjectPackageResourcesHelper(ProjectPackage proje
 
     public async Task ExportAssetsAsync(IEnumerable<AssetNode> files, StorageFolder outputFolder)
     {
-        foreach (AssetNode node in files)
+        await Parallel.ForEachAsync(files, async (node, ct) =>
         {
             await ExportAssetsCore(node, outputFolder);
-        }
+        });
     }
 
     private async Task ExportAssetsCore(AssetNode node, StorageFolder outputFolder)
@@ -49,12 +49,16 @@ internal sealed partial class ProjectPackageResourcesHelper(ProjectPackage proje
                 {
                     if (item.Children.Count > 0)
                     {
-                        StorageFolder folder = await outputFolder.CreateFolderAsync(item.DisplayName, CreationCollisionOption.OpenIfExists);
+                        StorageFolder currentNodeFolder = await outputFolder.CreateFolderAsync(item.DisplayName, CreationCollisionOption.OpenIfExists);
 
-                        foreach (AssetNode subItem in item.Children)
+                        await Parallel.ForEachAsync(item.Children, async (subItem, ct) =>
                         {
-                            await ExportAssetsCore(subItem, folder);
-                        }
+                            StorageFolder nextOutputFolder = subItem.Type == AssetNodeType.Folder
+                                ? (await currentNodeFolder.CreateFolderAsync(subItem.DisplayName, CreationCollisionOption.OpenIfExists))
+                                : currentNodeFolder;
+
+                            await ExportAssetsCore(subItem, nextOutputFolder);
+                        });
                     }
                 }
                 else if (item.Type == AssetNodeType.File && item is FileNode fileNode)

@@ -39,7 +39,10 @@
         </DataTemplate>
 
         <DataTemplate x:Key="FolderNodeTemplate" x:DataType="models:AssetNode">
-            <TreeViewItem Background="Transparent" ItemsSource="{x:Bind Children}">
+            <TreeViewItem
+                Background="Transparent"
+                IsExpanded="True"
+                ItemsSource="{x:Bind Children}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -187,7 +190,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <ContentDialog />
+
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.UI.Xaml.Media.Imaging;
 using AnEoT.Tools.VolumeCreator.Models;
@@ -29,7 +29,7 @@ partial class VolumeCreationPageViewModel
     }
     public static IVolumeResourcesHelper ResourcesHelperForValidation { get; set; } = new MemoryResourcesHelper();
 
-    private IVolumeResourcesHelper resourcesHelper = new MemoryResourcesHelper();
+    private IVolumeResourcesHelper resourcesHelper;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsVolumeCoverNotExist))]

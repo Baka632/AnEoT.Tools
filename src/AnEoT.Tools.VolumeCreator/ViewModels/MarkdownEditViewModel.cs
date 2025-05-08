@@ -78,7 +78,9 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
                 stringBuilder.AppendLine();
             }
 
-            stringBuilder.AppendLine(value.ReplaceLineEndings($"{Environment.NewLine}{Environment.NewLine}"));
+            string textkaiStyle = GenerateCssClassList("textkai");
+            string content = $"{value.TrimEnd().ReplaceLineEndings($"{textkaiStyle}{Environment.NewLine}{Environment.NewLine}")}{textkaiStyle}";
+            stringBuilder.AppendLine(content);
             stringBuilder.AppendLine();
             if (hasYaml)
             {
@@ -98,7 +100,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
     [RelayCommand]
     private void AddEodTagToText(TextBox textBox)
     {
-        const string eodTag = "  <eod />";
+        const string eodTag = "<eod />";
 
         ArgumentNullException.ThrowIfNull(textBox);
         int position = textBox.SelectionStart;
@@ -299,7 +301,7 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
 
     public void InsertImageToText(TextBox textBox, FileNode fileNode)
     {
-        string imageUri = ConstructImageUriByFileNode(fileNode);
+        string imageUri = CommonValues.ConstructImageUriByFileNode(fileNode);
         if (ConvertWebP)
         {
             imageUri = Path.ChangeExtension(imageUri, ".webp");
@@ -318,56 +320,11 @@ public sealed partial class MarkdownEditViewModel : ObservableObject
 
         foreach (AssetNode node in Assets)
         {
-            foreach (FileNode fileNode in DescendantsFileNode(node))
+            foreach (FileNode fileNode in CommonValues.DescendantsFileNode(node))
             {
-                string imageUri = ConstructImageUriByFileNode(fileNode);
+                string imageUri = CommonValues.ConstructImageUriByFileNode(fileNode);
                 MarkdownImageUriToFileMapping[imageUri] = fileNode;
             }
         }
-    }
-
-    private static string ConstructImageUriByFileNode(FileNode fileNode)
-    {
-        List<string> targetParts = new(3);
-        AssetNode? parentNode = fileNode;
-        while (true)
-        {
-            if (parentNode is null)
-            {
-                break;
-            }
-            targetParts.Add(parentNode.DisplayName);
-
-            if (parentNode.DisplayName.Equals("res", StringComparison.OrdinalIgnoreCase))
-            {
-                break;
-            }
-
-            parentNode = parentNode.Parent;
-        }
-
-        targetParts.Reverse();
-
-        string imageUri = $"./{string.Join('/', targetParts)}";
-        return imageUri;
-    }
-
-    private static List<FileNode> DescendantsFileNode(AssetNode node)
-    {
-        List<FileNode> fileNodes = new(10);
-
-        foreach (AssetNode item in node.Children)
-        {
-            if (item is FileNode fileNode)
-            {
-                fileNodes.Add(fileNode);
-            }
-            else if (item is FolderNode folderNode)
-            {
-                fileNodes.AddRange(DescendantsFileNode(folderNode));
-            }
-        }
-
-        return fileNodes;
     }
 }

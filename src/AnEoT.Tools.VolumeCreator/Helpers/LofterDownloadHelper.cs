@@ -1,4 +1,4 @@
-﻿namespace AnEoT.Tools.VolumeCreator.Helpers;
+namespace AnEoT.Tools.VolumeCreator.Helpers;
 
 /// <summary>
 /// 为 Lofter 的内容下载提供帮助的类。
